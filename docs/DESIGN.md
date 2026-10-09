@@ -257,12 +257,13 @@ unit. Tappable → sheet with the section's full text and source URL.
 
 ## 9. Screen blueprints (Phase 2 order)
 
-1. **Home = car dashboard.** Large-title greeting + plate · chips row
-   (coding / Offline-ready / location) · SOS hero (flex region) · 2×2 action
-   grid (Tanong kay Buddy, Na-flag ako, QR Exchange, Ibahagi lokasyon) ·
-   "Tip ng araw" card (a law section from `laws.json`, rotated daily, with its
-   law pill). Fills the screen above the tab bar; scrolls only at extreme
-   font sizes.
+1. **Home = car dashboard.** Profile card (avatar with initials in a gradient
+   ring · time-based greeting · name · PH license-plate badge + vehicle ·
+   one row of chips: coding / Offline / GPS icon-only; tap → Profile) · SOS
+   hero, ~68% of the screen width (max 380dp), shrinking gracefully on short
+   phones · 2×2 actions with short labels (Buddy, Na-flag ako, QR, Lokasyon;
+   subtitles only if all fit) · "Tip ng araw" only when SOS keeps its size
+   (tablets). Greeting: 4:00–11:59 umaga, 12:00–5:59 PM hapon, otherwise gabi.
 2. **Buddy chat.** Glass header with avatar, "Buddy", Offline-ready badge;
    iMessage bubbles; typing indicator; answer section cards; law pills;
    glass input with mic/send; Tanong / Dalawang panig segmented control.

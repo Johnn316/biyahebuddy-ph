@@ -13,6 +13,7 @@ import '../../shared/widgets/action_tile.dart';
 import '../../shared/widgets/grouped.dart';
 import '../controllers/home_controller.dart';
 import '../widgets/home_widgets.dart';
+import '../widgets/profile_card.dart';
 import '../widgets/sos_button.dart';
 
 /// Home = car dashboard (docs/DESIGN.md §9.1): greeting · status chips ·
@@ -44,15 +45,24 @@ class HomeScreen extends ConsumerWidget {
             final width =
                 math.min(viewport.maxWidth, AppSizes.maxContentWidth) -
                 2 * AppSpace.md;
+            // ~68% of the SCREEN width (not the content column), never
+            // wider than the content.
+            // Capped at 380dp so tablets don't get a giant button.
+            final sosMax = math.min(
+              math.min(viewport.maxWidth * 0.68, width),
+              380.0,
+            );
 
-            final header = _Header(status: status, compact: compact);
-            final chips = HomeStatusChips(
-              coding: status?.coding,
-              scroll: compact,
+            final header = ProfileCard(
+              status: status,
+              onTap: () => context.go(Routes.profile),
             );
             // Tall tiles only when each tile is wide enough (tablets);
             // phones use the compact icon-beside-title tile.
-            final grid = _ActionGrid(compact: compact || width < 560);
+            final grid = _ActionGrid(
+              compact: compact || width < 560,
+              width: width,
+            );
             final tipCard = showTip
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: AppSpace.sm),
@@ -87,10 +97,8 @@ class HomeScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         header,
-                        const SizedBox(height: AppSpace.sm),
-                        chips,
                         const SizedBox(height: AppSpace.md),
-                        _SosArea(diameter: width * 0.5),
+                        _SosArea(diameter: width * 0.6),
                         const SizedBox(height: AppSpace.md),
                         grid,
                         tipCard,
@@ -107,23 +115,23 @@ class HomeScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     header,
-                    const SizedBox(height: AppSpace.sm),
-                    chips,
                     Expanded(
                       child: LayoutBuilder(
                         builder: (context, box) {
                           // Room left for the circle after its sublabel.
                           final below = 24 * scale + AppSpace.sm + 16;
+                          // SOS fills the free space up to ~68% of the width,
+                          // shrinking gracefully on short screens.
                           double sos(double h) =>
                               ((h - below) / SosButton.glowRoom)
-                                  .clamp(96.0, math.max(96.0, width * 0.6))
+                                  .clamp(96.0, math.max(96.0, sosMax))
                                   .toDouble();
-                          // The tip only if SOS can stay a hero (≥ 45% of
-                          // the width) with it; SOS always wins the space.
+                          // The tip only if SOS stays a hero (≥ 60% of the
+                          // width) with it; SOS always wins the space.
                           final tipH = 132 * scale + AppSpace.sm;
                           final withTip =
                               showTip &&
-                              sos(box.maxHeight - tipH) >= width * 0.45;
+                              sos(box.maxHeight - tipH) >= sosMax * 0.92;
                           return Column(
                             children: [
                               Expanded(
@@ -148,53 +156,6 @@ class HomeScreen extends ConsumerWidget {
           },
         ),
       ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({required this.status, required this.compact});
-
-  final HomeStatus? status;
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = status;
-    final greeting = s == null
-        ? 'Magandang araw'
-        : '${s.greeting}, ${s.firstName}';
-    final plate = s == null ? null : '${s.plateNo} · ${s.vehicleType}';
-    final title = Text(
-      greeting,
-      maxLines: compact ? 1 : 2,
-      style: compact ? context.text.headlineLarge : context.text.displaySmall,
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (compact)
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: title,
-          )
-        else
-          title,
-        if (plate != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Text(
-              plate,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.text.titleSmall?.copyWith(
-                color: context.palette.muted,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
-          ),
-      ],
     );
   }
 }
@@ -239,27 +200,46 @@ class _SosArea extends StatelessWidget {
 }
 
 class _ActionGrid extends ConsumerWidget {
-  const _ActionGrid({required this.compact});
+  const _ActionGrid({required this.compact, required this.width});
 
   final bool compact;
+
+  /// Content width; each tile gets half (minus the gap).
+  final double width;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider).valueOrNull;
     final p = context.palette;
+    final tileWidth = (width - AppSpace.sm) / 2;
+    // Subtitles all-or-nothing: shown only if every one fits on one line.
+    const subtitles = [
+      'Batas at multa',
+      'Alamin ang multa',
+      'Palitan ng detalye',
+      'I-text sa contacts',
+    ];
+    final subsFit = subtitles.every(
+      (t) => ActionTile.subtitleFits(context, t, tileWidth, compact: compact),
+    );
+    final w = subsFit ? tileWidth : null;
     final tiles = [
       ActionTile(
         tapKey: const Key('home-chat'),
         compact: compact,
+        width: w,
+        semanticsLabel: 'Tanong kay Buddy',
         icon: CupertinoIcons.chat_bubble_2_fill,
         iconColor: context.colors.primary,
-        title: 'Tanong kay Buddy',
-        subtitle: 'Batas at multa, offline',
+        title: 'Buddy',
+        subtitle: 'Batas at multa',
         onTap: () => context.go(Routes.chat),
       ),
       ActionTile(
         tapKey: const Key('home-violation'),
         compact: compact,
+        width: w,
+        semanticsLabel: 'Na-flag ako',
         icon: CupertinoIcons.flag_fill,
         iconColor: p.cautionText,
         title: 'Na-flag ako',
@@ -269,10 +249,12 @@ class _ActionGrid extends ConsumerWidget {
       ActionTile(
         tapKey: const Key('home-qr'),
         compact: compact,
+        width: w,
+        semanticsLabel: 'QR Exchange',
         icon: CupertinoIcons.qrcode,
         iconColor: context.colors.primary,
-        title: 'QR Exchange',
-        subtitle: 'Ipakita sa kabilang driver',
+        title: 'QR',
+        subtitle: 'Palitan ng detalye',
         onTap: () {
           final pr = profile;
           if (pr != null) QrExchangeScreen.open(context, pr);
@@ -281,9 +263,11 @@ class _ActionGrid extends ConsumerWidget {
       ActionTile(
         tapKey: const Key('home-share-location'),
         compact: compact,
+        width: w,
+        semanticsLabel: 'Ibahagi lokasyon',
         icon: CupertinoIcons.location_fill,
         iconColor: p.success,
-        title: 'Ibahagi lokasyon',
+        title: 'Lokasyon',
         subtitle: 'I-text sa contacts',
         onTap: () => context.push('${Routes.emergency}?section=contacts'),
       ),

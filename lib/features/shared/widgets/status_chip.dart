@@ -55,19 +55,21 @@ class StatusChip extends StatelessWidget {
             children: [
               if (icon != null) ...[
                 Icon(icon, size: height >= 36 ? 18 : AppIcon.sm, color: fg),
-                const SizedBox(width: 6),
+                if (label.isNotEmpty) const SizedBox(width: 6),
               ],
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.text.bodySmall?.copyWith(
-                    color: fg,
-                    fontWeight: FontWeight.w700,
+              // Empty label = icon-only chip (semanticsLabel carries meaning).
+              if (label.isNotEmpty)
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.text.bodySmall?.copyWith(
+                      color: fg,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -83,12 +85,16 @@ class OfflineReadyBadge extends StatelessWidget {
     super.key,
     required this.ready,
     this.compact = false,
+    this.short = false,
   });
 
   final bool ready;
 
   /// Header size (28dp) instead of chip size (36dp).
   final bool compact;
+
+  /// "Offline" / "I-download" instead of the full labels.
+  final bool short;
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +105,12 @@ class OfflineReadyBadge extends StatelessWidget {
       icon: ready
           ? CupertinoIcons.checkmark_seal_fill
           : CupertinoIcons.arrow_down_circle_fill,
-      label: ready ? 'Offline-ready' : 'I-download si Buddy',
+      label: switch ((ready, short)) {
+        (true, false) => 'Offline-ready',
+        (true, true) => 'Offline',
+        (false, false) => 'I-download si Buddy',
+        (false, true) => 'I-download',
+      },
       semanticsLabel: ready
           ? 'Offline-ready. Gumagana si Buddy kahit walang signal.'
           : 'Hindi pa naka-download si Buddy.',

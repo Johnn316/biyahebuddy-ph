@@ -14,14 +14,16 @@ final minuteTickProvider = StreamProvider.autoDispose<DateTime>((ref) async* {
 
 typedef HomeStatus = ({
   String plateNo,
+  String name,
   String firstName,
   String vehicleType,
   CodingStatus coding,
   String greeting,
 });
 
-/// "Magandang umaga / hapon / gabi".
+/// 4:00–11:59 AM umaga · 12:00–5:59 PM hapon · 6:00 PM–3:59 AM gabi.
 String greetingFor(DateTime now) => switch (now.hour) {
+  < 4 => 'Magandang gabi',
   < 12 => 'Magandang umaga',
   < 18 => 'Magandang hapon',
   _ => 'Magandang gabi',
@@ -38,6 +40,7 @@ final homeStatusProvider = FutureProvider.autoDispose<HomeStatus?>((ref) async {
       .statusFor(profile.plateNo, now);
   return (
     plateNo: profile.plateNo,
+    name: profile.name.trim(),
     firstName: profile.name.trim().split(RegExp(r'\s+')).first,
     vehicleType: profile.vehicleType,
     coding: coding,

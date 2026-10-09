@@ -54,6 +54,13 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.highlight,
     required this.cardShadow,
     required this.raisedShadow,
+    required this.heroStart,
+    required this.heroEnd,
+    required this.ringStart,
+    required this.ringEnd,
+    required this.plateFill,
+    required this.plateInk,
+    required this.plateBorder,
   });
 
   /// SOS red (top of the SOS gradient). SOS surfaces only.
@@ -112,6 +119,32 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final List<BoxShadow> cardShadow;
   final List<BoxShadow> raisedShadow;
 
+  /// Profile hero card surface (dark: subtle blue→indigo; light: white).
+  final Color heroStart;
+  final Color heroEnd;
+
+  /// Avatar ring gradient.
+  final Color ringStart;
+  final Color ringEnd;
+
+  /// PH license-plate badge: white plate, dark ink, thin border (same in
+  /// both themes, like a real plate).
+  final Color plateFill;
+  final Color plateInk;
+  final Color plateBorder;
+
+  LinearGradient get heroGradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [heroStart, heroEnd],
+  );
+
+  LinearGradient get ringGradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [ringStart, ringEnd],
+  );
+
   LinearGradient get emergencyGradient => LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
@@ -146,6 +179,13 @@ class AppPalette extends ThemeExtension<AppPalette> {
     raisedShadow: [
       BoxShadow(color: Color(0x140B0D12), blurRadius: 24, offset: Offset(0, 8)),
     ],
+    heroStart: Color(0xFFFFFFFF),
+    heroEnd: Color(0xFFFFFFFF),
+    ringStart: Color(0xFF0064D6),
+    ringEnd: Color(0xFF5B4BD6),
+    plateFill: Color(0xFFFFFFFF),
+    plateInk: Color(0xFF0B0D12),
+    plateBorder: Color(0xFF8A93A3),
   );
 
   static const dark = AppPalette(
@@ -172,6 +212,13 @@ class AppPalette extends ThemeExtension<AppPalette> {
     highlight: Color(0x0FFFFFFF),
     cardShadow: [],
     raisedShadow: [],
+    heroStart: Color(0xFF16233D),
+    heroEnd: Color(0xFF211B42),
+    ringStart: Color(0xFF4D9BFF),
+    ringEnd: Color(0xFF8B7CFF),
+    plateFill: Color(0xFFFFFFFF),
+    plateInk: Color(0xFF0B0D12),
+    plateBorder: Color(0xFF8A93A3),
   );
 
   @override
@@ -206,6 +253,13 @@ class AppPalette extends ThemeExtension<AppPalette> {
       cardShadow: BoxShadow.lerpList(cardShadow, other.cardShadow, t) ?? [],
       raisedShadow:
           BoxShadow.lerpList(raisedShadow, other.raisedShadow, t) ?? [],
+      heroStart: c(heroStart, other.heroStart),
+      heroEnd: c(heroEnd, other.heroEnd),
+      ringStart: c(ringStart, other.ringStart),
+      ringEnd: c(ringEnd, other.ringEnd),
+      plateFill: c(plateFill, other.plateFill),
+      plateInk: c(plateInk, other.plateInk),
+      plateBorder: c(plateBorder, other.plateBorder),
     );
   }
 }

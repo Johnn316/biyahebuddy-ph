@@ -18,6 +18,8 @@ class ActionTile extends StatelessWidget {
     this.subtitle,
     this.compact = false,
     this.tapKey,
+    this.semanticsLabel,
+    this.width,
   });
 
   final String title;
@@ -29,6 +31,39 @@ class ActionTile extends StatelessWidget {
 
   /// Key on the tappable surface (tests and deep links).
   final Key? tapKey;
+
+  /// Full name for screen readers when [title] is a short label.
+  final String? semanticsLabel;
+
+  /// Tile width, if known — used to decide whether the subtitle fits.
+  /// (No LayoutBuilder: tiles sit in IntrinsicHeight rows.) null = no
+  /// subtitle.
+  final double? width;
+
+  /// Whether [subtitle] fits on one line in a tile of [tileWidth].
+  static bool subtitleFits(
+    BuildContext context,
+    String subtitle,
+    double tileWidth, {
+    required bool compact,
+  }) {
+    final textWidth =
+        tileWidth - 2 * (AppSpace.sm + 2) - (compact ? 36 + AppSpace.sm : 0);
+    final painter = TextPainter(
+      text: TextSpan(text: subtitle, style: _subtitleStyle(context)),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout(maxWidth: textWidth);
+    final fits = !painter.didExceedMaxLines;
+    painter.dispose();
+    return fits;
+  }
+
+  static TextStyle? _subtitleStyle(BuildContext context) => context
+      .text
+      .labelSmall
+      ?.copyWith(color: context.palette.muted, fontSize: 13);
 
   @override
   Widget build(BuildContext context) {
@@ -43,16 +78,25 @@ class ActionTile extends StatelessWidget {
       ),
       child: Icon(icon, size: compact ? 20 : 24, color: iconColor),
     );
-    final titleText = Text(
-      title,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      style: context.text.titleMedium,
+    // Short labels never truncate: at extreme font sizes they shrink.
+    final titleText = FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Text(title, maxLines: 1, style: context.text.titleMedium),
+    );
+    // width != null means the grid checked that every subtitle fits.
+    final sub = subtitle == null || width == null
+        ? null
+        : Text(subtitle!, maxLines: 1, style: _subtitleStyle(context));
+    Widget texts() => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [titleText, ?sub],
     );
 
     return Semantics(
       button: true,
-      label: subtitle == null ? title : '$title. $subtitle',
+      label: [semanticsLabel ?? title, ?subtitle].join('. '),
       excludeSemantics: true,
       child: Pressable(
         child: DecoratedBox(
@@ -79,7 +123,7 @@ class ActionTile extends StatelessWidget {
                         children: [
                           iconSquare,
                           const SizedBox(width: AppSpace.sm),
-                          Expanded(child: titleText),
+                          Expanded(child: texts()),
                         ],
                       )
                     : Column(
@@ -88,17 +132,7 @@ class ActionTile extends StatelessWidget {
                         children: [
                           iconSquare,
                           const SizedBox(height: AppSpace.sm),
-                          titleText,
-                          if (subtitle != null)
-                            Text(
-                              subtitle!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: context.text.labelSmall?.copyWith(
-                                color: p.muted,
-                                fontSize: 13,
-                              ),
-                            ),
+                          texts(),
                         ],
                       ),
               ),
