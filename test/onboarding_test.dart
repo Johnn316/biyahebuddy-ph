@@ -95,7 +95,7 @@ void main() {
     expect(find.text('SOS'), findsOneWidget);
     expect(find.text('ABC 1235'), findsOneWidget); // plate badge
     expect(find.text('Motorsiklo'), findsOneWidget);
-    expect(find.text('AS'), findsOneWidget); // initials avatar
+    expect(find.text('Ana Santos'), findsOneWidget); // profile card
 
     final prefs = await SharedPreferences.getInstance();
     final saved =

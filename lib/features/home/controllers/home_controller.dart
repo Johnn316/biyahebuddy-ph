@@ -66,7 +66,6 @@ LawTip? pickTip(List<dynamic> laws, DateTime day) {
   final candidates = [
     for (final l in laws.cast<Map<String, dynamic>>())
       if (!_tipBoilerplate.hasMatch(l['title'] as String) &&
-          (l['title'] as String).length <= 40 && // a short rule fits the sign
           !(l['id'] as String).contains('-p') &&
           (l['text'] as String).length >= 120)
         l,

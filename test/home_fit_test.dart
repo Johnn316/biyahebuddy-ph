@@ -1,6 +1,6 @@
-// Home must show the whole dashboard above the floating tab bar — no
-// scrolling needed — on real phone/tablet sizes with system insets; the SOS
-// bar is always pinned right above the tab bar.
+// Home must show SOS, both pills and both shortcut rows above the floating
+// tab bar — no scrolling needed — on real phone/tablet sizes with system
+// insets, at normal and enlarged font.
 import 'package:biyahebuddy_ph/app.dart';
 import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
@@ -57,27 +57,25 @@ void main() {
         expect(tester.takeException(), isNull);
 
         final tabTop = tester.getRect(find.byKey(const Key('tab-home'))).top;
-        // SOS bar always visible, right above the tab bar.
-        final sos = tester.getRect(find.byKey(const Key('home-emergency')));
-        expect(sos.bottom, lessThan(tabTop));
-        expect(tabTop - sos.bottom, lessThan(24));
-        // Compact bar (~64dp) at normal text.
-        if (scale == 1.0) expect(sos.height, lessThan(72));
-        // Everything else fits without scrolling (except the smallest phone
-        // at enlarged text, where the middle scrolls).
-        if (scale == 1.0 || size.height >= 800) {
-          for (final key in [
-            'home-avatar',
-            'home-vehicle',
-            'home-chat',
-            'home-violation',
-            'home-tip',
-            'home-emergency',
-          ]) {
-            final f = find.byKey(Key(key));
-            expect(f.hitTestable(), findsOneWidget, reason: key);
-            expect(tester.getRect(f).bottom, lessThan(tabTop), reason: key);
-          }
+        for (final key in [
+          'home-emergency',
+          'home-share-location',
+          'home-qr',
+          'home-chat',
+          'home-violation',
+        ]) {
+          final f = find.byKey(Key(key));
+          expect(f.hitTestable(), findsOneWidget, reason: key);
+          expect(tester.getRect(f).bottom, lessThan(tabTop), reason: key);
+        }
+        // SOS stays a real hero on phones and tablets at normal font.
+        if (scale == 1.0) {
+          final sos = tester.getSize(find.byKey(const Key('home-emergency')));
+          // 360×640 also fits the brand row, so its SOS is a bit smaller.
+          expect(
+            sos.width,
+            greaterThanOrEqualTo(size.height < 700 ? 100 : 120),
+          );
         }
       });
     }
