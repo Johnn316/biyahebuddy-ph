@@ -1,42 +1,1052 @@
 [
   {
-    "violation": "SAMPLE — Driving without a valid license",
+    "violation": "Driving without a valid driver's license or conductor's permit",
     "agency": "lto",
     "amount": 3000,
-    "legal_basis": "SAMPLE — LTO JAO 2014-01",
+    "legal_basis": "JAO No. 2014-01, Rule I(a) (fine + 1-year disqualification from getting a license); JAO upheld in Republic v. Maria Basa Express Jeepney Operators, G.R. No. 206486, Aug. 16, 2022",
     "aliases": [
       "walang lisensya",
-      "no license"
+      "walang license",
+      "no license",
+      "no driver's license",
+      "nakalimutan ang lisensya",
+      "expired na lisensya",
+      "driving without license"
     ]
   },
   {
-    "violation": "SAMPLE — Using mobile phone while driving",
+    "violation": "No / non-standard motorcycle helmet — 1st offense",
+    "agency": "lto",
+    "amount": 1500,
+    "legal_basis": "RA 10054 (Motorcycle Helmet Act of 2009), Sec. 7",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 2nd offense",
+    "agency": "lto",
+    "amount": 3000,
+    "legal_basis": "RA 10054 (Motorcycle Helmet Act of 2009), Sec. 7",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 3rd offense",
     "agency": "lto",
     "amount": 5000,
-    "legal_basis": "SAMPLE — RA 10913, Sec. 4",
+    "legal_basis": "RA 10054 (Motorcycle Helmet Act of 2009), Sec. 7",
     "aliases": [
-      "cellphone",
-      "texting"
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
     ]
   },
   {
-    "violation": "SAMPLE — Number coding (UVVRP) violation",
+    "violation": "No / non-standard motorcycle helmet — 4th offense and subsequent (+ license confiscation)",
+    "agency": "lto",
+    "amount": 10000,
+    "legal_basis": "RA 10054 (Motorcycle Helmet Act of 2009), Sec. 7",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 1st offense",
+    "agency": "lto",
+    "amount": 5000,
+    "legal_basis": "RA 10913 (Anti-Distracted Driving Act), Sec. 8",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 2nd offense",
+    "agency": "lto",
+    "amount": 10000,
+    "legal_basis": "RA 10913 (Anti-Distracted Driving Act), Sec. 8",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 3rd offense (+ 3-month license suspension)",
+    "agency": "lto",
+    "amount": 15000,
+    "legal_basis": "RA 10913 (Anti-Distracted Driving Act), Sec. 8",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 4th offense and succeeding (+ license revocation)",
+    "agency": "lto",
+    "amount": 20000,
+    "legal_basis": "RA 10913 (Anti-Distracted Driving Act), Sec. 8",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving by a public utility, school service, or hazardous-cargo vehicle driver, or within 50 m of a school",
+    "agency": "lto",
+    "amount": 30000,
+    "legal_basis": "RA 10913 (Anti-Distracted Driving Act), Sec. 8 (+ 3-month license suspension)",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "No child restraint system / child under 12 in front seat — 1st offense",
+    "agency": "lto",
+    "amount": 1000,
+    "legal_basis": "RA 11229 (Child Safety in Motor Vehicles Act), Sec. 10",
+    "aliases": [
+      "walang child seat",
+      "walang car seat",
+      "child car seat",
+      "batang nasa harap",
+      "bata sa front seat",
+      "child restraint"
+    ]
+  },
+  {
+    "violation": "No child restraint system / child under 12 in front seat — 2nd offense",
+    "agency": "lto",
+    "amount": 2000,
+    "legal_basis": "RA 11229 (Child Safety in Motor Vehicles Act), Sec. 10",
+    "aliases": [
+      "walang child seat",
+      "walang car seat",
+      "child car seat",
+      "batang nasa harap",
+      "bata sa front seat",
+      "child restraint"
+    ]
+  },
+  {
+    "violation": "No child restraint system / child under 12 in front seat — 3rd offense and subsequent (+ 1-year license suspension)",
+    "agency": "lto",
+    "amount": 5000,
+    "legal_basis": "RA 11229 (Child Safety in Motor Vehicles Act), Sec. 10",
+    "aliases": [
+      "walang child seat",
+      "walang car seat",
+      "child car seat",
+      "batang nasa harap",
+      "bata sa front seat",
+      "child restraint"
+    ]
+  },
+  {
+    "violation": "Child passenger on motorcycle in prohibited conditions — 1st offense",
+    "agency": "lto",
+    "amount": 3000,
+    "legal_basis": "RA 10666 (Children's Safety on Motorcycles Act), Sec. 6",
+    "aliases": [
+      "may batang angkas sa motor",
+      "bata sa motor",
+      "angkas na bata",
+      "child on motorcycle",
+      "batang backride"
+    ]
+  },
+  {
+    "violation": "Child passenger on motorcycle in prohibited conditions — 2nd offense",
+    "agency": "lto",
+    "amount": 5000,
+    "legal_basis": "RA 10666 (Children's Safety on Motorcycles Act), Sec. 6",
+    "aliases": [
+      "may batang angkas sa motor",
+      "bata sa motor",
+      "angkas na bata",
+      "child on motorcycle",
+      "batang backride"
+    ]
+  },
+  {
+    "violation": "Child passenger on motorcycle in prohibited conditions — 3rd offense (+ 1-month license suspension)",
+    "agency": "lto",
+    "amount": 10000,
+    "legal_basis": "RA 10666 (Children's Safety on Motorcycles Act), Sec. 6",
+    "aliases": [
+      "may batang angkas sa motor",
+      "bata sa motor",
+      "angkas na bata",
+      "child on motorcycle",
+      "batang backride"
+    ]
+  },
+  {
+    "violation": "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)",
+    "agency": "lto",
+    "amount": 20000,
+    "legal_basis": "RA 10586 (Anti-Drunk and Drugged Driving Act), Sec. 12(a)",
+    "aliases": [
+      "lasing na nagmamaneho",
+      "drunk driving",
+      "nakainom",
+      "DUI",
+      "lasing",
+      "naka-drugs habang nagmamaneho",
+      "drink driving"
+    ]
+  },
+  {
+    "violation": "Disregarding traffic signs (incl. beating the red light)",
     "agency": "mmda",
-    "amount": 300,
-    "legal_basis": "SAMPLE — MMDA Reg. 96-005",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 10",
+    "aliases": [
+      "beating the red light",
+      "nag-beat ng red light",
+      "lumusot sa pula",
+      "disregarding traffic signs",
+      "hindi sumunod sa traffic sign",
+      "no left turn",
+      "no u-turn",
+      "lumampas sa yellow lane",
+      "swerving sa linya",
+      "bawal kumanan"
+    ]
+  },
+  {
+    "violation": "Illegal parking (attended or unattended; vehicle may be impounded)",
+    "agency": "mmda",
+    "amount": 4000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 11.3, as amended by JMMTC No. 01, s. 2024",
+    "aliases": [
+      "illegal parking",
+      "bawal pumarada",
+      "nag-park sa bawal",
+      "no parking",
+      "naka-park sa kalsada",
+      "double parking",
+      "na-tow"
+    ]
+  },
+  {
+    "violation": "Number coding (UVVRP) violation",
+    "agency": "mmda",
+    "amount": 500,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 12",
     "aliases": [
       "coding",
-      "number coding"
+      "number coding",
+      "UVVRP",
+      "na-coding",
+      "color coding",
+      "huli sa coding"
     ]
   },
   {
-    "violation": "SAMPLE — Illegal parking",
+    "violation": "Truck ban violation",
+    "agency": "mmda",
+    "amount": 3000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 13",
+    "aliases": [
+      "truck ban",
+      "bawal ang truck",
+      "truck sa EDSA"
+    ]
+  },
+  {
+    "violation": "Light truck ban violation",
+    "agency": "mmda",
+    "amount": 2000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 14",
+    "aliases": [
+      "light truck ban",
+      "bawal ang light truck",
+      "AUV truck ban"
+    ]
+  },
+  {
+    "violation": "Reckless driving — 1st offense",
+    "agency": "mmda",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 15",
+    "aliases": [
+      "reckless driving",
+      "pabaya sa pagmamaneho",
+      "kaskasero",
+      "illegal swerving",
+      "biglang lipat ng lane",
+      "nag-zigzag"
+    ]
+  },
+  {
+    "violation": "Reckless driving — 2nd offense (+ driver's seminar)",
+    "agency": "mmda",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 15",
+    "aliases": [
+      "reckless driving",
+      "pabaya sa pagmamaneho",
+      "kaskasero",
+      "illegal swerving",
+      "biglang lipat ng lane",
+      "nag-zigzag"
+    ]
+  },
+  {
+    "violation": "Reckless driving — 3rd offense and subsequent (+ driver's seminar)",
+    "agency": "mmda",
+    "amount": 2000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 15",
+    "aliases": [
+      "reckless driving",
+      "pabaya sa pagmamaneho",
+      "kaskasero",
+      "illegal swerving",
+      "biglang lipat ng lane",
+      "nag-zigzag"
+    ]
+  },
+  {
+    "violation": "Tricycle ban violation",
+    "agency": "mmda",
+    "amount": 500,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 16",
+    "aliases": [
+      "tricycle ban",
+      "tricycle sa highway",
+      "trike sa main road"
+    ]
+  },
+  {
+    "violation": "Obstruction of traffic",
+    "agency": "mmda",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 17",
+    "aliases": [
+      "obstruction",
+      "nakaharang sa kalsada",
+      "nakabara sa intersection",
+      "blocking the box",
+      "humarang sa daan"
+    ]
+  },
+  {
+    "violation": "Motorcycle dress code violation (slippers, sando/shorts) — 1st offense",
+    "agency": "mmda",
+    "amount": 500,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 18",
+    "aliases": [
+      "naka-tsinelas sa motor",
+      "naka-slippers sa motor",
+      "naka-shorts sa motor",
+      "motorcycle dress code",
+      "flip-flops habang nagmomotor"
+    ]
+  },
+  {
+    "violation": "Motorcycle dress code violation (slippers, sando/shorts) — 2nd offense",
+    "agency": "mmda",
+    "amount": 750,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 18",
+    "aliases": [
+      "naka-tsinelas sa motor",
+      "naka-slippers sa motor",
+      "naka-shorts sa motor",
+      "motorcycle dress code",
+      "flip-flops habang nagmomotor"
+    ]
+  },
+  {
+    "violation": "Motorcycle dress code violation (slippers, sando/shorts) — 3rd offense",
+    "agency": "mmda",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 18",
+    "aliases": [
+      "naka-tsinelas sa motor",
+      "naka-slippers sa motor",
+      "naka-shorts sa motor",
+      "motorcycle dress code",
+      "flip-flops habang nagmomotor"
+    ]
+  },
+  {
+    "violation": "Overloading (passengers or cargo)",
+    "agency": "mmda",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 19",
+    "aliases": [
+      "overloading",
+      "sobrang pasahero",
+      "sobrang karga",
+      "overloaded"
+    ]
+  },
+  {
+    "violation": "Defective motor vehicle accessories (lights, mirrors, horn)",
+    "agency": "mmda",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 20",
+    "aliases": [
+      "sira ang ilaw",
+      "walang headlight",
+      "sirang brake light",
+      "walang side mirror",
+      "sira ang busina",
+      "defective accessories",
+      "walang signal light"
+    ]
+  },
+  {
+    "violation": "Unauthorized modification of motor vehicle",
+    "agency": "mmda",
+    "amount": 2000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 21",
+    "aliases": [
+      "unauthorized modification",
+      "modified na sasakyan",
+      "binago ang sasakyan",
+      "maingay na tambutso",
+      "open pipe"
+    ]
+  },
+  {
+    "violation": "Arrogance / discourteous conduct by driver (+ driver's seminar)",
+    "agency": "mmda",
+    "amount": 500,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 22",
+    "aliases": [
+      "arogante sa enforcer",
+      "bastos sa enforcer",
+      "discourteous conduct",
+      "arrogance",
+      "nakipagtalo sa enforcer",
+      "minura ang enforcer"
+    ]
+  },
+  {
+    "violation": "Loading/unloading in a prohibited zone",
+    "agency": "mmda",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 23",
+    "aliases": [
+      "loading and unloading",
+      "nagbaba ng pasahero sa bawal",
+      "nagsakay sa bawal",
+      "no loading zone",
+      "nagbaba sa gitna ng kalsada"
+    ]
+  },
+  {
+    "violation": "Illegal counterflow",
+    "agency": "mmda",
+    "amount": 2000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 24",
+    "aliases": [
+      "counterflow",
+      "kontra-flow",
+      "salungat sa daloy",
+      "wrong way",
+      "pumasok sa one way"
+    ]
+  },
+  {
+    "violation": "Illegal counterflow causing physical injury or property damage",
+    "agency": "mmda",
+    "amount": 5000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 24",
+    "aliases": [
+      "counterflow",
+      "kontra-flow",
+      "salungat sa daloy",
+      "wrong way",
+      "pumasok sa one way"
+    ]
+  },
+  {
+    "violation": "Overspeeding",
+    "agency": "mmda",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 25",
+    "aliases": [
+      "overspeeding",
+      "mabilis magpatakbo",
+      "lumampas sa speed limit",
+      "speeding",
+      "humarurot"
+    ]
+  },
+  {
+    "violation": "No seatbelt (driver/front passenger) — 1st offense",
+    "agency": "mmda",
+    "amount": 1000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 26 (RA 8750)",
+    "aliases": [
+      "walang seatbelt",
+      "hindi naka-seatbelt",
+      "no seatbelt",
+      "seat belt",
+      "pasahero walang seatbelt"
+    ]
+  },
+  {
+    "violation": "No seatbelt (driver/front passenger) — 2nd offense",
+    "agency": "mmda",
+    "amount": 2000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 26 (RA 8750)",
+    "aliases": [
+      "walang seatbelt",
+      "hindi naka-seatbelt",
+      "no seatbelt",
+      "seat belt",
+      "pasahero walang seatbelt"
+    ]
+  },
+  {
+    "violation": "No seatbelt (driver/front passenger) — 3rd offense and subsequent (+ 1-week license suspension)",
+    "agency": "mmda",
+    "amount": 5000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 26 (RA 8750)",
+    "aliases": [
+      "walang seatbelt",
+      "hindi naka-seatbelt",
+      "no seatbelt",
+      "seat belt",
+      "pasahero walang seatbelt"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 1st offense",
+    "agency": "mmda",
+    "amount": 1500,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 28 (RA 10054)",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 2nd offense",
+    "agency": "mmda",
+    "amount": 3000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 28 (RA 10054)",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 3rd offense",
+    "agency": "mmda",
+    "amount": 5000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 28 (RA 10054)",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 4th offense and subsequent",
+    "agency": "mmda",
+    "amount": 10000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 28 (RA 10054)",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 1st offense",
+    "agency": "mmda",
+    "amount": 5000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 30 (RA 10913)",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 2nd offense",
+    "agency": "mmda",
+    "amount": 10000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 30 (RA 10913)",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 3rd offense (+ 3-month license suspension)",
+    "agency": "mmda",
+    "amount": 15000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 30 (RA 10913)",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 4th offense and succeeding (+ license revocation)",
+    "agency": "mmda",
+    "amount": 20000,
+    "legal_basis": "Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023; MMDA Res. No. 23-02), Sec. 30 (RA 10913)",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Disregarding traffic signs (incl. beating the red light)",
     "agency": "city",
     "amount": 1000,
-    "legal_basis": "SAMPLE — City ordinance",
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 10",
     "aliases": [
-      "parking",
-      "bawal pumarada"
+      "beating the red light",
+      "nag-beat ng red light",
+      "lumusot sa pula",
+      "disregarding traffic signs",
+      "hindi sumunod sa traffic sign",
+      "no left turn",
+      "no u-turn",
+      "lumampas sa yellow lane",
+      "swerving sa linya",
+      "bawal kumanan"
+    ]
+  },
+  {
+    "violation": "Illegal parking, attended by the driver",
+    "agency": "city",
+    "amount": 1000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 11",
+    "aliases": [
+      "illegal parking",
+      "bawal pumarada",
+      "nag-park sa bawal",
+      "no parking",
+      "naka-park sa kalsada",
+      "double parking",
+      "na-tow"
+    ]
+  },
+  {
+    "violation": "Illegal parking, unattended (+ impoundment)",
+    "agency": "city",
+    "amount": 2000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 11",
+    "aliases": [
+      "illegal parking",
+      "bawal pumarada",
+      "nag-park sa bawal",
+      "no parking",
+      "naka-park sa kalsada",
+      "double parking",
+      "na-tow"
+    ]
+  },
+  {
+    "violation": "Number coding (UVVRP) violation",
+    "agency": "city",
+    "amount": 500,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 12",
+    "aliases": [
+      "coding",
+      "number coding",
+      "UVVRP",
+      "na-coding",
+      "color coding",
+      "huli sa coding"
+    ]
+  },
+  {
+    "violation": "Truck ban violation",
+    "agency": "city",
+    "amount": 3000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 13",
+    "aliases": [
+      "truck ban",
+      "bawal ang truck",
+      "truck sa EDSA"
+    ]
+  },
+  {
+    "violation": "Reckless driving — 1st offense",
+    "agency": "city",
+    "amount": 1000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 15",
+    "aliases": [
+      "reckless driving",
+      "pabaya sa pagmamaneho",
+      "kaskasero",
+      "illegal swerving",
+      "biglang lipat ng lane",
+      "nag-zigzag"
+    ]
+  },
+  {
+    "violation": "Reckless driving — 2nd offense (+ driver's seminar)",
+    "agency": "city",
+    "amount": 1000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 15",
+    "aliases": [
+      "reckless driving",
+      "pabaya sa pagmamaneho",
+      "kaskasero",
+      "illegal swerving",
+      "biglang lipat ng lane",
+      "nag-zigzag"
+    ]
+  },
+  {
+    "violation": "Reckless driving — 3rd offense and subsequent (+ driver's seminar)",
+    "agency": "city",
+    "amount": 2000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 15",
+    "aliases": [
+      "reckless driving",
+      "pabaya sa pagmamaneho",
+      "kaskasero",
+      "illegal swerving",
+      "biglang lipat ng lane",
+      "nag-zigzag"
+    ]
+  },
+  {
+    "violation": "Obstruction of traffic",
+    "agency": "city",
+    "amount": 1000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 17",
+    "aliases": [
+      "obstruction",
+      "nakaharang sa kalsada",
+      "nakabara sa intersection",
+      "blocking the box",
+      "humarang sa daan"
+    ]
+  },
+  {
+    "violation": "Loading/unloading in a prohibited zone",
+    "agency": "city",
+    "amount": 1000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 23",
+    "aliases": [
+      "loading and unloading",
+      "nagbaba ng pasahero sa bawal",
+      "nagsakay sa bawal",
+      "no loading zone",
+      "nagbaba sa gitna ng kalsada"
+    ]
+  },
+  {
+    "violation": "Illegal counterflow",
+    "agency": "city",
+    "amount": 2000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 24",
+    "aliases": [
+      "counterflow",
+      "kontra-flow",
+      "salungat sa daloy",
+      "wrong way",
+      "pumasok sa one way"
+    ]
+  },
+  {
+    "violation": "Illegal counterflow causing physical injury or property damage",
+    "agency": "city",
+    "amount": 5000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 24",
+    "aliases": [
+      "counterflow",
+      "kontra-flow",
+      "salungat sa daloy",
+      "wrong way",
+      "pumasok sa one way"
+    ]
+  },
+  {
+    "violation": "Overspeeding",
+    "agency": "city",
+    "amount": 1000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 25",
+    "aliases": [
+      "overspeeding",
+      "mabilis magpatakbo",
+      "lumampas sa speed limit",
+      "speeding",
+      "humarurot"
+    ]
+  },
+  {
+    "violation": "No seatbelt (driver/front passenger) — 1st offense",
+    "agency": "city",
+    "amount": 1000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 26",
+    "aliases": [
+      "walang seatbelt",
+      "hindi naka-seatbelt",
+      "no seatbelt",
+      "seat belt",
+      "pasahero walang seatbelt"
+    ]
+  },
+  {
+    "violation": "No seatbelt (driver/front passenger) — 2nd offense",
+    "agency": "city",
+    "amount": 2000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 26",
+    "aliases": [
+      "walang seatbelt",
+      "hindi naka-seatbelt",
+      "no seatbelt",
+      "seat belt",
+      "pasahero walang seatbelt"
+    ]
+  },
+  {
+    "violation": "No seatbelt (driver/front passenger) — 3rd offense and subsequent (+ 1-week license suspension)",
+    "agency": "city",
+    "amount": 5000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 26",
+    "aliases": [
+      "walang seatbelt",
+      "hindi naka-seatbelt",
+      "no seatbelt",
+      "seat belt",
+      "pasahero walang seatbelt"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 1st offense",
+    "agency": "city",
+    "amount": 1500,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 28",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 2nd offense",
+    "agency": "city",
+    "amount": 3000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 28",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 3rd offense",
+    "agency": "city",
+    "amount": 5000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 28",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "No / non-standard motorcycle helmet — 4th offense and subsequent",
+    "agency": "city",
+    "amount": 10000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 28",
+    "aliases": [
+      "walang helmet",
+      "no helmet",
+      "hindi naka-helmet",
+      "walang suot na helmet",
+      "substandard helmet",
+      "helmet na walang ICC",
+      "motor walang helmet"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 1st offense",
+    "agency": "city",
+    "amount": 5000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 30",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 2nd offense",
+    "agency": "city",
+    "amount": 10000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 30",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 3rd offense (+ 3-month license suspension)",
+    "agency": "city",
+    "amount": 15000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 30",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
+    ]
+  },
+  {
+    "violation": "Distracted driving (mobile phone / gadget use) — 4th offense and succeeding (+ license revocation)",
+    "agency": "city",
+    "amount": 20000,
+    "legal_basis": "Quezon City Ordinance No. SP-3172, S-2023 (Revised Traffic Management Code), Sec. 30",
+    "aliases": [
+      "nag-cellphone habang nagmamaneho",
+      "nag-text habang nagmamaneho",
+      "cellphone",
+      "texting while driving",
+      "distracted driving",
+      "tumawag habang nagmamaneho",
+      "hawak ang phone",
+      "nanonood habang nagmamaneho",
+      "anti-distracted driving"
     ]
   }
 ]
