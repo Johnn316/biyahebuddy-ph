@@ -136,11 +136,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final p = context.palette;
     final twoSides = state.mode == ChatMode.twoSides;
     final showResult = twoSides && state.twoSidesStep == TwoSidesStep.result;
-    // Room for the frosted input area (body extends behind it).
-    final bottom = MediaQuery.paddingOf(context).bottom;
     final busy = state.streaming || _revealing;
 
-    final Widget body = switch (state) {
+    // [bottom] = frosted input bar + tab bar + safe area. Read INSIDE the
+    // Scaffold body (extendBody adds the input bar there), so nothing is
+    // ever hidden behind the bar.
+    Widget body(double bottom) => switch (state) {
       ChatState(mode: ChatMode.ask, askMessages: []) => _EmptyAsk(
         bottom: bottom,
         onAsk: _quickQuestion,
@@ -235,7 +236,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 },
               ),
             ),
-            Expanded(child: body),
+            Expanded(
+              child: Builder(
+                builder: (context) =>
+                    body(MediaQuery.paddingOf(context).bottom),
+              ),
+            ),
           ],
         ),
       ),
@@ -313,49 +319,51 @@ class _FrostedBottom extends StatelessWidget {
 class _EmptyAsk extends StatelessWidget {
   const _EmptyAsk({required this.bottom, required this.onAsk});
 
+  /// Input bar + tab bar + safe area: the content stays above it.
   final double bottom;
   final ValueChanged<String> onAsk;
 
   @override
   Widget build(BuildContext context) {
-    // Fills the space; scrolls instead of overflowing on short screens.
+    // Fits above the input bar on normal phones; scrolls on small ones.
     return LayoutBuilder(
       builder: (context, box) {
         final room = box.maxHeight - bottom;
         return SingleChildScrollView(
+          key: const Key('chat-empty'),
           padding: EdgeInsets.fromLTRB(
             AppSpace.md,
+            AppSpace.sm,
             AppSpace.md,
-            AppSpace.md,
-            bottom + AppSpace.md,
+            bottom + AppSpace.sm,
           ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: (room - 2 * AppSpace.md).clamp(0, double.infinity),
+              minHeight: (room - 2 * AppSpace.sm).clamp(0, double.infinity),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (room > 420)
+                if (room > 460)
                   const Padding(
-                    padding: EdgeInsets.only(bottom: AppSpace.md),
-                    child: Center(child: BuddyAvatar(size: 76)),
+                    padding: EdgeInsets.only(bottom: AppSpace.sm),
+                    child: Center(child: BuddyAvatar(size: 72)),
                   ),
                 Text(
                   'Ano ang gusto mong itanong?',
                   textAlign: TextAlign.center,
-                  style: context.text.headlineMedium,
+                  style: context.text.headlineSmall,
                 ),
-                const SizedBox(height: AppSpace.xs),
+                const SizedBox(height: AppSpace.xxs),
                 Text(
-                  'Batas trapiko, multa, aksidente — sagot kahit offline.',
+                  'Batas, multa, aksidente — kahit offline.',
                   textAlign: TextAlign.center,
-                  style: context.text.bodyLarge?.copyWith(
+                  style: context.text.bodyMedium?.copyWith(
                     color: context.palette.muted,
                   ),
                 ),
-                const SizedBox(height: AppSpace.lg),
+                const SizedBox(height: AppSpace.md),
                 _Suggestions(
                   width: box.maxWidth - 2 * AppSpace.md,
                   onTap: onAsk,
@@ -428,6 +436,7 @@ class _Suggestions extends StatelessWidget {
   }
 }
 
+/// Compact suggestion: icon + max 2 lines (ellipsis); the whole card sends.
 class _SuggestionCard extends StatelessWidget {
   const _SuggestionCard({
     required this.tapKey,
@@ -466,29 +475,35 @@ class _SuggestionCard extends StatelessWidget {
             child: InkWell(
               key: tapKey,
               onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpace.sm + 2),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.16),
-                        borderRadius: BorderRadius.circular(AppRadius.sm),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 56),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpace.sm),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                        ),
+                        child: Icon(icon, size: 17, color: color),
                       ),
-                      child: Icon(icon, size: 18, color: color),
-                    ),
-                    const SizedBox(height: AppSpace.xs),
-                    Text(
-                      text,
-                      style: context.text.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        height: 1.3,
+                      const SizedBox(width: AppSpace.sm),
+                      Expanded(
+                        child: Text(
+                          text,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.text.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
