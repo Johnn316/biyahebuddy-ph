@@ -5,29 +5,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/contracts/contracts.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../emergency/screens/qr_exchange_screen.dart';
+import '../../shared/widgets/action_tile.dart';
 import '../../shared/widgets/grouped.dart';
 import '../controllers/home_controller.dart';
 import '../widgets/home_widgets.dart';
 import '../widgets/sos_button.dart';
 
-/// Home tab: large greeting, coding pill, SOS hero, quick pills, shortcuts.
+/// Home = car dashboard (docs/DESIGN.md §9.1): greeting · status chips ·
+/// SOS hero · 2×2 quick actions · "Tip ng araw".
 ///
-/// "Fit" layout (normal): header and shortcuts at natural size, the SOS area
-/// takes exactly the space left and sizes the circle to it — everything
-/// visible above the tab bar. "Scroll" layout only for extreme cases
-/// (tiny screen + very large font).
+/// "Fit" layout: everything at natural size except the SOS area, which takes
+/// exactly the space left — all visible above the tab bar. Short screens use
+/// compact chips/tiles and skip the tip. "Scroll" layout only for extreme
+/// cases (largest font, tiny screen).
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final status = ref.watch(homeStatusProvider).valueOrNull;
-    final profile = ref.watch(profileProvider).valueOrNull;
+    final tip = ref.watch(tipOfDayProvider).valueOrNull;
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     final scale = MediaQuery.textScalerOf(context).scale(1);
 
@@ -37,21 +38,46 @@ class HomeScreen extends ConsumerWidget {
         child: LayoutBuilder(
           builder: (context, viewport) {
             final usable = viewport.maxHeight - bottomInset;
-            final compact = usable < 700;
-            final scroll = usable < 380 * scale;
+            final compact = usable < 700 || scale > 1.3;
+            final scroll = usable < 420 || scale > 1.5;
+            final showTip = tip != null && !compact;
             final width =
-                math.min(viewport.maxWidth, AppSizes.maxContentWidth) - 32;
+                math.min(viewport.maxWidth, AppSizes.maxContentWidth) -
+                2 * AppSpace.md;
 
             final header = _Header(status: status, compact: compact);
-            final shortcuts = _Shortcuts(compact: compact);
-            Widget hero(double diameter, {required bool fixed}) => _SosArea(
-              diameter: diameter,
-              spread: compact ? 1.12 : SosButton.ringSpread,
-              fixed: fixed,
-              profile: profile,
+            final chips = HomeStatusChips(
+              coding: status?.coding,
+              scroll: compact,
+            );
+            // Tall tiles only when each tile is wide enough (tablets);
+            // phones use the compact icon-beside-title tile.
+            final grid = _ActionGrid(compact: compact || width < 560);
+            final tipCard = showTip
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpace.sm),
+                    child: TipOfDayCard(
+                      tip: tip,
+                      onTap: () => context.go(
+                        Uri(
+                          path: Routes.chat,
+                          queryParameters: {
+                            'q':
+                                'Ipaliwanag ang ${tip.citation} '
+                                '(${tip.title})',
+                          },
+                        ).toString(),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink();
+            final padding = EdgeInsets.fromLTRB(
+              AppSpace.md,
+              AppSpace.xs,
+              AppSpace.md,
+              bottomInset + AppSpace.sm,
             );
 
-            final padding = EdgeInsets.fromLTRB(16, 8, 16, bottomInset + 12);
             if (scroll) {
               return ListView(
                 padding: padding,
@@ -61,9 +87,13 @@ class HomeScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         header,
-                        const SizedBox(height: 12),
-                        hero(width * 0.5, fixed: true),
-                        shortcuts,
+                        const SizedBox(height: AppSpace.sm),
+                        chips,
+                        const SizedBox(height: AppSpace.md),
+                        _SosArea(diameter: width * 0.5),
+                        const SizedBox(height: AppSpace.md),
+                        grid,
+                        tipCard,
                       ],
                     ),
                   ),
@@ -77,25 +107,40 @@ class HomeScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     header,
+                    const SizedBox(height: AppSpace.sm),
+                    chips,
                     Expanded(
                       child: LayoutBuilder(
                         builder: (context, box) {
-                          // Room left for the circle after label + pills.
-                          final below =
-                              23 * scale +
-                              10 +
-                              math.max(52, 24 * scale + 20) +
-                              16;
-                          final spread = compact ? 1.12 : SosButton.ringSpread;
-                          final d = ((box.maxHeight - below) / spread).clamp(
-                            96.0,
-                            math.max(96.0, width * 0.6),
+                          // Room left for the circle after its sublabel.
+                          final below = 24 * scale + AppSpace.sm + 16;
+                          double sos(double h) =>
+                              ((h - below) / SosButton.glowRoom)
+                                  .clamp(96.0, math.max(96.0, width * 0.6))
+                                  .toDouble();
+                          // The tip only if SOS can stay a hero (≥ 45% of
+                          // the width) with it; SOS always wins the space.
+                          final tipH = 132 * scale + AppSpace.sm;
+                          final withTip =
+                              showTip &&
+                              sos(box.maxHeight - tipH) >= width * 0.45;
+                          return Column(
+                            children: [
+                              Expanded(
+                                child: _SosArea(
+                                  diameter: sos(
+                                    box.maxHeight - (withTip ? tipH : 0),
+                                  ),
+                                  fill: true,
+                                ),
+                              ),
+                              if (withTip) tipCard,
+                            ],
                           );
-                          return hero(d.toDouble(), fixed: false);
                         },
                       ),
                     ),
-                    shortcuts,
+                    grid,
                   ],
                 ),
               ),
@@ -119,46 +164,34 @@ class _Header extends StatelessWidget {
     final greeting = s == null
         ? 'Magandang araw'
         : '${s.greeting}, ${s.firstName}';
-    final subtitle = s == null ? null : '${s.plateNo} · ${s.vehicleType}';
-
-    if (compact) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(greeting, style: context.text.headlineLarge),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 10,
-            runSpacing: 6,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              if (subtitle != null)
-                Text(
-                  subtitle,
-                  style: context.text.titleSmall?.copyWith(
-                    color: context.palette.muted,
-                  ),
-                ),
-              CodingPill(coding: s?.coding),
-            ],
-          ),
-        ],
-      );
-    }
+    final plate = s == null ? null : '${s.plateNo} · ${s.vehicleType}';
+    final title = Text(
+      greeting,
+      maxLines: compact ? 1 : 2,
+      style: compact ? context.text.headlineLarge : context.text.displaySmall,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LargeTitle(greeting, subtitle: subtitle),
-        const SizedBox(height: 10),
-        CodingPill(coding: s?.coding),
-        if (s != null)
+        if (compact)
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: title,
+          )
+        else
+          title,
+        if (plate != null)
           Padding(
-            padding: const EdgeInsets.only(top: 6, left: 2),
+            padding: const EdgeInsets.only(top: 2),
             child: Text(
-              s.coding.message,
-              maxLines: 2,
+              plate,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: context.text.bodySmall,
+              style: context.text.titleSmall?.copyWith(
+                color: context.palette.muted,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
           ),
       ],
@@ -166,22 +199,15 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// SOS circle + "Pindutin kapag naaksidente" + the two pill actions.
+/// SOS circle + "Pindutin kapag naaksidente" (below the circle: small text
+/// never sits on bright red).
 class _SosArea extends StatelessWidget {
-  const _SosArea({
-    required this.diameter,
-    required this.spread,
-    required this.fixed,
-    required this.profile,
-  });
+  const _SosArea({required this.diameter, this.fill = false});
 
   final double diameter;
-  final double spread;
 
-  /// true = natural height (scroll layout); false = centered in its box and
-  /// scrolls internally if the estimate was too optimistic.
-  final bool fixed;
-  final Profile? profile;
+  /// Centered in its box, scrolling internally if the estimate was tight.
+  final bool fill;
 
   @override
   Widget build(BuildContext context) {
@@ -190,87 +216,95 @@ class _SosArea extends StatelessWidget {
       children: [
         SosButton(
           diameter: diameter,
-          layoutSpread: spread,
           onTap: () => context.push(Routes.emergency),
         ),
         Text(
           'Pindutin kapag naaksidente',
           textAlign: TextAlign.center,
-          style: context.text.titleMedium?.copyWith(
+          style: context.text.bodyMedium?.copyWith(
             color: context.palette.muted,
+            fontWeight: FontWeight.w600,
           ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: PillAction(
-                key: const Key('home-share-location'),
-                icon: CupertinoIcons.location_fill,
-                label: 'Ibahagi lokasyon',
-                onTap: () =>
-                    context.push('${Routes.emergency}?section=contacts'),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: PillAction(
-                key: const Key('home-qr'),
-                icon: CupertinoIcons.qrcode,
-                label: 'QR Exchange',
-                onTap: () {
-                  final p = profile;
-                  if (p != null) QrExchangeScreen.open(context, p);
-                },
-              ),
-            ),
-          ],
         ),
       ],
     );
-    if (fixed) return content;
+    if (!fill) return content;
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: AppSpace.xs),
         child: content,
       ),
     );
   }
 }
 
-class _Shortcuts extends StatelessWidget {
-  const _Shortcuts({required this.compact});
+class _ActionGrid extends ConsumerWidget {
+  const _ActionGrid({required this.compact});
 
   final bool compact;
 
   @override
-  Widget build(BuildContext context) {
-    return GroupedSection(
-      margin: const EdgeInsets.only(top: 12),
-      separatorIndent: 64,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(profileProvider).valueOrNull;
+    final p = context.palette;
+    final tiles = [
+      ActionTile(
+        tapKey: const Key('home-chat'),
+        compact: compact,
+        icon: CupertinoIcons.chat_bubble_2_fill,
+        iconColor: context.colors.primary,
+        title: 'Tanong kay Buddy',
+        subtitle: 'Batas at multa, offline',
+        onTap: () => context.go(Routes.chat),
+      ),
+      ActionTile(
+        tapKey: const Key('home-violation'),
+        compact: compact,
+        icon: CupertinoIcons.flag_fill,
+        iconColor: p.cautionText,
+        title: 'Na-flag ako',
+        subtitle: 'Alamin ang multa',
+        onTap: () => context.go(Routes.violation),
+      ),
+      ActionTile(
+        tapKey: const Key('home-qr'),
+        compact: compact,
+        icon: CupertinoIcons.qrcode,
+        iconColor: context.colors.primary,
+        title: 'QR Exchange',
+        subtitle: 'Ipakita sa kabilang driver',
+        onTap: () {
+          final pr = profile;
+          if (pr != null) QrExchangeScreen.open(context, pr);
+        },
+      ),
+      ActionTile(
+        tapKey: const Key('home-share-location'),
+        compact: compact,
+        icon: CupertinoIcons.location_fill,
+        iconColor: p.success,
+        title: 'Ibahagi lokasyon',
+        subtitle: 'I-text sa contacts',
+        onTap: () => context.push('${Routes.emergency}?section=contacts'),
+      ),
+    ];
+    Widget row(Widget a, Widget b) => IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(child: a),
+          const SizedBox(width: AppSpace.sm),
+          Expanded(child: b),
+        ],
+      ),
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        GroupedTile(
-          tapKey: const Key('home-chat'),
-          minHeight: 56,
-          leading: IconSquare(
-            CupertinoIcons.chat_bubble_2_fill,
-            color: context.colors.primary,
-          ),
-          title: 'Tanong kay Buddy',
-          subtitle: compact ? null : 'Batas at multa, kahit offline',
-          onTap: () => context.go(Routes.chat),
-        ),
-        GroupedTile(
-          tapKey: const Key('home-violation'),
-          minHeight: 56,
-          leading: IconSquare(
-            CupertinoIcons.flag_fill,
-            color: context.palette.accent,
-          ),
-          title: 'Na-flag ako',
-          subtitle: compact ? null : 'Alamin ang multa at ang batas',
-          onTap: () => context.go(Routes.violation),
-        ),
+        row(tiles[0], tiles[1]),
+        const SizedBox(height: AppSpace.sm),
+        row(tiles[2], tiles[3]),
       ],
     );
   }

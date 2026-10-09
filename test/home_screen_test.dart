@@ -3,7 +3,6 @@ import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
 import 'package:biyahebuddy_ph/core/theme/app_theme.dart';
 import 'package:biyahebuddy_ph/features/home/controllers/home_controller.dart';
-import 'package:biyahebuddy_ph/features/home/widgets/sos_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,7 +34,7 @@ Future<void> tapKey(WidgetTester tester, String key) async {
 }
 
 void main() {
-  testWidgets('Home: greeting, plate, coding pill, SOS, pills, shortcuts', (
+  testWidgets('Home dashboard: greeting, chips, SOS, 2x2 actions, tip', (
     tester,
   ) async {
     await pumpHome(tester, isCoding: false);
@@ -45,8 +44,15 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('NAB 1234 · Kotse'), findsOneWidget);
-    expect(find.text('MMDA coding'), findsOneWidget);
     expect(find.text('Hindi ka coding'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('MMDA coding: Hindi ka coding'),
+      findsOneWidget,
+    );
+    // Fakes: models not downloaded yet; GPS from the recording SOS fake.
+    expect(find.text('I-download si Buddy'), findsOneWidget);
+    expect(find.text('GPS handa'), findsOneWidget);
+    expect(find.text('TIP NG ARAW'), findsOneWidget); // tall phone: tip shown
     expect(find.text('SOS'), findsOneWidget);
     expect(find.text('Pindutin kapag naaksidente'), findsOneWidget);
     expect(find.text('Ibahagi lokasyon'), findsOneWidget);
@@ -77,25 +83,34 @@ void main() {
       final palette = brightness == Brightness.dark
           ? AppPalette.dark
           : AppPalette.light;
-      final badge = tester.widget<Container>(
-        find.byKey(const Key('coding-badge')),
+      // Amber tint + amber icon/text — never the SOS red.
+      final chip = find.byKey(const Key('coding-badge'));
+      final box = tester.widget<AnimatedContainer>(
+        find.descendant(of: chip, matching: find.byType(AnimatedContainer)),
       );
-      final color = (badge.decoration! as BoxDecoration).color;
-      expect(color, palette.accent);
-      expect(color, isNot(palette.emergency));
+      final bg = (box.decoration! as BoxDecoration).color;
+      final icon = tester.widget<Icon>(
+        find.descendant(of: chip, matching: find.byType(Icon)),
+      );
+      expect(bg, palette.cautionTint);
+      expect(icon.color, palette.cautionText);
+      for (final c in [bg, icon.color]) {
+        expect(c, isNot(palette.emergency));
+        expect(c, isNot(palette.emergencyDeep));
+      }
     });
   }
 
-  testWidgets('SOS is a big circle (~60% of the content width)', (
-    tester,
-  ) async {
+  testWidgets('SOS is the biggest thing on Home (a circle)', (tester) async {
     await pumpHome(tester, isCoding: false);
     final sos = tester.getSize(find.byKey(const Key('home-emergency')));
     expect(sos.width, sos.height); // circle
-    expect(sos.width, greaterThan(412 * 0.5));
+    expect(sos.width, greaterThan(412 * 0.4));
+    final tile = tester.getSize(find.byKey(const Key('home-chat')));
+    expect(sos.height, greaterThan(tile.height));
   });
 
-  testWidgets('SOS rings pulse, and stop when reduce motion is on', (
+  testWidgets('SOS glow breathes, and is static under reduce motion', (
     tester,
   ) async {
     tester.platformDispatcher.accessibilityFeaturesTestValue =
@@ -117,26 +132,63 @@ void main() {
     for (var i = 0; i < 5; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
-    List<Size> rings() => tester
-        .widgetList<Container>(
-          find.descendant(
-            of: find.byType(SosButton),
-            matching: find.byType(Container),
-          ),
-        )
-        .map((c) => c.constraints?.biggest ?? Size.zero)
-        .toList();
-    final before = rings();
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(rings(), isNot(before)); // animating
+    BoxShadow glow() =>
+        ((tester
+                        .widget<DecoratedBox>(find.byKey(const Key('sos-glow')))
+                        .decoration
+                    as BoxDecoration)
+                .boxShadow!)
+            .single;
+    final before = glow();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(glow(), isNot(before)); // breathing
 
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(disableAnimations: true);
     await tester.pump();
-    final still = rings();
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(rings(), still); // reduce motion: static
+    final still = glow();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(glow(), still); // reduce motion: static
+    expect(still.color.a, closeTo(0.45, 0.01));
     await tester.pumpWidget(const SizedBox()); // stop tickers
+  });
+
+  test('tip of the day skips boilerplate and is stable within a day', () {
+    final laws = [
+      {
+        'id': 'x-s1',
+        'source': 'RA 1 (X)',
+        'section': 'Sec. 1',
+        'title': 'Short Title',
+        'text': 'a' * 200,
+      },
+      {
+        'id': 'x-s2',
+        'source': 'RA 1 (X)',
+        'section': 'Sec. 2',
+        'title': 'Right of way',
+        'text': 'b' * 200,
+      },
+      {
+        'id': 'x-s3-p1',
+        'source': 'RA 1 (X)',
+        'section': 'Sec. 3',
+        'title': 'Speed',
+        'text': 'c' * 200,
+      },
+    ];
+    final tip = pickTip(laws, DateTime(2026, 10, 10, 8))!;
+    expect(tip.title, 'Right of way');
+    expect(tip.citation, 'RA 1 Sec. 2');
+    expect(pickTip(laws, DateTime(2026, 10, 10, 23))!.title, tip.title);
+  });
+
+  testWidgets('tapping the tip asks Buddy about that law', (tester) async {
+    await pumpHome(tester, isCoding: false);
+    await tapKey(tester, 'home-tip');
+    expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
+    final input = tester.widget<TextField>(find.byKey(const Key('chat-input')));
+    expect(input.controller!.text, startsWith('Ipaliwanag ang RA '));
   });
 
   testWidgets('SOS opens Emergency in one tap (no dialog); back returns', (

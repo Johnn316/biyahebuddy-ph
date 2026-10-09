@@ -1,28 +1,21 @@
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../shared/widgets/pressable.dart';
 
-/// Big circular SOS button with slowly pulsing concentric rings.
-/// Rings are static when the system asks to reduce motion.
+/// Hero SOS button (docs/DESIGN.md §8): red gradient circle with a soft glow
+/// that slowly breathes. One loop only; static glow under reduce motion.
 class SosButton extends StatefulWidget {
-  const SosButton({
-    super.key,
-    required this.diameter,
-    required this.onTap,
-    this.layoutSpread = ringSpread,
-  });
+  const SosButton({super.key, required this.diameter, required this.onTap});
 
   final double diameter;
   final VoidCallback onTap;
 
-  /// How far the outermost ring reaches (× diameter).
-  static const ringSpread = 1.42;
-
-  /// Layout box (× diameter). Smaller than [ringSpread] on short screens:
-  /// the rings then glow past the box without taking layout space.
-  final double layoutSpread;
+  /// Layout room around the circle for the glow (× diameter).
+  static const glowRoom = 1.16;
 
   @override
   State<SosButton> createState() => _SosButtonState();
@@ -30,24 +23,24 @@ class SosButton extends StatefulWidget {
 
 class _SosButtonState extends State<SosButton>
     with SingleTickerProviderStateMixin {
-  late final _pulse = AnimationController(
+  late final _breath = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 2600),
+    duration: AppMotion.sosBreath,
   );
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (MediaQuery.disableAnimationsOf(context)) {
-      _pulse.stop();
-    } else if (!_pulse.isAnimating) {
-      _pulse.repeat();
+      _breath.stop();
+    } else if (!_breath.isAnimating) {
+      _breath.repeat(reverse: true);
     }
   }
 
   @override
   void dispose() {
-    _pulse.dispose();
+    _breath.dispose();
     super.dispose();
   }
 
@@ -55,39 +48,35 @@ class _SosButtonState extends State<SosButton>
   Widget build(BuildContext context) {
     final p = context.palette;
     final d = widget.diameter;
-    final box = d * widget.layoutSpread;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return SizedBox.square(
-      dimension: box,
-      child: Stack(
-        alignment: Alignment.center,
-        clipBehavior: Clip.none,
-        children: [
-          // 3 concentric rings, staggered.
-          for (var i = 0; i < 3; i++)
-            AnimatedBuilder(
-              animation: _pulse,
-              builder: (_, _) {
-                final t = reduceMotion
-                    ? (i + 1) / 3.5
-                    : (_pulse.value + i / 3) % 1.0;
-                final scale = 1 + (SosButton.ringSpread - 1) * t;
-                return OverflowBox(
-                  maxWidth: d * SosButton.ringSpread,
-                  maxHeight: d * SosButton.ringSpread,
-                  child: Container(
-                    width: d * scale,
-                    height: d * scale,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: p.emergency.withValues(alpha: 0.16 * (1 - t)),
+      dimension: d * SosButton.glowRoom,
+      child: Center(
+        child: AnimatedBuilder(
+          animation: _breath,
+          builder: (context, child) {
+            final t = reduceMotion
+                ? 0.5
+                : AppMotion.breathe.transform(_breath.value);
+            return DecoratedBox(
+              key: const Key('sos-glow'),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: p.emergency.withValues(
+                      alpha: lerpDouble(0.35, 0.55, t)!,
                     ),
+                    blurRadius: lerpDouble(28, 44, t)! * (d / 200),
+                    spreadRadius: lerpDouble(0, 6, t)! * (d / 200),
                   ),
-                );
-              },
-            ),
-          Semantics(
+                ],
+              ),
+              child: child,
+            );
+          },
+          child: Semantics(
             button: true,
             label: 'SOS. Pindutin kapag naaksidente',
             excludeSemantics: true,
@@ -98,14 +87,15 @@ class _SosButtonState extends State<SosButton>
                 height: d,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: p.emergencyGradient,
-                  boxShadow: [
-                    BoxShadow(
-                      color: p.emergency.withValues(alpha: 0.35),
-                      blurRadius: d * 0.18,
-                      offset: Offset(0, d * 0.06),
-                    ),
-                  ],
+                  gradient: RadialGradient(
+                    center: const Alignment(-0.3, -0.4),
+                    radius: 1.0,
+                    colors: [p.emergency, p.emergencyDeep],
+                  ),
+                  border: Border.all(
+                    color: p.onEmergency.withValues(alpha: 0.18),
+                    width: 1.5,
+                  ),
                 ),
                 child: Material(
                   type: MaterialType.transparency,
@@ -119,14 +109,14 @@ class _SosButtonState extends State<SosButton>
                     },
                     child: Center(
                       child: Padding(
-                        padding: EdgeInsets.all(d * 0.12),
+                        padding: EdgeInsets.all(d * 0.16),
                         child: FittedBox(
                           child: Text(
                             'SOS',
                             style: context.text.displayLarge?.copyWith(
                               color: p.onEmergency,
                               fontSize: 64,
-                              letterSpacing: 2,
+                              letterSpacing: 3,
                             ),
                           ),
                         ),
@@ -137,7 +127,7 @@ class _SosButtonState extends State<SosButton>
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
