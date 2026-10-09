@@ -100,9 +100,12 @@ _Last updated: 2026-10-09_
 | Area | Owner | State |
 |---|---|---|
 | Project scaffold | John | ✅ Done |
-| Contracts + fakes | Shared | ✅ v1 (fakes only) |
-| Home screen | John | 🟡 Basic layout on fakes — branch `frontend/home` |
-| Onboarding / Emergency / Violation / Chat / Profile | John | ⬜ Placeholder screens |
+| Contracts + fakes | Shared | ✅ v1 (fakes only). FakeProfileRepository starts empty + persists to shared_preferences |
+| First-launch routing (no profile → /onboarding) | John | ✅ `routerProvider` in core/router — PR from `frontend/home` |
+| Home screen | John | ✅ On fakes — coding strip, EMERGENCY, Buddy / Na-flag, profile icon |
+| Onboarding (model download + profile form) | John | ✅ On fakes |
+| Profile screen (edit + save) | John | ✅ On fakes |
+| Emergency / Violation / Chat | John | ⬜ Placeholder screens |
 | Local DB + JSON loaders | Backend | ⬜ Not started |
 | CodingService (real) | Backend | ⬜ Not started |
 | AI / RAG (LLM package TBD after spike) | Backend | ⬜ Not started |
