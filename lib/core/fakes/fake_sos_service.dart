@@ -22,4 +22,10 @@ class FakeSosService implements SosService {
   @override
   Future<void> enableVolumeTrigger() async =>
       debugPrint('[FakeSos] volume trigger enabled (fake)');
+
+  @override
+  Future<bool> canSendSms() async => true;
+
+  @override
+  Future<bool> canCall() async => true;
 }

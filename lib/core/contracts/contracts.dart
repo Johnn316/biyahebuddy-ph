@@ -236,13 +236,37 @@ abstract interface class AiAssistant {
   Stream<String> analyzeTwoSides(String driverA, String driverB);
 }
 
+/// Thrown by [SosService] when the device can't do what was asked (no SIM,
+/// no dialer app, permission denied, SMS not sent). [message] is user-facing
+/// Taglish: show it as-is.
+class SosUnavailable implements Exception {
+  const SosUnavailable(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 abstract interface class SosService {
+  /// null when there is no fix (location off, permission denied, timeout).
   Future<({double lat, double lng})?> currentLocation();
+
+  /// Throws [SosUnavailable] if SMS can't be sent (e.g. no SIM).
   Future<void> smsContacts(List<EmergencyContact> contacts, String message);
+
+  /// Throws [SosUnavailable] if no dialer app exists (e.g. Wi-Fi tablet).
   Future<void> openDialer(String number);
 
   /// Native (Kotlin) foreground service: hold/press volume buttons to trigger SOS.
   Future<void> enableVolumeTrigger();
+
+  /// False on devices without a ready SIM / SMS support. Use to grey out
+  /// "text contacts" buttons.
+  Future<bool> canSendSms();
+
+  /// False on devices without a ready SIM / calling support.
+  Future<bool> canCall();
 }
 
 /// Local (on-device) speech recognition, e.g. Whisper. Filipino + English.
