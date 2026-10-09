@@ -4,10 +4,9 @@ import '../../data/local/local_data.dart';
 import '../contracts/contracts.dart';
 import '../fakes/fakes.dart';
 
-/// Single switch: true = fakes (frontend dev), false = real backend impls.
-/// Backend flips this (or swaps individual providers) once lib/data/ is merged.
-/// When false, main() must `await LocalData.init()` before runApp.
-const bool useFakes = true;
+/// Single switch: true = fakes (frontend dev), false = real on-device
+/// backends (lib/data/). When false, main() awaits `LocalData.init()`.
+const bool useFakes = false;
 
 final profileRepositoryProvider = Provider<ProfileRepository>(
   (ref) => useFakes ? FakeProfileRepository() : LocalData.instance.profiles,
@@ -48,3 +47,19 @@ final modelManagerProvider = Provider<ModelManager>(
 final profileProvider = FutureProvider<Profile?>(
   (ref) => ref.watch(profileRepositoryProvider).load(),
 );
+
+/// Every contract provider replaced by its fake. For widget tests (which
+/// don't run main(), so LocalData isn't initialised) and UI demos:
+///   ProviderScope(overrides: fakeOverrides, child: App())
+/// Riverpod rejects overriding one provider twice in a scope; for a
+/// test-specific fake, nest another ProviderScope inside this one.
+final List<Override> fakeOverrides = [
+  profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
+  codingServiceProvider.overrideWithValue(FakeCodingService()),
+  finesRepositoryProvider.overrideWithValue(FakeFinesRepository()),
+  hotlineRepositoryProvider.overrideWithValue(FakeHotlineRepository()),
+  aiAssistantProvider.overrideWithValue(FakeAiAssistant()),
+  sosServiceProvider.overrideWithValue(FakeSosService()),
+  speechServiceProvider.overrideWithValue(FakeSpeechService()),
+  modelManagerProvider.overrideWithValue(FakeModelManager()),
+];
