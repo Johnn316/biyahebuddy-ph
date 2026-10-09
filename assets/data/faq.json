@@ -689,5 +689,69 @@
       "Iwasan ang kanto, tawiran, at harap ng fire station o driveway.",
       "Kung na-tow, pumunta sa impounding area dala ang OR/CR at lisensya."
     ]
+  },
+  {
+    "id": "turn-signal",
+    "category": "Signs & Signals",
+    "question": "Kailangan ba mag-signal bago lumiko o huminto?",
+    "aliases": [
+      "do I need to signal before turning",
+      "hindi nag-signal bago kumanan",
+      "signal light bago lumiko required ba",
+      "bumusina ba pag may tao bago umandar",
+      "kumaliwa siya nang walang signal"
+    ],
+    "sections": [
+      "ra4136-s44"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 44, bago umandar, huminto, o lumiko, dapat siguraduhin munang ligtas ito at magbigay ng malinaw na signal sa ibang sasakyan. Pwedeng gamitin ang signal light o ang kamay na nakalabas sa kaliwa, at bumusina kung may taong maaapektuhan.",
+    "gagawin": [
+      "Mag-signal ilang segundo bago lumiko o lumipat ng lane.",
+      "Tingnan ang side mirror at blind spot bago gumalaw.",
+      "Kung sira ang signal light, gumamit ng hand signal at ipaayos agad."
+    ]
+  },
+  {
+    "id": "turning",
+    "category": "Right of Way & Turning",
+    "question": "Saang lane dapat manggaling bago kumanan o kumaliwa?",
+    "aliases": [
+      "which lane should I use before turning",
+      "paano ang tamang pagliko sa intersection",
+      "kumaliwa ako galing sa kanang lane",
+      "right turn from the left lane bawal ba",
+      "tamang lane para lumiko"
+    ],
+    "sections": [
+      "ra4136-s45"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 45, kapag kakanan, dapat galing ka sa pinakakanang lane at lumiko nang malapit sa gilid. Kapag kakaliwa, dapat galing ka sa lane na pinakamalapit sa gitna ng kalsada, o sa kaliwang lane kung one-way.",
+    "gagawin": [
+      "Lumipat sa tamang lane bago pa makarating sa interseksyon.",
+      "Mag-signal at bagalan bago lumiko.",
+      "Huwag lumiko mula sa maling lane kahit maluwag ang daan."
+    ]
+  },
+  {
+    "id": "child-car-seat",
+    "category": "Child Safety",
+    "question": "Kailangan ba ng car seat ang anak ko?",
+    "aliases": [
+      "is a child car seat required",
+      "child restraint system batas",
+      "car seat ng bata required ba",
+      "ilang taon dapat naka car seat ang bata",
+      "bata walang car seat sa kotse"
+    ],
+    "sections": [
+      "ra11229-s4",
+      "ra11229-s10"
+    ],
+    "pagsusuri": "Ayon sa RA 11229 Sec. 4, dapat naka-child restraint system o car seat ang bata habang bumibiyahe, maliban kung 150 cm (59 inches) na ang tangkad niya at maayos nang naka-seatbelt. Ayon sa Sec. 10, may multa ang driver na lalabag.",
+    "gagawin": [
+      "Gumamit ng car seat na angkop sa edad, tangkad, at timbang ng bata.",
+      "Siguraduhing naka-lock nang maayos ang car seat bago umandar.",
+      "Kapag 150 cm na ang bata, siguraduhing tama ang pagkakasuot ng seatbelt."
+    ]
   }
 ]

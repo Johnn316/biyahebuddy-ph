@@ -5,8 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/contracts/contracts.dart';
 import '../../../core/di/providers.dart';
 import 'flag_flow.dart';
+import 'topics.dart';
 
 export 'flag_flow.dart';
+export 'topics.dart';
+
+/// Which topic menu a Buddy message shows.
+enum TopicMenu { topics, questions }
 
 enum ChatRole { user, buddy }
 
@@ -22,6 +27,8 @@ class ChatMessage {
     this.agency,
     this.fine,
     this.chips = const [],
+    this.menu,
+    this.topic,
   });
 
   final ChatRole role;
@@ -43,6 +50,13 @@ class ChatMessage {
   /// Tappable violations ([FlagStep.askViolation] / [FlagStep.noMatch]).
   final List<String> chips;
 
+  /// Topic menu shown under this Buddy message.
+  final TopicMenu? menu;
+
+  /// [BuddyTopic.id]: the menu's topic, or the topic a tapped question came
+  /// from (its answer then offers the other questions).
+  final String? topic;
+
   ChatMessage copyWith({
     String? text,
     bool? streaming,
@@ -52,6 +66,8 @@ class ChatMessage {
     Agency? agency,
     Fine? fine,
     List<String>? chips,
+    TopicMenu? menu,
+    String? topic,
   }) => ChatMessage(
     role: role,
     text: text ?? this.text,
@@ -63,6 +79,8 @@ class ChatMessage {
     agency: agency ?? this.agency,
     fine: fine ?? this.fine,
     chips: chips ?? this.chips,
+    menu: menu ?? this.menu,
+    topic: topic ?? this.topic,
   );
 }
 
@@ -129,7 +147,7 @@ class ChatController extends AutoDisposeNotifier<ChatState> {
   /// typed message is matched against that agency's fines.
   Agency? _awaitingViolation;
 
-  void ask(String question) {
+  void ask(String question, {String? topic}) {
     final q = question.trim();
     if (q.isEmpty || state.streaming) return;
     final awaiting = _awaitingViolation;
@@ -147,7 +165,12 @@ class ChatController extends AutoDisposeNotifier<ChatState> {
       askMessages: [
         ...state.askMessages,
         ChatMessage(role: ChatRole.user, text: q),
-        const ChatMessage(role: ChatRole.buddy, text: '', streaming: true),
+        ChatMessage(
+          role: ChatRole.buddy,
+          text: '',
+          streaming: true,
+          topic: topic,
+        ),
       ],
     );
     _listen(ref.read(aiAssistantProvider).ask(q));
@@ -206,6 +229,43 @@ class ChatController extends AutoDisposeNotifier<ChatState> {
         ),
       );
     }
+  }
+
+  /// Category tapped: Buddy lists its questions.
+  Future<void> openTopic(String id) async {
+    final t = topicById(id);
+    if (t == null || state.streaming) return;
+    await _menuReply(
+      user: t.label,
+      text: 'Pumili ng tanong:',
+      menu: TopicMenu.questions,
+      topic: id,
+    );
+  }
+
+  /// "Bumalik sa mga topic" / "Lahat ng topic".
+  Future<void> showTopics() async {
+    if (state.streaming) return;
+    await _menuReply(
+      user: 'Lahat ng topic',
+      text: 'Pumili ng topic:',
+      menu: TopicMenu.topics,
+    );
+  }
+
+  Future<void> _menuReply({
+    required String user,
+    required String text,
+    required TopicMenu menu,
+    String? topic,
+  }) async {
+    _awaitingViolation = null;
+    _pushExchange(user);
+    // One beat so the typing dots show before the reveal.
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    _updateStreaming(
+      (m) => m.copyWith(text: text, streaming: false, menu: menu, topic: topic),
+    );
   }
 
   /// User message + an empty, "typing" Buddy message (dots, then reveal).

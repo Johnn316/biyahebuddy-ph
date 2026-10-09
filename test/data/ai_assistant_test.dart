@@ -237,6 +237,15 @@ void main() {
       expect(llm.lastUser, isNull);
     });
 
+    test('every FAQ question (topic menu taps) gets its own curated '
+        'answer', () async {
+      final buddy = curatedBuddy(FakeGenerator(modelReply));
+      for (final e in faq) {
+        final hit = await buddy.curatedFor(e.question);
+        expect(hit?.entry.id, e.id, reason: e.question);
+      }
+    });
+
     test('no strong FAQ match → LLM as before', () async {
       final llm = FakeGenerator(modelReply);
       final answer = await curatedBuddy(llm)

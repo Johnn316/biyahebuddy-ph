@@ -9,11 +9,11 @@ import 'package:go_router/go_router.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../shared/widgets/grouped.dart';
-import '../../shared/widgets/pressable.dart';
 import '../controllers/chat_controller.dart';
 import '../widgets/buddy_answer.dart';
 import '../widgets/chat_input_bar.dart';
 import '../widgets/flag_widgets.dart';
+import '../widgets/topic_widgets.dart';
 import '../widgets/user_bubble.dart';
 
 /// "Tanong kay Buddy" tab. `/chat?q=<text>` prefills the box (never
@@ -110,9 +110,45 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     FocusScope.of(context).unfocus();
   }
 
-  void _quickQuestion(String q) {
-    HapticFeedback.lightImpact();
-    _chat.ask(q);
+  /// What sits under a Buddy message: na-flag chips/card, topic menus, or
+  /// the topic's other questions after an answer.
+  Widget? _footerFor(ChatMessage m, {String? asked, required bool busy}) {
+    if (m.flag != null) {
+      return FlagFooter(
+        message: m,
+        onChip: (violation, agency) {
+          if (!busy) _chat.answerViolation(violation, agency);
+        },
+      );
+    }
+    void showTopics() {
+      if (!busy) _chat.showTopics();
+    }
+
+    void askTopic(String q, String topic) {
+      if (!busy) _chat.ask(q, topic: topic);
+    }
+
+    final topic = topicById(m.topic);
+    return switch (m.menu) {
+      TopicMenu.topics => TopicGrid(
+        onTap: (t) {
+          if (!busy) _chat.openTopic(t.id);
+        },
+      ),
+      TopicMenu.questions when topic != null => TopicQuestions(
+        topic: topic,
+        onQuestion: (q) => askTopic(q, topic.id),
+        onBack: showTopics,
+      ),
+      null when topic != null => TopicFollowUps(
+        topic: topic,
+        asked: asked,
+        onQuestion: (q) => askTopic(q, topic.id),
+        onAll: showTopics,
+      ),
+      _ => null,
+    };
   }
 
   Future<void> _newCase() async {
@@ -145,7 +181,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     Widget body(double bottom) => switch (state) {
       ChatState(mode: ChatMode.ask, askMessages: []) => _EmptyAsk(
         bottom: bottom,
-        onAsk: _quickQuestion,
+        onTopic: (t) => _chat.openTopic(t.id),
       ),
       _ when !twoSides || showResult => ListView.separated(
         controller: _scroll,
@@ -167,15 +203,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   stopSignal: _stopSignal,
                   onRevealing: _setRevealing,
                   onGrow: _follow,
-                  footer: m.flag == null
-                      ? null
-                      : FlagFooter(
-                          message: m,
-                          onChip: (violation, agency) {
-                            if (busy) return;
-                            _chat.answerViolation(violation, agency);
-                          },
-                        ),
+                  footer: _footerFor(
+                    m,
+                    asked: i > 0 ? state.visibleMessages[i - 1].text : null,
+                    busy: busy,
+                  ),
                 );
         },
       ),
@@ -327,197 +359,43 @@ class _FrostedBottom extends StatelessWidget {
 }
 
 class _EmptyAsk extends StatelessWidget {
-  const _EmptyAsk({required this.bottom, required this.onAsk});
+  const _EmptyAsk({required this.bottom, required this.onTopic});
 
   /// Input bar + tab bar + safe area: the content stays above it.
   final double bottom;
-  final ValueChanged<String> onAsk;
+  final ValueChanged<BuddyTopic> onTopic;
 
   @override
   Widget build(BuildContext context) {
-    // Fits above the input bar on normal phones; scrolls on small ones.
+    // Category tiles; scrolls, never hidden behind the input bar.
     return LayoutBuilder(
-      builder: (context, box) {
-        final room = box.maxHeight - bottom;
-        return SingleChildScrollView(
-          key: const Key('chat-empty'),
-          padding: EdgeInsets.fromLTRB(
-            AppSpace.md,
-            AppSpace.sm,
-            AppSpace.md,
-            bottom + AppSpace.sm,
-          ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: (room - 2 * AppSpace.sm).clamp(0, double.infinity),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (room > 460)
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: AppSpace.sm),
-                    child: Center(child: BuddyAvatar(size: 72)),
-                  ),
-                Text(
-                  'Ano ang gusto mong itanong?',
-                  textAlign: TextAlign.center,
-                  style: context.text.headlineSmall,
-                ),
-                const SizedBox(height: AppSpace.xxs),
-                Text(
-                  'Batas, multa, aksidente — kahit offline.',
-                  textAlign: TextAlign.center,
-                  style: context.text.bodyMedium?.copyWith(
-                    color: context.palette.muted,
-                  ),
-                ),
-                const SizedBox(height: AppSpace.md),
-                _Suggestions(
-                  width: box.maxWidth - 2 * AppSpace.md,
-                  onTap: onAsk,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// 2×2 suggestion cards (one column when text is huge); tap = send.
-class _Suggestions extends StatelessWidget {
-  const _Suggestions({required this.width, required this.onTap});
-
-  final double width;
-  final ValueChanged<String> onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    final scale = MediaQuery.textScalerOf(context).scale(1);
-    final icons = [
-      (CupertinoIcons.tag_fill, p.cautionText),
-      (CupertinoIcons.car_detailed, context.colors.primary),
-      (CupertinoIcons.exclamationmark_triangle_fill, p.cautionText),
-      (CupertinoIcons.flag_fill, p.success),
-    ];
-    final cards = [
-      for (final (i, q) in quickQuestions.indexed)
-        _SuggestionCard(
-          tapKey: Key('quick-$i'),
-          text: q,
-          icon: icons[i].$1,
-          color: icons[i].$2,
-          onTap: () => onTap(q),
+      builder: (context, box) => SingleChildScrollView(
+        key: const Key('chat-empty'),
+        padding: EdgeInsets.fromLTRB(
+          AppSpace.md,
+          AppSpace.sm,
+          AppSpace.md,
+          bottom + AppSpace.sm,
         ),
-    ];
-    if ((width - AppSpace.sm) / 2 < 150 * scale) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final (i, c) in cards.indexed) ...[
-            if (i > 0) const SizedBox(height: AppSpace.sm),
-            c,
-          ],
-        ],
-      );
-    }
-    Widget row(Widget a, Widget b) => IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(child: a),
-          const SizedBox(width: AppSpace.sm),
-          Expanded(child: b),
-        ],
-      ),
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        row(cards[0], cards[1]),
-        const SizedBox(height: AppSpace.sm),
-        row(cards[2], cards[3]),
-      ],
-    );
-  }
-}
-
-/// Compact suggestion: icon + max 2 lines (ellipsis); the whole card sends.
-class _SuggestionCard extends StatelessWidget {
-  const _SuggestionCard({
-    required this.tapKey,
-    required this.text,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  final Key tapKey;
-  final String text;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    final radius = BorderRadius.circular(AppRadius.md);
-    return Semantics(
-      button: true,
-      label: 'Itanong: $text',
-      excludeSemantics: true,
-      child: Pressable(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: context.colors.surface,
-            borderRadius: radius,
-            boxShadow: p.cardShadow,
-            border: Border(top: BorderSide(color: p.highlight, width: 0.5)),
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            borderRadius: radius,
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              key: tapKey,
-              onTap: onTap,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 56),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpace.sm),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.16),
-                          borderRadius: BorderRadius.circular(AppRadius.sm),
-                        ),
-                        child: Icon(icon, size: 17, color: color),
-                      ),
-                      const SizedBox(width: AppSpace.sm),
-                      Expanded(
-                        child: Text(
-                          text,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: context.text.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            height: 1.25,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Ano ang tanong mo?',
+              textAlign: TextAlign.center,
+              style: context.text.headlineSmall,
+            ),
+            const SizedBox(height: AppSpace.xxs),
+            Text(
+              'Pumili ng topic, o i-type ang tanong mo sa ibaba.',
+              textAlign: TextAlign.center,
+              style: context.text.bodyMedium?.copyWith(
+                color: context.palette.muted,
               ),
             ),
-          ),
+            const SizedBox(height: AppSpace.md),
+            TopicGrid(width: box.maxWidth - 2 * AppSpace.md, onTap: onTopic),
+          ],
         ),
       ),
     );

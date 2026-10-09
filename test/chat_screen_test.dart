@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:biyahebuddy_ph/app.dart';
 import 'package:biyahebuddy_ph/core/config/features.dart';
@@ -8,6 +10,7 @@ import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
 import 'package:biyahebuddy_ph/core/router/app_router.dart';
 import 'package:biyahebuddy_ph/features/chat/controllers/answer_format.dart';
 import 'package:biyahebuddy_ph/features/chat/controllers/flag_flow.dart';
+import 'package:biyahebuddy_ph/features/chat/controllers/topics.dart';
 import 'package:biyahebuddy_ph/features/chat/controllers/answer_reveal.dart';
 import 'package:biyahebuddy_ph/features/chat/widgets/buddy_answer.dart';
 import 'package:biyahebuddy_ph/features/chat/widgets/law_sheet.dart';
@@ -118,10 +121,10 @@ void main() {
 
     expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
     expect(find.byKey(const Key('offline-badge')), findsOneWidget);
-    expect(find.text('Ano ang gusto mong itanong?'), findsOneWidget);
-    expect(find.text('Magkano multa pag walang helmet?'), findsOneWidget);
+    expect(find.text('Ano ang tanong mo?'), findsOneWidget);
+    expect(find.byKey(const Key('topic-markings')), findsOneWidget);
     expect(
-      find.text('Nabangga ako, sino may mali?', skipOffstage: false),
+      find.byKey(const Key('topic-coding'), skipOffstage: false),
       findsOneWidget,
     );
     expect(inputText(tester), 'Na-flag ako ng LTO');
@@ -138,7 +141,7 @@ void main() {
 
     expect(ai.asked, ['Sino ang may right of way?']);
     expect(find.text('Sino ang may right of way?'), findsOneWidget);
-    expect(find.text('Ano ang gusto mong itanong?'), findsNothing);
+    expect(find.text('Ano ang tanong mo?'), findsNothing);
     expect(find.text('Nag-iisip si Buddy…'), findsOneWidget);
     // Streaming: send replaced by stop.
     expect(find.byKey(const Key('chat-send')), findsNothing);
@@ -211,16 +214,98 @@ void main() {
     expect(find.text(answerDisclaimer), findsOneWidget);
   });
 
-  testWidgets('suggestion cards send on tap', (tester) async {
-    final ai = ControlledAi();
-    await pumpChat(tester, ai: ai);
-    for (var i = 0; i < 4; i++) {
-      expect(find.byKey(Key('quick-$i')), findsOneWidget);
+  group('topic menu', () {
+    Future<void> tapAndSettle(WidgetTester tester, String key) async {
+      await tester.ensureVisible(find.byKey(Key(key)).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(Key(key)).last);
+      await tester.pumpAndSettle();
     }
-    await tester.tap(find.byKey(const Key('quick-0')));
-    await tester.pump();
-    expect(ai.asked, ['Magkano multa pag walang helmet?']);
-    expect(find.text('Magkano multa pag walang helmet?'), findsOneWidget);
+
+    testWidgets('category → questions → answer → more questions', (
+      tester,
+    ) async {
+      final ai = ControlledAi();
+      await pumpChat(tester, ai: ai);
+      await tapAndSettle(tester, 'topic-markings');
+      expect(ai.asked, isEmpty);
+      expect(find.text('Pumili ng tanong:'), findsOneWidget);
+      expect(
+        find.text('Pwede ba mag-overtake sa double solid yellow line?'),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('topics-back')), findsOneWidget);
+
+      await tapAndSettle(tester, 'topic-q-0');
+      // Sent exactly as the curated FAQ question.
+      expect(ai.asked, ['Pwede ba mag-overtake sa double solid yellow line?']);
+      ai.emit(_answer);
+      await ai.finish();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('section-batas')), findsOneWidget);
+      expect(
+        find.text('Iba pang tanong sa Road Markings & Overtaking'),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('topic-more-0')), findsOneWidget);
+      expect(find.byKey(const Key('topics-all')), findsOneWidget);
+
+      // A follow-up chip asks the next question of the same topic.
+      await tapAndSettle(tester, 'topic-more-0');
+      expect(
+        ai.asked.last,
+        'Pwede ba mag-overtake sa isang solid na dilaw na linya?',
+      );
+      await ai.finish();
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('back navigation: questions → all topics → another topic', (
+      tester,
+    ) async {
+      final ai = ControlledAi();
+      await pumpChat(tester, ai: ai);
+      await tapAndSettle(tester, 'topic-cellphone');
+      await tapAndSettle(tester, 'topics-back');
+      expect(find.text('Pumili ng topic:'), findsOneWidget);
+      // The full grid is shown again in the chat.
+      expect(find.byKey(const Key('topic-coding')), findsOneWidget);
+      await tapAndSettle(tester, 'topic-coding');
+      expect(find.text('Anong oras ang number coding?'), findsOneWidget);
+      expect(ai.asked, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Traffic Stops → "Na-flag ako…" starts the guided flow', (
+      tester,
+    ) async {
+      final ai = ControlledAi();
+      await pumpChat(tester, ai: ai);
+      await tapAndSettle(tester, 'topic-traffic-stops');
+      await tapAndSettle(tester, 'topic-q-0');
+      expect(ai.asked, isEmpty);
+      expect(find.textContaining(flagQuestion), findsOneWidget);
+    });
+
+    test('12 topics; every question is answerable from faq.json', () {
+      final faq = {
+        for (final e
+            in (jsonDecode(File('assets/data/faq.json').readAsStringSync())
+                as List<dynamic>))
+          (e as Map<String, dynamic>)['question'] as String,
+      };
+      expect(buddyTopics, hasLength(12));
+      for (final t in buddyTopics) {
+        expect(t.questions.length, inInclusiveRange(2, 5), reason: t.id);
+        for (final q in t.questions) {
+          if (q == flagFlowQuestion) {
+            expect(isFlaggedWithoutViolation(q), isTrue);
+          } else {
+            expect(faq, contains(q), reason: '${t.id}: $q');
+          }
+        }
+      }
+    });
   });
 
   testWidgets('no mic anywhere in chat when voice input is disabled', (
@@ -549,7 +634,7 @@ void main() {
     await tester.tap(find.text('Dalawang panig'));
     await tester.pumpAndSettle();
     expect(find.text('Ano ang nangyari sa panig mo?'), findsOneWidget);
-    expect(find.text('Magkano multa pag walang helmet?'), findsNothing);
+    expect(find.text('Ano ang tanong mo?'), findsNothing);
 
     await tester.enterText(find.byKey(const Key('chat-input')), 'Nauna ako');
     await tester.pump();
