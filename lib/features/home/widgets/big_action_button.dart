@@ -10,11 +10,13 @@ class BigActionButton extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onPressed,
+    this.subtitle,
     this.foreground = Colors.white,
     this.large = false,
   });
 
   final String label;
+  final String? subtitle;
   final IconData icon;
   final Color color;
   final Color foreground;
@@ -26,30 +28,41 @@ class BigActionButton extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     return Semantics(
       button: true,
-      label: label,
+      label: subtitle == null ? label : '$label. $subtitle',
+      excludeSemantics: true,
       child: Material(
         color: color,
         borderRadius: BorderRadius.circular(AppSizes.radius),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppSizes.radius),
           onTap: onPressed,
           child: Padding(
             padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: large ? 96 : 48, color: foreground),
-                const SizedBox(height: 8),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
+            // Scales the whole block down on short screens instead of
+            // overflowing; on tall screens the tile itself fills the space.
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: large ? 110 : 56, color: foreground),
+                  const SizedBox(height: 8),
+                  Text(
                     label,
                     textAlign: TextAlign.center,
-                    style: (large ? text.displayLarge : text.titleLarge)
-                        ?.copyWith(color: foreground),
+                    style: (large ? text.displayLarge : text.headlineMedium)
+                        ?.copyWith(color: foreground, height: 1.1),
                   ),
-                ),
-              ],
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle!,
+                      textAlign: TextAlign.center,
+                      style: text.headlineMedium?.copyWith(color: foreground),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
         ),

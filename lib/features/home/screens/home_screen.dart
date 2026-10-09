@@ -18,12 +18,25 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              StatusStrip(onProfileTap: () => context.push(Routes.profile)),
+              Row(
+                children: [
+                  const Expanded(child: StatusStrip()),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    key: const Key('home-profile'),
+                    tooltip: 'Profile',
+                    icon: const Icon(Icons.account_circle, size: 40),
+                    onPressed: () => context.push(Routes.profile),
+                  ),
+                ],
+              ),
               const SizedBox(height: AppSizes.gap),
               Expanded(
                 flex: 3,
                 child: BigActionButton(
+                  key: const Key('home-emergency'),
                   label: 'EMERGENCY',
+                  subtitle: 'Naaksidente ako',
                   icon: Icons.sos,
                   color: AppColors.emergency,
                   large: true,
@@ -38,6 +51,7 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: BigActionButton(
+                        key: const Key('home-chat'),
                         label: 'Tanong kay\nBuddy',
                         icon: Icons.record_voice_over,
                         color: AppColors.primary,
@@ -47,6 +61,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(width: AppSizes.gap),
                     Expanded(
                       child: BigActionButton(
+                        key: const Key('home-violation'),
                         label: 'Na-flag\nako',
                         icon: Icons.local_police,
                         color: AppColors.accent,
