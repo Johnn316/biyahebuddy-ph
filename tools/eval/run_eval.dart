@@ -22,6 +22,7 @@ import 'package:biyahebuddy_ph/data/ai/local_llm.dart';
 import 'package:biyahebuddy_ph/data/local/app_database.dart';
 import 'package:biyahebuddy_ph/data/rag/intent.dart';
 
+import 'answer_quality.dart';
 import 'eval_setup.dart';
 
 Future<void> main(List<String> args) async {
@@ -61,6 +62,7 @@ Future<void> main(List<String> args) async {
 
   var passed = 0, lawTotal = 0, lawHits = 0, fineTotal = 0, fineHits = 0;
   var answered = 0, invented = 0, onTarget = 0, onTargetTotal = 0;
+  var qualityOk = 0, badFormat = 0, blame = 0, shownWrong = 0, badAmount = 0;
   final retrievalMs = <int>[];
   final answerMs = <int>[];
   final rows = <Map<String, dynamic>>[];
@@ -102,6 +104,7 @@ Future<void> main(List<String> args) async {
     if (ok) passed++;
 
     String? answer;
+    List<String>? problems;
     int? ms;
     if (llm != null) {
       final sw = Stopwatch()..start();
@@ -113,6 +116,11 @@ Future<void> main(List<String> args) async {
       ms = sw.elapsedMilliseconds;
       answerMs.add(ms);
       answer = _pagsusuri(full);
+      problems = answerProblems(
+        full,
+        expLaws: [for (final e in expLaws) _citationOf(e)],
+        expFines: expFines,
+      );
       // Citations the LLM wrote vs. what retrieval gave it.
       answered++;
       final cited = _citations(answer);
@@ -121,7 +129,15 @@ Future<void> main(List<String> args) async {
         for (final l in got.laws) _citationOf(l.id),
         for (final f in got.fines) ...lawIdsInLegalBasis(f.legalBasis),
       };
-      if (cited.any((c) => !allowed.contains(c))) invented++;
+      if (cited.any((c) => !allowed.contains(c))) {
+        invented++;
+        problems.add('invented citation');
+      }
+      if (problems.any((p) => p.startsWith('format'))) badFormat++;
+      if (problems.any((p) => p.startsWith('blame'))) blame++;
+      if (problems.any((p) => p.startsWith('shown'))) shownWrong++;
+      if (problems.any((p) => p.startsWith('amount'))) badAmount++;
+      if (problems.isEmpty) qualityOk++;
       if (expLaws.isNotEmpty) {
         onTargetTotal++;
         if (cited.any((c) => expLaws.map(_citationOf).contains(c))) onTarget++;
@@ -144,6 +160,9 @@ Future<void> main(List<String> args) async {
     }
     if (answer != null) {
       stdout.writeln('     answer (${ms}ms): ${_oneLine(answer)}');
+      stdout.writeln(
+        '     quality: ${problems!.isEmpty ? 'ok' : 'BAD — ${problems.join('; ')}'}',
+      );
     }
     stdout.writeln('');
 
@@ -157,6 +176,7 @@ Future<void> main(List<String> args) async {
       'fines': fineNames,
       'answerMs': ms,
       'answer': answer,
+      'answerProblems': problems,
     });
   }
 
@@ -176,6 +196,11 @@ Future<void> main(List<String> args) async {
         ? null
         : answerMs.reduce((a, b) => a + b) ~/ answerMs.length,
     'inventedCitationRate': answered == 0 ? null : invented / answered,
+    'answerQualityRate': answered == 0 ? null : qualityOk / answered,
+    'badFormat': badFormat,
+    'blame': blame,
+    'shownWrong': shownWrong,
+    'badAmount': badAmount,
     'onTargetCitationRate': onTargetTotal == 0
         ? null
         : onTarget / onTargetTotal,
@@ -204,6 +229,12 @@ Future<void> main(List<String> args) async {
     );
     stdout.writeln(
       '  analysis invents a citation (not retrieved): ${pct(invented, answered)}',
+    );
+    stdout.writeln(
+      '  answer quality ok (format, no blame, right law+fine shown, '
+      'no invented citation): ${pct(qualityOk, answered)}  '
+      '[bad format $badFormat, blame $blame, wrong/missing shown $shownWrong, '
+      'amount not shown $badAmount]',
     );
   }
 

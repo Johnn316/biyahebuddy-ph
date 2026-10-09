@@ -216,3 +216,16 @@ question ──► classifyIntent ─┐
 5. Before a PR: `flutter analyze` clean, `flutter test` passing,
    `flutter build apk --debug` succeeds; update `docs/AI_DISCLOSURE.md` if a
    model changes.
+
+## 6. Tuning log (`backend/ai-tuning`)
+
+Targets: main ≥ 90%, held-out ≥ 80%, the 4 demo questions (`tools/eval/demo.json`)
+correct on every run (retrieval + answer quality, 3 runs with the 1B).
+Answer quality (`tools/eval/answer_quality.dart`): 4 headers once and in order;
+no blame sentence (code's neutral frame excepted); expected law and fine shown
+in "Ano ang sinasabi ng batas"; no invented citation; every peso amount in the
+analysis appears in the shown law/fines.
+
+| Step | Main (30) | Held-out (10) | Demo, 3 runs (1B) |
+|---|---|---|---|
+| Baseline on `main` (reproduced) | 86.7% (26/30) | 80.0% (8/10) | 4/4 retrieval, 4/4 quality, every run |

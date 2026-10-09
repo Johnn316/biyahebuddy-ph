@@ -1,0 +1,92 @@
+{
+  "summary": {
+    "label": "demo-base-r2",
+    "retriever": "Hybrid FTS5 + embeddinggemma-300m-q8 (RRF, intent, FAQ: 0 phrasings)",
+    "llm": "models/gemma-3-1b-it-Q4_K_M.gguf",
+    "accuracy": 1.0,
+    "lawHitRate": 1.0,
+    "fineHitRate": 1.0,
+    "retrievalMsMedian": 103,
+    "answerMsMedian": 13700,
+    "answerMsMean": 12097,
+    "inventedCitationRate": 0.0,
+    "answerQualityRate": 1.0,
+    "badFormat": 0,
+    "blame": 0,
+    "shownWrong": 0,
+    "onTargetCitationRate": 0.0,
+    "answerMsMax": 14178
+  },
+  "questions": [
+    {
+      "id": "d1",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra10054-s3",
+        "ra10054-s7",
+        "ra10054-s5"
+      ],
+      "fines": [
+        "No / non-standard motorcycle helmet — 1st offense",
+        "No seatbelt (driver/front passenger) — 3rd offense and subsequent (+ 1-week license suspension)"
+      ],
+      "answerMs": 14178,
+      "answer": "Kung hindi angkop ang helmet, magkakaroon ng multa na Php 1,500.00 para sa unang pagkakataon,Php3,000.00 para sa pangalawa at Pangatlong pagkakataon, at Php10,000.00 plus confiscation of the driver’s license.",
+      "answerProblems": []
+    },
+    {
+      "id": "d2",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s41",
+        "ra4136-s39"
+      ],
+      "fines": [],
+      "answerMs": 9973,
+      "answer": "Hindi maaaring mag-overtake sa double yellow line. Ang batas ay nagbabawal na mag-oovertake sa left side ng center line maliban kung ito ay nakikita at ligtas ang lugar para sa pag-overtake. \n\nAng pag-overtaking sa double yellow line ay labag sa batas dahil hindi ito pinapayagan, lalo na sa highway.",
+      "answerProblems": []
+    },
+    {
+      "id": "d3",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s44",
+        "ra4136-s40",
+        "ra4136-s49"
+      ],
+      "fines": [],
+      "answerMs": 10538,
+      "answer": "Hindi ito pinal na hatol kung sino ang may sala. Ito ang tinitingnan ng batas sa kuwento ng bawat isa:\nKung totoo ang kuwento ni Driver A, hindi tumutugma ang batas sa sinumang manakumanan nang walang signal light. Kung totoo ang kuwento ni Driver B, dapat magbigay ng audible signal at umabante para makapag-overtake.",
+      "answerProblems": []
+    },
+    {
+      "id": "d4",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s34-p2",
+        "ra10913-s10",
+        "ra10586-s10"
+      ],
+      "fines": [
+        "Disregarding traffic signs (incl. beating the red light)",
+        "Defective motor vehicle accessories (lights, mirrors, horn)"
+      ],
+      "answerMs": 13700,
+      "answer": "Ang MMDA ay may responsibilidad na magpatupad ng batas hinggil sa paglabag sa traffic signs at lights, na may multa na Php 1,000. Ang pag-beat ng red light ay maaaring magresulta sa multa rin. Mahalaga ang pagsunod sa mga patakaran para maiwasan ang legal na problema at mapanatili ang kaligtasan ng trapiko.",
+      "answerProblems": []
+    }
+  ]
+}
