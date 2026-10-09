@@ -9,13 +9,16 @@ Everything here works in airplane mode.
 
 | Item | Type | Purpose |
 |---|---|---|
-| On-device LLM (TBD after spike) | Model | Traffic-law Q&A, two-sides analysis |
-| Whisper (variant TBD) | Model | Local speech recognition, Filipino + English |
+| Gemma 3 1B IT, Q4_K_M GGUF (`ggml-org/gemma-3-1b-it-GGUF`, ~806 MB, Gemma Terms of Use) | Model | Traffic-law Q&A, two-sides analysis |
+| llama.cpp via `llamadart` (MIT) | Package | Runs the GGUF LLM on the phone CPU |
+| Whisper base, multilingual (`ggerganov/whisper.cpp` `ggml-base.bin`, ~148 MB, MIT) | Model | Local speech recognition, Filipino + English |
+| whisper.cpp via `whisper_ggml` (MIT; bundles `ffmpeg_kit_flutter_new_min` for local audio conversion) | Package | Runs Whisper on the phone |
+| `record` | Package | Records 16 kHz mono WAV from the mic for Whisper |
 | Local RAG over `assets/data/laws.json` | Asset + code | Grounds answers in cited law sections |
 | `assets/data/*.json` (laws, fines, hotlines, coding) | Asset | SAMPLE data; sources in [SOURCES.md](SOURCES.md) |
 | Flutter / Dart | Framework | App UI and logic |
 | flutter_riverpod, go_router | Package | State management, navigation |
-| sqlite3, sqlite3_flutter_libs, shared_preferences, path_provider | Package | Local storage |
+| sqlite3 (bundles SQLite with FTS5), shared_preferences, path_provider | Package | Local storage, FTS5 search for RAG |
 | geolocator | Package | GPS location for SOS (no network geocoding) |
 | url_launcher | Package | Opens the phone dialer / SMS app |
 | permission_handler | Package | Runtime permissions |
@@ -26,9 +29,12 @@ Everything here works in airplane mode.
 
 | Item | When | Purpose |
 |---|---|---|
-| Model download (`ModelManager.downloadModels()`) | Once, on first launch | Fetches the LLM + Whisper model files (source URL TBD) |
+| Model download (`ModelManager.downloadModels()`) | Once, on first launch | Fetches `gemma-3-1b-it-Q4_K_M.gguf` and `ggml-base.bin` from huggingface.co (public, no account/token) into app storage. Resumable. |
 
 No other feature uses the network. No cloud AI APIs are used.
+
+Build time only (developer machine, not the app): `llamadart` and `sqlite3`
+build hooks download prebuilt native libraries while compiling the APK.
 
 ## AI dev tools
 
