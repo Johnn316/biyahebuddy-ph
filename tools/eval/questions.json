@@ -28,5 +28,6 @@
   {"id": "q27", "lang": "tagalog", "intent": "fine", "question": "Sobra ang pasahero ng jeep ko, may multa ba?", "laws": ["ra4136-s32"], "fines": ["Overloading"]},
   {"id": "q28", "lang": "english", "intent": "general", "question": "Do I need license plates on both the front and the rear of my car?", "laws": ["ra4136-s18", "ra4136-s17"]},
   {"id": "q29", "lang": "taglish", "intent": "two_sides", "question": "Nauna ako sa intersection at dumiretso lang ako", "driverB": "Kumaliwa ako kasi akala ko titigil siya", "laws": ["ra4136-s42", "ra4136-s45"]},
-  {"id": "q30", "lang": "taglish", "intent": "two_sides", "question": "Nag-overtake siya sa kanan ko tapos biglang sumingit", "driverB": "Ang bagal niya kasi kaya nag-overtake ako", "laws": ["ra4136-s39", "ra4136-s40", "ra4136-s41"]}
+  {"id": "q30", "lang": "taglish", "intent": "two_sides", "question": "Nag-overtake siya sa kanan ko tapos biglang sumingit", "driverB": "Ang bagal niya kasi kaya nag-overtake ako", "laws": ["ra4136-s39", "ra4136-s40", "ra4136-s41"]},
+  {"id": "q31", "lang": "taglish", "intent": "enforcer", "question": "Hinuli ako dahil ang backride ko ay naka tsinelas, ano ang gagawin ko", "fines": ["Motorcycle dress code"]}
 ]

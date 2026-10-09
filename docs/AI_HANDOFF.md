@@ -248,3 +248,4 @@ than the section-1 numbers); phone still to be measured.
 Note: `expandQuery` doesn't look up hyphen parts ("nag-counterflow"), so
 synonyms miss prefixed words. Worth fixing together with the q18 data fix and
 measuring.
+| 5. `assets/data/faq.json`: 32 common situations, 156 Taglish/English phrasings → law sections; 97 everyday aliases added to fines (tsinelas/backride, red light, coding, …); main set +q31 (slippers, from ask-mode feedback). FAQ phrasings reworded where they echoed eval questions (honest numbers), and never name the actor (pulis/enforcer — they matched every "sabi ng pulis" question). | 96.8% (30/31) | 80.0% (8/10) | 4/4 retrieval |

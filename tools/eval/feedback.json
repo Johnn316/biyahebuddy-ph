@@ -1,0 +1,26 @@
+[
+  {
+    "at": "2026-10-10T01:06:16.870217",
+    "question": "Hinuli ako dahil ang backride ko ay naka tsinelas, ano ang gagawin ko",
+    "intents": [
+      "enforcer"
+    ],
+    "topLaws": [
+      "ra10054-s3",
+      "ra10054-s5",
+      "ra10054-s2"
+    ],
+    "topFines": [
+      "Child passenger on motorcycle in prohibited conditions",
+      "Motorcycle dress code violation (slippers, sando/shorts)"
+    ],
+    "answerPagsusuri": "Kailangan mong mag-adjust ng iyong helmet para sa safety. Kung may nakasabit na tali o tela sa likod mo, dapat itong alisin upang maiwasan ang pagkahulog at masiguro ang iyong seguridad.  Kung hindi ka makapag-adjust, kailangang magbigay ng proof na ito ay mandatory dahil nasa likod ka nagkakasya.",
+    "expected": {
+      "fines": [
+        "Motorcycle dress code"
+      ],
+      "laws": []
+    },
+    "note": "Right fine (MMDA dress code, slippers, P500) ranked 2nd behind unrelated 'Child passenger on motorcycle' (0.0705 vs 0.0703). Laws are helmet sections incl. boilerplate Sec. 2 Declaration of Policy. Analysis talks about adjusting a helmet, never slippers. 'Hinuli ako' not treated as a fine question -> generic steps. Likely: 'tsinelas' not in dress-code aliases; 'backride' pulls helmet law (back riders). Total 37 s on PC."
+  }
+]
