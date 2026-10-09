@@ -14,7 +14,8 @@ class OfficerMessageScreen extends StatefulWidget {
   final Fine fine;
 
   static Future<void> open(BuildContext context, Fine fine) =>
-      Navigator.of(context).push(
+      // Root navigator: full screen above the tab bar.
+      Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute<void>(
           fullscreenDialog: true,
           builder: (_) => OfficerMessageScreen(fine: fine),

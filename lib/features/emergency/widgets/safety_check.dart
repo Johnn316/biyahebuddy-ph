@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -33,20 +35,24 @@ class SafetyCheck extends ConsumerWidget {
               duration: const Duration(milliseconds: 180),
               decoration: BoxDecoration(
                 color: selected ? color : context.colors.surface,
-                borderRadius: BorderRadius.circular(18),
+                // iOS: borderless when idle, colored ring when chosen.
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                 border: Border.all(
-                  color: selected ? color : context.colors.outline,
+                  color: selected ? color : Colors.transparent,
                   width: 2,
                 ),
                 boxShadow: selected ? p.cardShadow : null,
               ),
               child: Material(
                 type: MaterialType.transparency,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   key: key,
-                  onTap: () => ref.read(injuredProvider.notifier).state = value,
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref.read(injuredProvider.notifier).state = value;
+                  },
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 76),
                     child: Padding(
@@ -92,7 +98,7 @@ class SafetyCheck extends ConsumerWidget {
             choice(
               key: const Key('injured-yes'),
               label: 'May sugatan',
-              icon: Icons.personal_injury_rounded,
+              icon: CupertinoIcons.bandage_fill,
               value: true,
               color: p.emergency,
               onColor: p.onEmergency,
@@ -101,7 +107,7 @@ class SafetyCheck extends ConsumerWidget {
             choice(
               key: const Key('injured-no'),
               label: 'Walang sugatan',
-              icon: Icons.health_and_safety_rounded,
+              icon: CupertinoIcons.checkmark_shield_fill,
               value: false,
               color: p.success,
               onColor: p.onSuccess,
@@ -126,7 +132,7 @@ class SafetyCheck extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.call_rounded,
+                          CupertinoIcons.phone_fill,
                           size: 40,
                           color: p.onEmergency,
                         ),

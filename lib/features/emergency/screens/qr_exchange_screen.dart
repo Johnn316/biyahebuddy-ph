@@ -22,7 +22,8 @@ class QrExchangeScreen extends StatelessWidget {
   final Profile profile;
 
   static Future<void> open(BuildContext context, Profile profile) =>
-      Navigator.of(context).push(
+      // Root navigator: full screen above the tab bar.
+      Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute<void>(
           fullscreenDialog: true,
           builder: (_) => QrExchangeScreen(profile: profile),
@@ -58,6 +59,7 @@ class QrExchangeScreen extends StatelessWidget {
                       child: AppCard(
                         color: Colors.white,
                         padding: const EdgeInsets.all(18),
+                        shadow: false,
                         child: QrImageView(
                           key: const Key('qr-exchange'),
                           data: qrExchangeText(profile),

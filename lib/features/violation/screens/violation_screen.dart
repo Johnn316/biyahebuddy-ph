@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,13 +6,14 @@ import 'package:go_router/go_router.dart';
 import '../../../core/contracts/contracts.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_card.dart';
+import '../../shared/widgets/grouped.dart';
 import '../controllers/violation_controller.dart';
 import '../widgets/agency_picker.dart';
 import '../widgets/violation_search_field.dart';
 import 'fine_result_screen.dart';
 
-/// "Na-flag ako": 1) pick agency → 2) tap a violation → result. Max 2 taps.
+/// "Na-flag ako" tab: 1) pick agency → 2) tap a violation → result.
+/// Max 2 taps. Back from step 2 returns to step 1.
 class ViolationScreen extends ConsumerStatefulWidget {
   const ViolationScreen({super.key});
 
@@ -34,14 +36,6 @@ class _ViolationScreenState extends ConsumerState<ViolationScreen> {
     ref.read(selectedAgencyProvider.notifier).state = agency;
   }
 
-  void _back() {
-    if (ref.read(selectedAgencyProvider) != null) {
-      _selectAgency(null); // step 2 → step 1
-    } else {
-      context.canPop() ? context.pop() : context.go(Routes.home);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final agency = ref.watch(selectedAgencyProvider);
@@ -52,15 +46,19 @@ class _ViolationScreenState extends ConsumerState<ViolationScreen> {
         if (!didPop) _selectAgency(null);
       },
       child: Scaffold(
-        appBar: AppBar(
-          leading: BackButton(onPressed: _back),
-          title: const Text('Na-flag ako'),
-        ),
+        appBar: agency == null
+            ? null
+            : AppBar(
+                leading: BackButton(onPressed: () => _selectAgency(null)),
+                title: const Text('Na-flag ako'),
+              ),
         body: SafeArea(
-          top: false,
-          child: agency == null
-              ? AgencyPickerLarge(onSelected: _selectAgency)
-              : _ViolationStep(agency: agency, search: _search),
+          top: agency == null,
+          child: ContentWidth(
+            child: agency == null
+                ? AgencyPickerLarge(onSelected: _selectAgency)
+                : _ViolationStep(agency: agency, search: _search),
+          ),
         ),
       ),
     );
@@ -77,10 +75,9 @@ class _ViolationStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final results = ref.watch(violationResultsProvider);
     final query = ref.watch(violationQueryProvider).trim();
-    final text = Theme.of(context).textTheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -91,55 +88,62 @@ class _ViolationStep extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           ViolationSearchField(controller: search),
-          const SizedBox(height: 12),
-          Text(
-            query.isEmpty ? 'Karaniwang violation' : 'Resulta',
-            style: text.titleMedium?.copyWith(color: context.palette.muted),
-          ),
-          const SizedBox(height: 4),
           Expanded(
             child: results.when(
               skipLoadingOnReload: true,
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CupertinoActivityIndicator()),
               error: (_, _) => Center(
                 child: Text(
                   'Hindi ma-load ang listahan.',
-                  style: text.titleLarge,
+                  style: context.text.titleLarge,
                 ),
               ),
               data: (fines) => fines.isEmpty
                   ? Center(
-                      child: Text(
-                        'Walang nahanap para sa "$query".\n'
-                        'Subukan ang ibang salita o pindutin ang '
-                        '"Hindi ko alam" sa ibaba.',
-                        textAlign: TextAlign.center,
-                        style: text.titleLarge,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          'Walang nahanap para sa "$query".\n'
+                          'Subukan ang ibang salita o pindutin ang '
+                          '"Hindi ko alam" sa ibaba.',
+                          textAlign: TextAlign.center,
+                          style: context.text.titleMedium?.copyWith(
+                            color: context.palette.muted,
+                          ),
+                        ),
                       ),
                     )
-                  : ListView.separated(
-                      itemCount: fines.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 8),
-                      itemBuilder: (context, i) =>
-                          _FineTile(index: i, fine: fines[i]),
+                  : ListView(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      children: [
+                        GroupedSection(
+                          header: query.isEmpty
+                              ? 'Karaniwang violation'
+                              : 'Resulta',
+                          margin: const EdgeInsets.only(top: 18),
+                          children: [
+                            for (final (i, f) in fines.indexed)
+                              _FineTile(index: i, fine: f),
+                          ],
+                        ),
+                      ],
                     ),
             ),
           ),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
+          FilledButton.tonalIcon(
             key: const Key('unknown-violation'),
-            style: OutlinedButton.styleFrom(
+            style: FilledButton.styleFrom(
+              backgroundColor: context.colors.surface,
               foregroundColor: context.colors.primary,
-              side: BorderSide(color: context.colors.primary, width: 2),
-              textStyle: text.titleMedium,
+              textStyle: context.text.titleMedium,
             ),
-            onPressed: () => context.push(
+            onPressed: () => context.go(
               Uri(
                 path: Routes.chat,
                 queryParameters: {'q': unknownViolationQuestion(agency)},
               ).toString(),
             ),
-            icon: const Icon(Icons.help_outline_rounded),
+            icon: const Icon(CupertinoIcons.question_circle_fill),
             label: const Text('Hindi ko alam ang violation'),
           ),
         ],
@@ -157,31 +161,20 @@ class _FineTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return AppCard(
+    return GroupedTile(
       tapKey: Key('fine-$index'),
-      shadow: false,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      title: fine.violation,
       onTap: () => FineResultScreen.open(context, fine),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(fine.violation, style: context.text.titleMedium),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: p.accent,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              formatPeso(fine.amount),
-              style: context.text.titleMedium?.copyWith(color: p.onAccent),
-            ),
-          ),
-          const SizedBox(width: 4),
-          Icon(Icons.chevron_right_rounded, color: p.muted),
-        ],
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: p.accent,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Text(
+          formatPeso(fine.amount),
+          style: context.text.titleSmall?.copyWith(color: p.onAccent),
+        ),
       ),
     );
   }

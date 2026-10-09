@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -62,8 +63,8 @@ class ModelDownloadStep extends ConsumerWidget {
                         ),
                         child: Icon(
                           done
-                              ? Icons.check_circle_rounded
-                              : Icons.download_for_offline_rounded,
+                              ? CupertinoIcons.checkmark_seal_fill
+                              : CupertinoIcons.cloud_download_fill,
                           size: 96,
                           color: heroColor,
                         ),
@@ -85,7 +86,7 @@ class ModelDownloadStep extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.wifi_off_rounded, color: p.success),
+                          Icon(CupertinoIcons.wifi_slash, color: p.success),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
@@ -130,7 +131,7 @@ class ModelDownloadStep extends ConsumerWidget {
                   foregroundColor: p.onSuccess,
                 ),
                 onPressed: onContinue,
-                icon: const Icon(Icons.arrow_forward_rounded),
+                icon: const Icon(CupertinoIcons.arrow_right),
                 label: const Text('Tuloy'),
               ),
               DownloadPhase.downloading => const FilledButton(
@@ -140,7 +141,7 @@ class ModelDownloadStep extends ConsumerWidget {
               DownloadPhase.idle || DownloadPhase.failed => FilledButton.icon(
                 key: const Key('model-download'),
                 onPressed: controller.start,
-                icon: const Icon(Icons.download_rounded),
+                icon: const Icon(CupertinoIcons.arrow_down_circle_fill),
                 label: Text(
                   state.phase == DownloadPhase.failed
                       ? 'Subukan ulit'

@@ -1,12 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../core/contracts/contracts.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_card.dart';
+import '../../shared/widgets/grouped.dart';
 import '../controllers/violation_controller.dart';
 import 'officer_message_screen.dart';
 
-/// Result card for one violation + big IPAKITA button (thumb zone).
+/// Result as an inset card + big IPAKITA button (thumb zone).
 class FineResultScreen extends StatelessWidget {
   const FineResultScreen({super.key, required this.fine});
 
@@ -18,102 +20,113 @@ class FineResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
     final scheme = context.colors;
+    final p = context.palette;
 
-    Widget label(String s) => Padding(
-      padding: const EdgeInsets.only(top: 18, bottom: 2),
-      child: Text(s, style: context.text.bodySmall),
+    Widget row(String label, String value) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: context.text.bodySmall),
+          Text(value, style: context.text.titleMedium),
+        ],
+      ),
     );
 
     return Scaffold(
       appBar: AppBar(title: Text('Multa · ${fine.agency.label}')),
       body: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSizes.gap),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: AppCard(
-                  padding: EdgeInsets.zero,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          fine.violation,
-                          style: context.text.headlineMedium,
-                        ),
-                        label('Multa'),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            formatPeso(fine.amount),
-                            key: const Key('fine-amount'),
-                            style: context.text.displayLarge?.copyWith(
-                              fontSize: 60,
-                              color: scheme.primary,
-                            ),
-                          ),
-                        ),
-                        label('Ahensya'),
-                        Text(
-                          '${fine.agency.label} — ${fine.agency.description}',
-                          style: context.text.titleLarge,
-                        ),
-                        label('Legal basis'),
-                        Text(fine.legalBasis, style: context.text.titleLarge),
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: scheme.tertiaryContainer,
-                            borderRadius: BorderRadius.circular(
-                              AppSizes.radiusSm,
-                            ),
-                            border: Border.all(color: p.accent, width: 1.5),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.receipt_long_rounded,
-                                color: scheme.onTertiaryContainer,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Humingi ng official ticket. Huwag magbayad '
-                                  'on the spot nang walang resibo.',
-                                  style: context.text.titleMedium?.copyWith(
-                                    color: scheme.onTertiaryContainer,
+        child: ContentWidth(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: ListView(
+                    children: [
+                      GroupedSection(
+                        margin: const EdgeInsets.only(top: 8),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  fine.violation,
+                                  style: context.text.headlineMedium,
+                                ),
+                                const SizedBox(height: 10),
+                                Text('Multa', style: context.text.bodySmall),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    formatPeso(fine.amount),
+                                    key: const Key('fine-amount'),
+                                    style: context.text.displayLarge?.copyWith(
+                                      fontSize: 60,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                          ),
+                          row(
+                            'Ahensya',
+                            '${fine.agency.label} — ${fine.agency.description}',
+                          ),
+                          row('Legal basis', fine.legalBasis),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: scheme.tertiaryContainer,
+                          borderRadius: BorderRadius.circular(
+                            AppSizes.radiusSm,
                           ),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(CupertinoIcons.doc_text_fill, color: p.accent),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Humingi ng official ticket. Huwag magbayad '
+                                'on the spot nang walang resibo.',
+                                style: context.text.titleMedium?.copyWith(
+                                  color: scheme.onTertiaryContainer,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSizes.gap),
-              FilledButton.icon(
-                key: const Key('ipakita'),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(84),
-                  textStyle: context.text.headlineMedium,
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  key: const Key('ipakita'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(72),
+                    textStyle: context.text.headlineSmall,
+                  ),
+                  onPressed: () {
+                    HapticFeedback.mediumImpact();
+                    OfficerMessageScreen.open(context, fine);
+                  },
+                  icon: const Icon(CupertinoIcons.fullscreen, size: 28),
+                  label: const Text('IPAKITA'),
                 ),
-                onPressed: () => OfficerMessageScreen.open(context, fine),
-                icon: const Icon(Icons.fullscreen_rounded, size: 36),
-                label: const Text('IPAKITA'),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

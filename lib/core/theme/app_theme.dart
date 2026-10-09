@@ -1,23 +1,30 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-/// Layout constants: large, one-thumb-friendly.
+/// Layout constants: large, one-thumb-friendly, iOS-like radii.
 abstract final class AppSizes {
   /// Minimum touch target for one-thumb use while stopped.
-  static const minTap = 64.0;
+  static const minTap = 60.0;
   static const gap = 16.0;
 
-  /// Cards, big buttons.
-  static const radius = 20.0;
+  /// Grouped cards, hero elements.
+  static const radius = 26.0;
 
-  /// Inputs, chips, small cards.
-  static const radiusSm = 16.0;
+  /// Buttons, inputs, inner cards.
+  static const radiusSm = 22.0;
+
+  /// Settings-style icon squares.
+  static const radiusIcon = 10.0;
+
+  /// Readable column width on tablets.
+  static const maxContentWidth = 640.0;
 }
 
 /// Brand colors that ColorScheme has no slot for. Screens read these via
 /// `context.palette` — never hardcode colors in features/.
 ///
-/// Rules: [emergency] (red) is ONLY for emergency actions. Warnings like the
-/// coding badge use [accent] (amber). Safe/OK states use [success] (green).
+/// Rules: [emergency] (SOS red) is ONLY for emergency. Coding badge and
+/// citations use [accent] (amber). Safe/OK states use [success] (green).
 @immutable
 class AppPalette extends ThemeExtension<AppPalette> {
   const AppPalette({
@@ -29,56 +36,68 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.success,
     required this.onSuccess,
     required this.muted,
+    required this.groupedBackground,
+    required this.elevated,
     required this.cardShadow,
   });
 
   final Color emergency;
   final Color onEmergency;
 
-  /// Darker end of the emergency gradient.
+  /// Darker end of the SOS gradient.
   final Color emergencyDeep;
   final Color accent;
   final Color onAccent;
   final Color success;
   final Color onSuccess;
 
-  /// Secondary text.
+  /// Secondary label (iOS secondaryLabel, 60%).
   final Color muted;
+
+  /// iOS grouped background (behind inset cards).
+  final Color groupedBackground;
+
+  /// Raised fill on top of cards (iOS secondarySystemGroupedBackground /
+  /// tertiary): Buddy bubbles, search fields, pills.
+  final Color elevated;
+
+  /// Very soft (light) or none (dark).
   final List<BoxShadow> cardShadow;
 
   LinearGradient get emergencyGradient => LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
     colors: [emergency, emergencyDeep],
   );
 
   static const light = AppPalette(
-    emergency: Color(0xFFE5383B),
+    emergency: Color(0xFFFF3B30),
     onEmergency: Colors.white,
-    emergencyDeep: Color(0xFFB4232A),
-    accent: Color(0xFFF5A524),
-    onAccent: Color(0xFF0F172A),
-    success: Color(0xFF1F9D6B),
-    onSuccess: Colors.white,
-    muted: Color(0xFF5B6B82),
+    emergencyDeep: Color(0xFFD70015),
+    accent: Color(0xFFFFB020),
+    onAccent: Color(0xFF000000),
+    success: Color(0xFF34C759),
+    onSuccess: Color(0xFF000000),
+    muted: Color(0x993C3C43),
+    groupedBackground: Color(0xFFF2F2F7),
+    elevated: Color(0xFFE9E9EB),
     cardShadow: [
-      BoxShadow(color: Color(0x140F2A4A), blurRadius: 24, offset: Offset(0, 8)),
-      BoxShadow(color: Color(0x0A0F2A4A), blurRadius: 4, offset: Offset(0, 1)),
+      BoxShadow(color: Color(0x0D000000), blurRadius: 18, offset: Offset(0, 4)),
     ],
   );
 
   static const dark = AppPalette(
-    emergency: Color(0xFFFF5A5F),
+    emergency: Color(0xFFFF3B30),
     onEmergency: Colors.white,
-    emergencyDeep: Color(0xFFC81E2B),
-    accent: Color(0xFFFFB833),
-    onAccent: Color(0xFF0B1220),
-    success: Color(0xFF3DDC97),
-    onSuccess: Color(0xFF0B1220),
-    muted: Color(0xFF93A3BA),
-    cardShadow: [
-      BoxShadow(color: Color(0x66000000), blurRadius: 20, offset: Offset(0, 8)),
-    ],
+    emergencyDeep: Color(0xFFC4141C),
+    accent: Color(0xFFFFB020),
+    onAccent: Color(0xFF000000),
+    success: Color(0xFF34C759),
+    onSuccess: Color(0xFF000000),
+    muted: Color(0x99EBEBF5),
+    groupedBackground: Color(0xFF000000),
+    elevated: Color(0xFF2C2C2E),
+    cardShadow: [],
   );
 
   @override
@@ -91,6 +110,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? success,
     Color? onSuccess,
     Color? muted,
+    Color? groupedBackground,
+    Color? elevated,
     List<BoxShadow>? cardShadow,
   }) => AppPalette(
     emergency: emergency ?? this.emergency,
@@ -101,22 +122,27 @@ class AppPalette extends ThemeExtension<AppPalette> {
     success: success ?? this.success,
     onSuccess: onSuccess ?? this.onSuccess,
     muted: muted ?? this.muted,
+    groupedBackground: groupedBackground ?? this.groupedBackground,
+    elevated: elevated ?? this.elevated,
     cardShadow: cardShadow ?? this.cardShadow,
   );
 
   @override
   AppPalette lerp(AppPalette? other, double t) {
     if (other == null) return this;
+    Color c(Color a, Color b) => Color.lerp(a, b, t)!;
     return AppPalette(
-      emergency: Color.lerp(emergency, other.emergency, t)!,
-      onEmergency: Color.lerp(onEmergency, other.onEmergency, t)!,
-      emergencyDeep: Color.lerp(emergencyDeep, other.emergencyDeep, t)!,
-      accent: Color.lerp(accent, other.accent, t)!,
-      onAccent: Color.lerp(onAccent, other.onAccent, t)!,
-      success: Color.lerp(success, other.success, t)!,
-      onSuccess: Color.lerp(onSuccess, other.onSuccess, t)!,
-      muted: Color.lerp(muted, other.muted, t)!,
-      cardShadow: BoxShadow.lerpList(cardShadow, other.cardShadow, t)!,
+      emergency: c(emergency, other.emergency),
+      onEmergency: c(onEmergency, other.onEmergency),
+      emergencyDeep: c(emergencyDeep, other.emergencyDeep),
+      accent: c(accent, other.accent),
+      onAccent: c(onAccent, other.onAccent),
+      success: c(success, other.success),
+      onSuccess: c(onSuccess, other.onSuccess),
+      muted: c(muted, other.muted),
+      groupedBackground: c(groupedBackground, other.groupedBackground),
+      elevated: c(elevated, other.elevated),
+      cardShadow: BoxShadow.lerpList(cardShadow, other.cardShadow, t) ?? [],
     );
   }
 }
@@ -129,111 +155,120 @@ extension AppThemeContext on BuildContext {
 
 abstract final class AppTheme {
   static const fontFamily = 'PlusJakartaSans';
+  static const _link = Color(0xFF0A84FF);
 
   static final ThemeData light = _build(
     palette: AppPalette.light,
     scheme: const ColorScheme(
       brightness: Brightness.light,
-      primary: Color(0xFF0F2A4A),
+      primary: _link,
       onPrimary: Colors.white,
-      primaryContainer: Color(0xFFDCE7F5),
-      onPrimaryContainer: Color(0xFF0F2A4A),
-      secondary: Color(0xFF0F2A4A),
+      primaryContainer: Color(0xFFDDEBFF),
+      onPrimaryContainer: Color(0xFF003A80),
+      secondary: _link,
       onSecondary: Colors.white,
-      tertiary: Color(0xFFF5A524),
-      onTertiary: Color(0xFF0F172A),
-      tertiaryContainer: Color(0xFFFDEBC8),
-      onTertiaryContainer: Color(0xFF5A3A00),
-      error: Color(0xFFE5383B),
+      tertiary: Color(0xFFFFB020),
+      onTertiary: Colors.black,
+      tertiaryContainer: Color(0xFFFFF1D6),
+      onTertiaryContainer: Color(0xFF5C3B00),
+      // Validation errors: amber, NOT red — red is reserved for SOS.
+      error: Color(0xFFB25E00),
       onError: Colors.white,
       surface: Color(0xFFFFFFFF),
-      onSurface: Color(0xFF0F172A),
-      onSurfaceVariant: Color(0xFF5B6B82),
+      onSurface: Color(0xFF000000),
+      onSurfaceVariant: Color(0x993C3C43),
       surfaceContainerLowest: Color(0xFFFFFFFF),
-      surfaceContainerLow: Color(0xFFF5F7FB),
-      surfaceContainer: Color(0xFFEDF1F7),
-      surfaceContainerHigh: Color(0xFFE6EBF3),
-      surfaceContainerHighest: Color(0xFFDFE5EF),
-      outline: Color(0xFFDCE3EE),
-      outlineVariant: Color(0xFFDCE3EE),
-      inverseSurface: Color(0xFF0F172A),
-      onInverseSurface: Color(0xFFF5F7FB),
-      shadow: Color(0xFF0F2A4A),
+      surfaceContainerLow: Color(0xFFF2F2F7),
+      surfaceContainer: Color(0xFFEFEFF4),
+      surfaceContainerHigh: Color(0xFFE9E9EB),
+      surfaceContainerHighest: Color(0xFFE5E5EA),
+      outline: Color(0xFFC6C6C8),
+      outlineVariant: Color(0xFFC6C6C8),
+      inverseSurface: Color(0xFF1C1C1E),
+      onInverseSurface: Colors.white,
+      shadow: Colors.black,
     ),
-    background: const Color(0xFFF5F7FB),
   );
 
   static final ThemeData dark = _build(
     palette: AppPalette.dark,
     scheme: const ColorScheme(
       brightness: Brightness.dark,
-      primary: Color(0xFF7FB2FF),
-      onPrimary: Color(0xFF0B1220),
-      primaryContainer: Color(0xFF1D3A66),
-      onPrimaryContainer: Color(0xFFDCE9FF),
-      secondary: Color(0xFF7FB2FF),
-      onSecondary: Color(0xFF0B1220),
-      tertiary: Color(0xFFFFB833),
-      onTertiary: Color(0xFF0B1220),
-      tertiaryContainer: Color(0xFF4A3510),
-      onTertiaryContainer: Color(0xFFFFE2B0),
-      error: Color(0xFFFF5A5F),
-      onError: Color(0xFF0B1220),
-      surface: Color(0xFF141D2F),
-      onSurface: Color(0xFFE7EDF7),
-      onSurfaceVariant: Color(0xFF93A3BA),
-      surfaceContainerLowest: Color(0xFF0B1220),
-      surfaceContainerLow: Color(0xFF141D2F),
-      surfaceContainer: Color(0xFF1C2840),
-      surfaceContainerHigh: Color(0xFF22304B),
-      surfaceContainerHighest: Color(0xFF293856),
-      outline: Color(0xFF26344F),
-      outlineVariant: Color(0xFF26344F),
-      inverseSurface: Color(0xFFE7EDF7),
-      onInverseSurface: Color(0xFF0B1220),
+      primary: _link,
+      onPrimary: Colors.white,
+      primaryContainer: Color(0xFF0B3B73),
+      onPrimaryContainer: Color(0xFFD6E8FF),
+      secondary: _link,
+      onSecondary: Colors.white,
+      tertiary: Color(0xFFFFB020),
+      onTertiary: Colors.black,
+      tertiaryContainer: Color(0xFF3D2C0B),
+      onTertiaryContainer: Color(0xFFFFE2A8),
+      // Validation errors: amber, NOT red — red is reserved for SOS.
+      error: Color(0xFFFFB020),
+      onError: Colors.black,
+      surface: Color(0xFF1C1C1E),
+      onSurface: Color(0xFFFFFFFF),
+      onSurfaceVariant: Color(0x99EBEBF5),
+      surfaceContainerLowest: Color(0xFF000000),
+      surfaceContainerLow: Color(0xFF1C1C1E),
+      surfaceContainer: Color(0xFF242426),
+      surfaceContainerHigh: Color(0xFF2C2C2E),
+      surfaceContainerHighest: Color(0xFF3A3A3C),
+      outline: Color(0xFF38383A),
+      outlineVariant: Color(0xFF38383A),
+      inverseSurface: Color(0xFFF2F2F7),
+      onInverseSurface: Colors.black,
       shadow: Colors.black,
     ),
-    background: const Color(0xFF0B1220),
   );
 
   static ThemeData _build({
     required ColorScheme scheme,
     required AppPalette palette,
-    required Color background,
   }) {
     final text = _textTheme(scheme.onSurface, palette.muted);
-    final rounded = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(18),
+    final pill = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppSizes.radiusSm),
     );
     const bigButton = Size.fromHeight(AppSizes.minTap);
 
     return ThemeData(
       useMaterial3: true,
+      // iOS behaviours on every device: back chevrons, bouncing scroll,
+      // Cupertino transitions, adaptive switches/dialogs.
+      platform: TargetPlatform.iOS,
       brightness: scheme.brightness,
       colorScheme: scheme,
       fontFamily: fontFamily,
       textTheme: text,
-      scaffoldBackgroundColor: background,
-      canvasColor: background,
+      scaffoldBackgroundColor: palette.groupedBackground,
+      canvasColor: palette.groupedBackground,
       extensions: [palette],
-      visualDensity: VisualDensity.standard,
-      splashFactory: InkSparkle.splashFactory,
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: scheme.onSurface.withValues(alpha: 0.06),
+      cupertinoOverrideTheme: NoDefaultCupertinoThemeData(
+        brightness: scheme.brightness,
+        primaryColor: scheme.primary,
+        scaffoldBackgroundColor: palette.groupedBackground,
+      ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
         },
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: background,
-        foregroundColor: scheme.onSurface,
+        backgroundColor: palette.groupedBackground,
+        foregroundColor: scheme.primary,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        centerTitle: false,
-        titleTextStyle: text.headlineSmall,
+        centerTitle: true,
+        titleTextStyle: text.titleLarge,
+        iconTheme: IconThemeData(color: scheme.primary, size: 28),
       ),
-      iconTheme: IconThemeData(size: 28, color: scheme.onSurface),
+      iconTheme: IconThemeData(size: 26, color: scheme.onSurface),
       cardTheme: CardThemeData(
         color: scheme.surface,
         surfaceTintColor: Colors.transparent,
@@ -241,108 +276,58 @@ abstract final class AppTheme {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSizes.radius),
-          side: BorderSide(color: scheme.outline),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: bigButton,
           textStyle: text.labelLarge,
-          shape: rounded,
+          shape: pill,
           elevation: 0,
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          minimumSize: bigButton,
-          textStyle: text.labelLarge,
-          shape: rounded,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: bigButton,
           textStyle: text.labelLarge,
-          shape: rounded,
-          foregroundColor: scheme.onSurface,
-          side: BorderSide(color: scheme.outline, width: 1.5),
+          shape: pill,
+          foregroundColor: scheme.primary,
+          side: BorderSide(color: scheme.outline),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           minimumSize: const Size(48, 48),
+          foregroundColor: scheme.primary,
           textStyle: text.titleMedium,
         ),
       ),
       iconButtonTheme: IconButtonThemeData(
-        style: IconButton.styleFrom(minimumSize: const Size(56, 56)),
+        style: IconButton.styleFrom(minimumSize: const Size(52, 52)),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: scheme.surfaceContainer,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 18,
-        ),
+        filled: false,
+        border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
+        contentPadding: const EdgeInsets.symmetric(vertical: 14),
         labelStyle: text.bodyLarge?.copyWith(color: palette.muted),
-        floatingLabelStyle: text.titleMedium?.copyWith(color: scheme.primary),
+        floatingLabelStyle: text.titleSmall?.copyWith(color: scheme.primary),
         hintStyle: text.bodyLarge?.copyWith(color: palette.muted),
         errorStyle: text.bodyMedium?.copyWith(color: scheme.error),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-          borderSide: BorderSide(color: scheme.outline),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-          borderSide: BorderSide(color: scheme.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-          borderSide: BorderSide(color: scheme.error, width: 1.5),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-          borderSide: BorderSide(color: scheme.error, width: 2),
-        ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: scheme.surface,
-        side: BorderSide(color: scheme.outline),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-        ),
-        labelStyle: text.titleMedium,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      ),
-      segmentedButtonTheme: SegmentedButtonThemeData(
-        style: SegmentedButton.styleFrom(
-          minimumSize: const Size.fromHeight(56),
-          textStyle: text.titleMedium,
-          backgroundColor: scheme.surface,
-          foregroundColor: scheme.onSurface,
-          selectedBackgroundColor: scheme.primary,
-          selectedForegroundColor: scheme.onPrimary,
-          side: BorderSide(color: scheme.outline),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-          ),
-        ),
-      ),
-      checkboxTheme: CheckboxThemeData(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        side: BorderSide(color: palette.muted, width: 2),
-        fillColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected) ? palette.success : null,
-        ),
-        checkColor: WidgetStatePropertyAll(palette.onSuccess),
+        side: BorderSide.none,
+        shape: const StadiumBorder(),
+        labelStyle: text.titleSmall,
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: scheme.primary,
-        linearTrackColor: scheme.surfaceContainer,
+        linearTrackColor: palette.elevated,
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
@@ -354,17 +339,20 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.circular(AppSizes.radiusSm),
         ),
       ),
-      dividerTheme: DividerThemeData(color: scheme.outline, thickness: 1),
-      listTileTheme: ListTileThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+      dividerTheme: DividerThemeData(
+        color: scheme.outline,
+        thickness: 0.5,
+        space: 0.5,
+      ),
+      switchTheme: SwitchThemeData(
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? palette.success : null,
         ),
       ),
-      dropdownMenuTheme: DropdownMenuThemeData(textStyle: text.titleLarge),
     );
   }
 
-  /// Big bold headings, readable body.
+  /// iOS-like hierarchy, sized up for drivers.
   static TextTheme _textTheme(Color on, Color muted) {
     TextStyle s(double size, FontWeight w, {double h = 1.25, double ls = 0}) =>
         TextStyle(
@@ -376,21 +364,22 @@ abstract final class AppTheme {
           color: on,
         );
     return TextTheme(
-      displayLarge: s(44, FontWeight.w800, h: 1.1, ls: -0.5),
-      displayMedium: s(36, FontWeight.w800, h: 1.12, ls: -0.4),
-      displaySmall: s(32, FontWeight.w800, h: 1.15, ls: -0.3),
-      headlineLarge: s(30, FontWeight.w800, h: 1.18, ls: -0.3),
-      headlineMedium: s(26, FontWeight.w800, h: 1.2, ls: -0.2),
-      headlineSmall: s(23, FontWeight.w700, h: 1.22),
-      titleLarge: s(21, FontWeight.w700),
-      titleMedium: s(18, FontWeight.w700),
-      titleSmall: s(16, FontWeight.w700),
+      // Large Title and friends.
+      displayLarge: s(48, FontWeight.w800, h: 1.05, ls: -1),
+      displayMedium: s(38, FontWeight.w800, h: 1.1, ls: -0.6),
+      displaySmall: s(34, FontWeight.w800, h: 1.12, ls: -0.5),
+      headlineLarge: s(30, FontWeight.w800, h: 1.15, ls: -0.4),
+      headlineMedium: s(26, FontWeight.w700, h: 1.2, ls: -0.3),
+      headlineSmall: s(23, FontWeight.w700, h: 1.22, ls: -0.2),
+      titleLarge: s(20, FontWeight.w700, ls: -0.2),
+      titleMedium: s(18, FontWeight.w600),
+      titleSmall: s(16, FontWeight.w600),
       bodyLarge: s(19, FontWeight.w500, h: 1.4),
       bodyMedium: s(17, FontWeight.w500, h: 1.4),
       bodySmall: s(15, FontWeight.w500, h: 1.35).copyWith(color: muted),
-      labelLarge: s(20, FontWeight.w800, ls: 0.2),
-      labelMedium: s(16, FontWeight.w700),
-      labelSmall: s(14, FontWeight.w700),
+      labelLarge: s(19, FontWeight.w700),
+      labelMedium: s(15, FontWeight.w600),
+      labelSmall: s(13, FontWeight.w600).copyWith(color: muted),
     );
   }
 }

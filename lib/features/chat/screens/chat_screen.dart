@@ -1,15 +1,21 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../shared/widgets/grouped.dart';
 import '../controllers/chat_controller.dart';
 import '../widgets/buddy_answer.dart';
 import '../widgets/chat_input_bar.dart';
 import '../widgets/user_bubble.dart';
 
-/// "Tanong kay Buddy". `/chat?q=<text>` prefills the box (never auto-sends).
+/// "Tanong kay Buddy" tab. `/chat?q=<text>` prefills the box (never
+/// auto-sends) — also when the tab already exists. History lives as long as
+/// the app session (tabs keep their state).
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
 
@@ -18,11 +24,20 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
-  late final _input = TextEditingController(
-    text: GoRouterState.of(context).uri.queryParameters['q'],
-  );
+  final _input = TextEditingController();
   final _inputFocus = FocusNode();
   final _scroll = ScrollController();
+  String? _appliedQ;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final q = GoRouterState.of(context).uri.queryParameters['q'];
+    if (q != null && q != _appliedQ) {
+      _appliedQ = q;
+      _input.text = q;
+    }
+  }
 
   @override
   void dispose() {
@@ -57,6 +72,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _quickQuestion(String q) {
+    HapticFeedback.selectionClick();
     if (q.endsWith('…')) {
       // Unfinished question: put it in the box for the driver to complete.
       _input.text = '${q.substring(0, q.length - 1)} ';
@@ -67,21 +83,38 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
   }
 
+  Future<void> _newCase() async {
+    final ok = await confirmWithSheet(
+      context,
+      title: 'Bagong kaso?',
+      message: 'Mabubura ang kasalukuyang pagsusuri.',
+      confirmLabel: 'Magsimula ulit',
+      destructive: false,
+    );
+    if (!ok || !mounted) return;
+    _input.clear();
+    _chat.newCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(chatControllerProvider);
     ref.listen(chatControllerProvider, (prev, next) {
       if (prev?.visibleMessages != next.visibleMessages) _scrollToBottom();
     });
-    final text = Theme.of(context).textTheme;
+    final p = context.palette;
     final twoSides = state.mode == ChatMode.twoSides;
     final showResult = twoSides && state.twoSidesStep == TwoSidesStep.result;
+    // Room for the frosted input area (body extends behind it).
+    final bottom = MediaQuery.paddingOf(context).bottom;
 
     final Widget body = switch (state) {
-      ChatState(mode: ChatMode.ask, askMessages: []) => const _EmptyAsk(),
+      ChatState(mode: ChatMode.ask, askMessages: []) => _EmptyAsk(
+        bottom: bottom,
+      ),
       _ when !twoSides || showResult => ListView.separated(
         controller: _scroll,
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+        padding: EdgeInsets.fromLTRB(14, 12, 14, bottom + 16),
         itemCount: state.visibleMessages.length,
         separatorBuilder: (_, _) => const SizedBox(height: 14),
         itemBuilder: (_, i) {
@@ -94,6 +127,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       _ => _TwoSidesPrompt(
         step: state.twoSidesStep,
         sideA: state.sideA,
+        bottom: bottom,
         onEditSideA: () {
           _input.text = state.sideA;
           _chat.backToSideA();
@@ -102,12 +136,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     };
 
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
-        leading: BackButton(
-          onPressed: () =>
-              context.canPop() ? context.pop() : context.go(Routes.home),
-        ),
-        titleSpacing: 0,
+        automaticallyImplyLeading: false,
+        centerTitle: false,
+        titleSpacing: 16,
         title: Row(
           children: [
             const BuddyAvatar(size: 40),
@@ -116,13 +149,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Buddy'),
+                  Text('Buddy', style: context.text.titleLarge),
                   Row(
                     children: [
                       Icon(
-                        Icons.wifi_off_rounded,
-                        size: 16,
-                        color: context.palette.success,
+                        CupertinoIcons.wifi_slash,
+                        size: 14,
+                        color: p.success,
                       ),
                       const SizedBox(width: 4),
                       Flexible(
@@ -131,9 +164,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             'Gumagana kahit walang signal',
-                            style: text.bodyMedium?.copyWith(
-                              color: context.palette.success,
-                              fontSize: 15,
+                            style: context.text.labelMedium?.copyWith(
+                              color: p.success,
                             ),
                           ),
                         ),
@@ -146,119 +178,166 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ],
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-            child: SegmentedButton<ChatMode>(
-              key: const Key('chat-mode'),
-              showSelectedIcon: false,
-              style: SegmentedButton.styleFrom(
-                minimumSize: const Size.fromHeight(56),
-                textStyle: text.titleLarge,
+      body: ContentWidth(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+              child: CupertinoSlidingSegmentedControl<ChatMode>(
+                key: const Key('chat-mode'),
+                groupValue: state.mode,
+                thumbColor: context.colors.surface,
+                backgroundColor: p.elevated,
+                padding: const EdgeInsets.all(4),
+                children: {
+                  for (final (m, icon, label) in [
+                    (ChatMode.ask, CupertinoIcons.chat_bubble_fill, 'Tanong'),
+                    (
+                      ChatMode.twoSides,
+                      CupertinoIcons.person_2_fill,
+                      'Dalawang panig',
+                    ),
+                  ])
+                    m: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(icon, size: 18),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.text.titleSmall,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                },
+                onValueChanged: (m) {
+                  if (m == null || state.streaming) return;
+                  HapticFeedback.selectionClick();
+                  _input.clear();
+                  _chat.setMode(m);
+                },
               ),
-              segments: const [
-                ButtonSegment(
-                  value: ChatMode.ask,
-                  icon: Icon(Icons.forum_rounded),
-                  label: Text('Tanong'),
+            ),
+            Expanded(child: body),
+          ],
+        ),
+      ),
+      bottomNavigationBar: _FrostedBottom(
+        child: ContentWidth(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (state.mode == ChatMode.ask && state.askMessages.isEmpty)
+                _QuickChips(onTap: _quickQuestion),
+              if (showResult && !state.streaming)
+                FilledButton.icon(
+                  key: const Key('new-case'),
+                  onPressed: _newCase,
+                  icon: const Icon(CupertinoIcons.arrow_counterclockwise),
+                  label: const Text('Bagong kaso'),
+                )
+              else
+                ChatInputBar(
+                  controller: _input,
+                  focusNode: _inputFocus,
+                  hint: switch ((state.mode, state.twoSidesStep)) {
+                    (ChatMode.ask, _) => 'Itanong kay Buddy…',
+                    (_, TwoSidesStep.sideA) => 'Ikuwento ang nangyari…',
+                    _ => 'Ano ang sabi niya…',
+                  },
+                  actionLabel: switch ((state.mode, state.twoSidesStep)) {
+                    (ChatMode.ask, _) => null,
+                    (_, TwoSidesStep.sideA) => 'Susunod',
+                    _ => 'Suriin',
+                  },
+                  streaming: state.streaming,
+                  onSubmit: _submit,
+                  onStop: _chat.stop,
                 ),
-                ButtonSegment(
-                  value: ChatMode.twoSides,
-                  icon: Icon(Icons.balance_rounded),
-                  label: Text('Dalawang panig'),
-                ),
-              ],
-              selected: {state.mode},
-              onSelectionChanged: state.streaming
-                  ? null
-                  : (s) {
-                      _input.clear();
-                      _chat.setMode(s.single);
-                    },
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Translucent, blurred bottom area (content scrolls behind it).
+class _FrostedBottom extends StatelessWidget {
+  const _FrostedBottom({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: context.palette.groupedBackground.withValues(alpha: 0.78),
+            border: Border(
+              top: BorderSide(
+                color: context.colors.outline.withValues(alpha: 0.6),
+                width: 0.5,
+              ),
             ),
           ),
-          Expanded(child: body),
-          if (state.mode == ChatMode.ask && state.askMessages.isEmpty)
-            _QuickChips(onTap: _quickQuestion),
-          if (showResult && !state.streaming)
-            SafeArea(
-              top: false,
-              minimum: const EdgeInsets.all(12),
-              child: FilledButton.icon(
-                key: const Key('new-case'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: context.palette.accent,
-                  foregroundColor: context.palette.onAccent,
-                ),
-                onPressed: () {
-                  _input.clear();
-                  _chat.newCase();
-                },
-                icon: const Icon(Icons.restart_alt_rounded),
-                label: const Text('Bagong kaso'),
-              ),
-            )
-          else
-            ChatInputBar(
-              controller: _input,
-              focusNode: _inputFocus,
-              hint: switch ((state.mode, state.twoSidesStep)) {
-                (ChatMode.ask, _) => 'Itanong kay Buddy…',
-                (_, TwoSidesStep.sideA) => 'Ikuwento ang nangyari…',
-                _ => 'Ano ang sabi niya…',
-              },
-              actionLabel: switch ((state.mode, state.twoSidesStep)) {
-                (ChatMode.ask, _) => null,
-                (_, TwoSidesStep.sideA) => 'Susunod',
-                _ => 'Suriin',
-              },
-              streaming: state.streaming,
-              onSubmit: _submit,
-              onStop: _chat.stop,
-            ),
-        ],
+          child: SafeArea(
+            top: false,
+            minimum: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            child: child,
+          ),
+        ),
       ),
     );
   }
 }
 
 class _EmptyAsk extends StatelessWidget {
-  const _EmptyAsk();
+  const _EmptyAsk({required this.bottom});
+
+  final double bottom;
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
     // Fills the space; scrolls instead of overflowing on short screens.
     return LayoutBuilder(
       builder: (context, box) => SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSizes.gap),
+        padding: EdgeInsets.fromLTRB(24, 16, 24, bottom + 16),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            minHeight: (box.maxHeight - 2 * AppSizes.gap).clamp(
-              0,
-              double.infinity,
-            ),
+            minHeight: (box.maxHeight - bottom - 32).clamp(0, double.infinity),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (box.maxHeight > 260)
+              if (box.maxHeight - bottom > 280)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 20),
-                  child: BuddyAvatar(size: 96),
+                  child: BuddyAvatar(size: 88),
                 ),
               Text(
                 'Ano ang gusto mong itanong kay Buddy?',
                 textAlign: TextAlign.center,
-                style: text.headlineMedium,
+                style: context.text.headlineMedium,
               ),
               const SizedBox(height: 8),
               Text(
                 'Batas trapiko, multa, aksidente — magsalita o mag-type.',
                 textAlign: TextAlign.center,
-                style: text.bodyLarge?.copyWith(color: context.palette.muted),
+                style: context.text.bodyLarge?.copyWith(
+                  color: context.palette.muted,
+                ),
               ),
             ],
           ),
@@ -278,7 +357,7 @@ class _QuickChips extends StatelessWidget {
     // One swipeable row: keeps the input visible even with the keyboard open.
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
           for (final (i, q) in quickQuestions.indexed)
@@ -287,14 +366,10 @@ class _QuickChips extends StatelessWidget {
               child: ActionChip(
                 key: Key('quick-$i'),
                 label: Text(q),
-                labelStyle: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontSize: 18),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 10,
+                labelStyle: context.text.titleSmall?.copyWith(
+                  color: context.colors.primary,
                 ),
-                side: BorderSide(color: context.palette.accent, width: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
                 onPressed: () => onTap(q),
               ),
             ),
@@ -309,33 +384,37 @@ class _TwoSidesPrompt extends StatelessWidget {
   const _TwoSidesPrompt({
     required this.step,
     required this.sideA,
+    required this.bottom,
     required this.onEditSideA,
   });
 
   final TwoSidesStep step;
   final String sideA;
+  final double bottom;
   final VoidCallback onEditSideA;
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
     final isA = step == TwoSidesStep.sideA;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSizes.gap),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, bottom + 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            isA ? 'Hakbang 1 ng 2' : 'Hakbang 2 ng 2',
-            style: text.titleMedium?.copyWith(color: context.colors.primary),
+            isA ? 'HAKBANG 1 NG 2' : 'HAKBANG 2 NG 2',
+            style: context.text.labelMedium?.copyWith(
+              color: context.colors.primary,
+              letterSpacing: 0.6,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             isA
                 ? 'Ano ang nangyari sa panig mo?'
                 : 'Ano ang sabi ng kabilang driver?',
             key: const Key('two-sides-prompt'),
-            style: text.displayLarge?.copyWith(fontSize: 34),
+            style: context.text.displaySmall,
           ),
           const SizedBox(height: 12),
           Text(
@@ -344,31 +423,33 @@ class _TwoSidesPrompt extends StatelessWidget {
                       'lumiko pakaliwa."'
                 : 'Ilagay ang kuwento niya kahit hindi ka sang-ayon. Si Buddy '
                       'ang titingin sa dalawang panig.',
-            style: text.bodyLarge?.copyWith(color: context.palette.muted),
-          ),
-          if (!isA) ...[
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: context.colors.surfaceContainer,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Panig mo', style: text.bodySmall),
-                  Text(sideA, style: text.bodyLarge),
-                  TextButton.icon(
-                    key: const Key('edit-side-a'),
-                    onPressed: onEditSideA,
-                    icon: const Icon(Icons.edit_rounded),
-                    label: const Text('Baguhin'),
-                  ),
-                ],
-              ),
+            style: context.text.bodyLarge?.copyWith(
+              color: context.palette.muted,
             ),
-          ],
+          ),
+          if (!isA)
+            GroupedSection(
+              header: 'Panig mo',
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                  child: Text(sideA, style: context.text.bodyLarge),
+                ),
+                GroupedTile(
+                  tapKey: const Key('edit-side-a'),
+                  leading: Icon(
+                    CupertinoIcons.pencil,
+                    color: context.colors.primary,
+                  ),
+                  title: 'Baguhin',
+                  titleStyle: context.text.titleMedium?.copyWith(
+                    color: context.colors.primary,
+                  ),
+                  chevron: false,
+                  onTap: onEditSideA,
+                ),
+              ],
+            ),
         ],
       ),
     );

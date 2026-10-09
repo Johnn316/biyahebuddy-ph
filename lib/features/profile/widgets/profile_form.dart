@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/contracts/contracts.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../shared/widgets/grouped.dart';
 import 'form_fields.dart';
 
 const vehicleTypes = ['Kotse', 'Motorsiklo', 'SUV/Van', 'Truck', 'Iba pa'];
@@ -147,9 +149,29 @@ class _ProfileFormState extends State<ProfileForm> {
     );
   }
 
+  Future<void> _removeContact(_ContactControllers c) async {
+    final name = c.name.text.trim();
+    final ok = await confirmWithSheet(
+      context,
+      title: name.isEmpty ? 'Tanggalin ang contact?' : 'Tanggalin si $name?',
+      message: 'Hindi na siya ite-text kapag may emergency.',
+      confirmLabel: 'Tanggalin',
+      destructive: false, // red is reserved for SOS
+    );
+    if (!ok || !mounted) return;
+    setState(() {
+      _contacts.remove(c);
+      c.dispose();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    const gap = SizedBox(height: AppSizes.gap);
+    Widget field(Widget child) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: child,
+    );
+
     return Form(
       key: _formKey,
       child: Column(
@@ -159,225 +181,218 @@ class _ProfileFormState extends State<ProfileForm> {
             // SingleChildScrollView (not ListView) so off-screen fields are
             // still built and validated.
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ?widget.header,
-                  const FormSectionTitle('Ikaw', icon: Icons.person_rounded),
-                  BigTextField(
-                    key: const Key('field-name'),
-                    controller: _name,
-                    label: 'Pangalan',
-                    required: true,
-                    textCapitalization: TextCapitalization.words,
-                  ),
-                  gap,
-                  BigTextField(
-                    key: const Key('field-age'),
-                    controller: _age,
-                    label: 'Edad',
-                    required: true,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) {
-                      final age = int.tryParse(v);
-                      return age == null || age < 16 || age > 100
-                          ? '16 hanggang 100 lang'
-                          : null;
-                    },
-                  ),
-                  const FormSectionTitle(
-                    'Lisensya at sasakyan',
-                    icon: Icons.badge_rounded,
-                  ),
-                  BigTextField(
-                    key: const Key('field-license'),
-                    controller: _license,
-                    label: 'License no.',
-                    hint: 'Hal. N01-23-456789',
-                    required: true,
-                    textCapitalization: TextCapitalization.characters,
-                  ),
-                  gap,
-                  BigTextField(
-                    key: const Key('field-restriction'),
-                    controller: _restriction,
-                    label: 'Restriction code',
-                    hint: 'Hal. B, B1',
-                    required: true,
-                    textCapitalization: TextCapitalization.characters,
-                  ),
-                  gap,
-                  BigTextField(
-                    key: const Key('field-plate'),
-                    controller: _plate,
-                    label: 'Plate no.',
-                    hint: 'Hal. NAB 1234',
-                    required: true,
-                    textCapitalization: TextCapitalization.characters,
-                    validator: (v) => RegExp(r'\d').hasMatch(v)
-                        ? null
-                        : 'Dapat may numero ang plate',
-                  ),
-                  gap,
-                  BigDropdownField(
-                    key: const Key('field-vehicle'),
-                    label: 'Uri ng sasakyan',
-                    options: vehicleTypes,
-                    value: _vehicleType,
-                    required: true,
-                    onChanged: (v) => setState(() => _vehicleType = v),
-                  ),
-                  const FormSectionTitle(
-                    'Kalusugan at insurance',
-                    icon: Icons.health_and_safety_rounded,
-                  ),
-                  BigDropdownField(
-                    key: const Key('field-blood'),
-                    label: 'Blood type',
-                    options: bloodTypes,
-                    value: _bloodType,
-                    onChanged: (v) => setState(() => _bloodType = v),
-                  ),
-                  gap,
-                  BigTextField(
-                    key: const Key('field-insurer'),
-                    controller: _insurer,
-                    label: 'Insurer',
-                    textCapitalization: TextCapitalization.words,
-                  ),
-                  gap,
-                  BigTextField(
-                    key: const Key('field-policy'),
-                    controller: _policy,
-                    label: 'Policy no.',
-                    textCapitalization: TextCapitalization.characters,
-                  ),
-                  const FormSectionTitle(
-                    'Emergency contacts',
-                    icon: Icons.contact_phone_rounded,
-                  ),
-                  Text(
-                    'Sila ang ite-text kapag pinindot mo ang EMERGENCY. '
-                    'Kailangan ng kahit isa.',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  for (final (i, c) in _contacts.indexed)
-                    _ContactCard(
-                      key: ObjectKey(c),
-                      index: i,
-                      controllers: c,
-                      canRemove: _contacts.length > 1,
-                      onRemove: () => setState(() {
-                        _contacts.remove(c);
-                        c.dispose();
-                      }),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+              child: ContentWidth(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ?widget.header,
+                    GroupedSection(
+                      header: 'Ikaw',
+                      children: [
+                        field(
+                          BigTextField(
+                            key: const Key('field-name'),
+                            controller: _name,
+                            label: 'Pangalan',
+                            required: true,
+                            textCapitalization: TextCapitalization.words,
+                          ),
+                        ),
+                        field(
+                          BigTextField(
+                            key: const Key('field-age'),
+                            controller: _age,
+                            label: 'Edad',
+                            required: true,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            validator: (v) {
+                              final age = int.tryParse(v);
+                              return age == null || age < 16 || age > 100
+                                  ? '16 hanggang 100 lang'
+                                  : null;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  gap,
-                  OutlinedButton.icon(
-                    key: const Key('add-contact'),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(AppSizes.minTap),
-                      textStyle: Theme.of(context).textTheme.titleLarge,
+                    GroupedSection(
+                      header: 'Lisensya at sasakyan',
+                      children: [
+                        field(
+                          BigTextField(
+                            key: const Key('field-license'),
+                            controller: _license,
+                            label: 'License no.',
+                            hint: 'Hal. N01-23-456789',
+                            required: true,
+                            textCapitalization: TextCapitalization.characters,
+                          ),
+                        ),
+                        field(
+                          BigTextField(
+                            key: const Key('field-restriction'),
+                            controller: _restriction,
+                            label: 'Restriction code',
+                            hint: 'Hal. B, B1',
+                            required: true,
+                            textCapitalization: TextCapitalization.characters,
+                          ),
+                        ),
+                        field(
+                          BigTextField(
+                            key: const Key('field-plate'),
+                            controller: _plate,
+                            label: 'Plate no.',
+                            hint: 'Hal. NAB 1234',
+                            required: true,
+                            textCapitalization: TextCapitalization.characters,
+                            validator: (v) => RegExp(r'\d').hasMatch(v)
+                                ? null
+                                : 'Dapat may numero ang plate',
+                          ),
+                        ),
+                        field(
+                          BigDropdownField(
+                            key: const Key('field-vehicle'),
+                            label: 'Uri ng sasakyan',
+                            options: vehicleTypes,
+                            value: _vehicleType,
+                            required: true,
+                            onChanged: (v) => setState(() => _vehicleType = v),
+                          ),
+                        ),
+                      ],
                     ),
-                    onPressed: () =>
-                        setState(() => _contacts.add(_ContactControllers())),
-                    icon: const Icon(Icons.person_add_rounded),
-                    label: const Text('Magdagdag ng contact'),
-                  ),
-                ],
+                    GroupedSection(
+                      header: 'Kalusugan at insurance',
+                      children: [
+                        field(
+                          BigDropdownField(
+                            key: const Key('field-blood'),
+                            label: 'Blood type',
+                            options: bloodTypes,
+                            value: _bloodType,
+                            onChanged: (v) => setState(() => _bloodType = v),
+                          ),
+                        ),
+                        field(
+                          BigTextField(
+                            key: const Key('field-insurer'),
+                            controller: _insurer,
+                            label: 'Insurer',
+                            textCapitalization: TextCapitalization.words,
+                          ),
+                        ),
+                        field(
+                          BigTextField(
+                            key: const Key('field-policy'),
+                            controller: _policy,
+                            label: 'Policy no.',
+                            textCapitalization: TextCapitalization.characters,
+                          ),
+                        ),
+                      ],
+                    ),
+                    for (final (i, c) in _contacts.indexed)
+                      GroupedSection(
+                        key: ObjectKey(c),
+                        header: i == 0
+                            ? 'Emergency contacts · Contact 1'
+                            : 'Contact ${i + 1}',
+                        footer: i == 0
+                            ? 'Sila ang ite-text kapag pinindot mo ang SOS. '
+                                  'Kailangan ng kahit isa.'
+                            : null,
+                        children: [
+                          field(
+                            BigTextField(
+                              key: Key('field-contact-name-$i'),
+                              controller: c.name,
+                              label: 'Pangalan',
+                              required: true,
+                              textCapitalization: TextCapitalization.words,
+                            ),
+                          ),
+                          field(
+                            BigTextField(
+                              key: Key('field-contact-phone-$i'),
+                              controller: c.phone,
+                              label: 'Mobile no.',
+                              hint: '09171234567',
+                              required: true,
+                              keyboardType: TextInputType.phone,
+                              validator: validatePhone,
+                            ),
+                          ),
+                          if (_contacts.length > 1)
+                            GroupedTile(
+                              tapKey: Key('remove-contact-$i'),
+                              leading: Icon(
+                                CupertinoIcons.trash,
+                                color: context.palette.muted,
+                              ),
+                              title: 'Tanggalin ang contact',
+                              chevron: false,
+                              onTap: () => _removeContact(c),
+                            ),
+                        ],
+                      ),
+                    GroupedSection(
+                      children: [
+                        GroupedTile(
+                          tapKey: const Key('add-contact'),
+                          leading: Icon(
+                            CupertinoIcons.plus_circle_fill,
+                            color: context.colors.primary,
+                            size: 28,
+                          ),
+                          title: 'Magdagdag ng contact',
+                          titleStyle: context.text.titleMedium?.copyWith(
+                            color: context.colors.primary,
+                          ),
+                          chevron: false,
+                          onTap: () => setState(
+                            () => _contacts.add(_ContactControllers()),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
           DecoratedBox(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              color: context.colors.surface,
               border: Border(
-                top: BorderSide(color: Theme.of(context).colorScheme.outline),
+                top: BorderSide(color: context.colors.outline, width: 0.5),
               ),
             ),
             child: SafeArea(
               top: false,
-              minimum: const EdgeInsets.all(AppSizes.gap),
-              child: FilledButton(
-                key: const Key('profile-submit'),
-                onPressed: widget.saving ? null : _submit,
-                child: widget.saving
-                    ? const SizedBox.square(
-                        dimension: 28,
-                        child: CircularProgressIndicator(strokeWidth: 3),
-                      )
-                    : Text(widget.submitLabel),
+              minimum: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              child: ContentWidth(
+                child: FilledButton(
+                  key: const Key('profile-submit'),
+                  onPressed: widget.saving
+                      ? null
+                      : () {
+                          HapticFeedback.mediumImpact();
+                          _submit();
+                        },
+                  child: widget.saving
+                      ? const CupertinoActivityIndicator()
+                      : Text(widget.submitLabel),
+                ),
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ContactCard extends StatelessWidget {
-  const _ContactCard({
-    super.key,
-    required this.index,
-    required this.controllers,
-    required this.canRemove,
-    required this.onRemove,
-  });
-
-  final int index;
-  final _ContactControllers controllers;
-  final bool canRemove;
-  final VoidCallback onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(top: AppSizes.gap),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Contact ${index + 1}',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                if (canRemove)
-                  IconButton(
-                    key: Key('remove-contact-$index'),
-                    tooltip: 'Tanggalin',
-                    icon: const Icon(Icons.delete_outline_rounded),
-                    onPressed: onRemove,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            BigTextField(
-              key: Key('field-contact-name-$index'),
-              controller: controllers.name,
-              label: 'Pangalan',
-              required: true,
-              textCapitalization: TextCapitalization.words,
-            ),
-            const SizedBox(height: 12),
-            BigTextField(
-              key: Key('field-contact-phone-$index'),
-              controller: controllers.phone,
-              label: 'Mobile no.',
-              hint: '09171234567',
-              required: true,
-              keyboardType: TextInputType.phone,
-              validator: validatePhone,
-            ),
-          ],
-        ),
       ),
     );
   }

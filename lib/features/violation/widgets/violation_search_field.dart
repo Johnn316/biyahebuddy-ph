@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -7,13 +9,15 @@ import '../controllers/violation_controller.dart';
 
 const _micKey = 'violation';
 
-/// Search box + mic (on-device SpeechService). Transcript fills the box.
+/// iOS-style search pill + mic (on-device SpeechService). Transcript fills
+/// the box.
 class ViolationSearchField extends ConsumerWidget {
   const ViolationSearchField({super.key, required this.controller});
 
   final TextEditingController controller;
 
   Future<void> _toggleMic(BuildContext context, WidgetRef ref) async {
+    HapticFeedback.lightImpact();
     try {
       final transcript = await ref
           .read(micControllerProvider(_micKey).notifier)
@@ -33,8 +37,8 @@ class ViolationSearchField extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mic = ref.watch(micControllerProvider(_micKey));
     ref.watch(violationQueryProvider); // rebuild for the clear (×) button
-    final text = Theme.of(context).textTheme;
     final listening = mic == MicPhase.listening;
+    final p = context.palette;
 
     return Row(
       children: [
@@ -42,57 +46,70 @@ class ViolationSearchField extends ConsumerWidget {
           child: TextField(
             key: const Key('violation-search'),
             controller: controller,
-            style: text.titleLarge,
+            style: context.text.titleMedium,
             textInputAction: TextInputAction.search,
             onChanged: (v) =>
                 ref.read(violationQueryProvider.notifier).state = v,
             decoration: InputDecoration(
+              filled: true,
+              fillColor: p.elevated,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: context.colors.primary),
+              ),
               hintText: switch (mic) {
                 MicPhase.listening => 'Nakikinig… (pindutin ulit)',
                 MicPhase.transcribing => 'Isinusulat…',
                 MicPhase.idle => 'Hanapin ang violation',
               },
-              hintStyle: text.bodyLarge,
-              prefixIcon: const Icon(Icons.search_rounded),
+              prefixIcon: Icon(CupertinoIcons.search, color: p.muted),
               suffixIcon: controller.text.isEmpty
                   ? null
                   : IconButton(
                       tooltip: 'Burahin',
-                      icon: const Icon(Icons.close),
+                      icon: Icon(
+                        CupertinoIcons.xmark_circle_fill,
+                        color: p.muted,
+                      ),
                       onPressed: () {
                         controller.clear();
                         ref.read(violationQueryProvider.notifier).state = '';
                       },
                     ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 18),
+              contentPadding: const EdgeInsets.symmetric(vertical: 16),
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 10),
         SizedBox.square(
-          dimension: AppSizes.minTap,
+          dimension: 56,
           child: IconButton.filled(
             key: const Key('mic'),
             tooltip: listening ? 'Itigil at isulat' : 'Magsalita',
             style: IconButton.styleFrom(
-              backgroundColor: listening
-                  ? context.palette.accent
-                  : context.colors.primary,
+              backgroundColor: listening ? p.accent : context.colors.primary,
               foregroundColor: listening
-                  ? context.palette.onAccent
+                  ? p.onAccent
                   : context.colors.onPrimary,
             ),
             onPressed: mic == MicPhase.transcribing
                 ? null
                 : () => _toggleMic(context, ref),
             icon: mic == MicPhase.transcribing
-                ? const SizedBox.square(
-                    dimension: 24,
-                    child: CircularProgressIndicator(strokeWidth: 3),
-                  )
+                ? const CupertinoActivityIndicator()
                 : Icon(
-                    listening ? Icons.stop_rounded : Icons.mic_rounded,
-                    size: 32,
+                    listening
+                        ? CupertinoIcons.stop_fill
+                        : CupertinoIcons.mic_fill,
+                    size: 28,
                   ),
           ),
         ),

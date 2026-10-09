@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_card.dart';
+import '../../shared/widgets/grouped.dart';
 import '../controllers/emergency_controller.dart';
 
 /// "Ano ang gagawin ngayon" — tickable steps after a crash.
@@ -15,56 +17,67 @@ class ChecklistSection extends ConsumerWidget {
     final p = context.palette;
     final allDone = done.length == emergencyChecklist.length;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return GroupedSection(
+      header: 'Ano ang gagawin ngayon',
+      headerTrailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        decoration: BoxDecoration(
+          color: allDone ? p.success : p.elevated,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Text(
+          '${done.length}/${emergencyChecklist.length}',
+          style: context.text.labelMedium?.copyWith(
+            color: allDone ? p.onSuccess : context.colors.onSurface,
+          ),
+        ),
+      ),
+      separatorIndent: 58,
       children: [
-        SectionTitle(
-          'Ano ang gagawin ngayon',
-          icon: Icons.checklist_rounded,
-          trailing: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: allDone ? p.success : context.colors.surfaceContainer,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              '${done.length}/${emergencyChecklist.length}',
-              style: context.text.titleMedium?.copyWith(
-                color: allDone ? p.onSuccess : p.muted,
+        for (final (i, item) in emergencyChecklist.indexed)
+          Semantics(
+            checked: done.contains(i),
+            child: InkWell(
+              key: Key('check-$i'),
+              onTap: () {
+                HapticFeedback.selectionClick();
+                final next = {...done};
+                if (!next.remove(i)) next.add(i);
+                ref.read(checklistProvider.notifier).state = next;
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 160),
+                      child: Icon(
+                        done.contains(i)
+                            ? CupertinoIcons.checkmark_circle_fill
+                            : CupertinoIcons.circle,
+                        key: ValueKey(done.contains(i)),
+                        size: 30,
+                        color: done.contains(i) ? p.success : p.muted,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        item,
+                        style: context.text.titleMedium?.copyWith(
+                          decoration: done.contains(i)
+                              ? TextDecoration.lineThrough
+                              : null,
+                          color: done.contains(i) ? p.muted : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        AppCard(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Column(
-            children: [
-              for (final (i, item) in emergencyChecklist.indexed) ...[
-                if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
-                CheckboxListTile(
-                  key: Key('check-$i'),
-                  value: done.contains(i),
-                  onChanged: (v) => ref.read(checklistProvider.notifier).state =
-                      {...done.where((d) => d != i), if (v ?? false) i},
-                  controlAffinity: ListTileControlAffinity.leading,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  title: Text(
-                    item,
-                    style: context.text.titleMedium?.copyWith(
-                      decoration: done.contains(i)
-                          ? TextDecoration.lineThrough
-                          : null,
-                      color: done.contains(i) ? p.muted : null,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
       ],
     );
   }

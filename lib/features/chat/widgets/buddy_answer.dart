@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../controllers/answer_format.dart';
@@ -11,26 +11,26 @@ const answerDisclaimer = 'Gabay batay sa batas, hindi legal na hatol.';
   AnswerSectionKind k,
 ) => switch (k) {
   AnswerSectionKind.kalma => (
-    icon: Icons.self_improvement_rounded,
+    icon: CupertinoIcons.heart_fill,
     color: context.palette.success,
   ),
   AnswerSectionKind.batas => (
-    icon: Icons.gavel_rounded,
+    icon: CupertinoIcons.book_fill,
     color: context.palette.accent,
   ),
   AnswerSectionKind.pagsusuri => (
-    icon: Icons.manage_search_rounded,
+    icon: CupertinoIcons.search,
     color: context.colors.primary,
   ),
   AnswerSectionKind.gagawin => (
-    icon: Icons.checklist_rounded,
-    color: context.colors.onSurface,
+    icon: CupertinoIcons.list_bullet,
+    color: context.colors.primary,
   ),
 };
 
-/// Buddy avatar: round, primary, with a soft ring.
+/// Buddy avatar: round blue circle with a soft ring.
 class BuddyAvatar extends StatelessWidget {
-  const BuddyAvatar({super.key, this.size = 36});
+  const BuddyAvatar({super.key, this.size = 34});
 
   final double size;
 
@@ -41,25 +41,25 @@ class BuddyAvatar extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: scheme.primary,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: scheme.primary.withValues(alpha: 0.25),
-          width: 3,
-          strokeAlign: BorderSide.strokeAlignOutside,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [scheme.primary.withValues(alpha: 0.85), scheme.primary],
         ),
+        shape: BoxShape.circle,
       ),
       child: Icon(
-        Icons.support_agent_rounded,
-        size: size * 0.6,
+        CupertinoIcons.person_alt,
+        size: size * 0.58,
         color: scheme.onPrimary,
       ),
     );
   }
 }
 
-/// Buddy's answer: 4 labeled section cards when present, else plain text.
-/// Citations are amber chips. Disclaimer always underneath.
+/// Buddy's answer: gray bubble (left, with avatar) holding the 4 sections as
+/// inset cards when present, else plain text. Citations are amber pills.
+/// Disclaimer always underneath.
 class BuddyAnswer extends StatelessWidget {
   const BuddyAnswer({super.key, required this.message});
 
@@ -73,60 +73,87 @@ class BuddyAnswer extends StatelessWidget {
 
     return Align(
       alignment: Alignment.centerLeft,
-      child: FractionallySizedBox(
-        widthFactor: 0.94,
-        alignment: Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 600),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 const BuddyAvatar(),
-                const SizedBox(width: 10),
-                Text('Buddy', style: context.text.titleLarge),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                    decoration: BoxDecoration(
+                      color: p.elevated,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(22),
+                        topRight: Radius.circular(22),
+                        bottomRight: Radius.circular(22),
+                        bottomLeft: Radius.circular(6),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4, bottom: 6),
+                          child: Text('Buddy', style: context.text.titleSmall),
+                        ),
+                        if (waiting)
+                          const _Thinking()
+                        else ...[
+                          if (parsed.intro.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
+                              child: CitationText(
+                                parsed.intro +
+                                    (parsed.hasSections ? '' : _cursor),
+                              ),
+                            ),
+                          for (final (i, s) in parsed.sections.indexed)
+                            _SectionCard(
+                              key: Key('section-${s.kind.name}'),
+                              label: s.kind.label,
+                              icon: _style(context, s.kind).icon,
+                              color: _style(context, s.kind).color,
+                              child: CitationText(
+                                s.body +
+                                    (i == parsed.sections.length - 1
+                                        ? _cursor
+                                        : ''),
+                              ),
+                            ),
+                        ],
+                        if (message.stopped)
+                          const _Note(
+                            'Itinigil.',
+                            icon: CupertinoIcons.stop_circle,
+                          ),
+                        if (message.failed)
+                          _Note(
+                            'Hindi nakasagot si Buddy. Subukan ulit.',
+                            icon: CupertinoIcons.exclamationmark_circle,
+                            color: p.accent,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 8),
-            if (waiting)
-              const _Thinking()
-            else ...[
-              if (parsed.intro.isNotEmpty)
-                _SectionCard(
-                  child: CitationText(
-                    parsed.intro + (parsed.hasSections ? '' : _cursor),
-                  ),
-                ),
-              for (final (i, s) in parsed.sections.indexed)
-                _SectionCard(
-                  key: Key('section-${s.kind.name}'),
-                  label: s.kind.label,
-                  icon: _style(context, s.kind).icon,
-                  color: _style(context, s.kind).color,
-                  child: CitationText(
-                    s.body + (i == parsed.sections.length - 1 ? _cursor : ''),
-                  ),
-                ),
-            ],
-            if (message.stopped)
-              _Note('Itinigil.', icon: Icons.stop_circle_outlined),
-            if (message.failed)
-              _Note(
-                'Hindi nakasagot si Buddy. Subukan ulit.',
-                icon: Icons.error_outline_rounded,
-                color: p.accent,
-              ),
             Padding(
-              padding: const EdgeInsets.only(top: 2, left: 4),
+              padding: const EdgeInsets.only(top: 6, left: 46),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline_rounded, size: 16, color: p.muted),
-                  const SizedBox(width: 6),
+                  Icon(CupertinoIcons.info_circle, size: 15, color: p.muted),
+                  const SizedBox(width: 5),
                   Flexible(
                     child: Text(
                       answerDisclaimer,
-                      style: context.text.bodySmall?.copyWith(
-                        fontStyle: FontStyle.italic,
-                      ),
+                      style: context.text.bodySmall?.copyWith(fontSize: 14),
                     ),
                   ),
                 ],
@@ -141,79 +168,56 @@ class BuddyAnswer extends StatelessWidget {
   String get _cursor => message.streaming ? ' ▍' : '';
 }
 
+/// Clean inset card for one answer section.
 class _SectionCard extends StatelessWidget {
   const _SectionCard({
     super.key,
     required this.child,
-    this.label,
-    this.icon,
-    this.color,
+    required this.label,
+    required this.icon,
+    required this.color,
   });
 
   final Widget child;
-  final String? label;
-  final IconData? icon;
-  final Color? color;
+  final String label;
+  final IconData icon;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = context.colors;
-    final c = color ?? scheme.outline;
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
       decoration: BoxDecoration(
-        color: scheme.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: scheme.outline),
-        boxShadow: context.palette.cardShadow,
       ),
-      clipBehavior: Clip.antiAlias,
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(width: 5, color: c),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (label != null) ...[
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: c.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(icon, color: c, size: 20),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              label!,
-                              style: context.text.titleMedium,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    child,
-                  ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(9),
                 ),
+                child: Icon(icon, color: color, size: 18),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: 10),
+              Expanded(child: Text(label, style: context.text.titleMedium)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          child,
+        ],
       ),
     );
   }
 }
 
-/// Body text with legal citations rendered as amber chips.
+/// Body text with legal citations rendered as amber pills.
 class CitationText extends StatelessWidget {
   const CitationText(this.data, {super.key});
 
@@ -244,15 +248,15 @@ class CitationText extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.menu_book_rounded, size: 16, color: p.onAccent),
+                Icon(CupertinoIcons.book_fill, size: 14, color: p.onAccent),
                 const SizedBox(width: 5),
                 Flexible(
                   child: Text(
                     cite,
                     style: style?.copyWith(
                       color: p.onAccent,
-                      fontWeight: FontWeight.w800,
-                      fontSize: (style.fontSize ?? 18) - 2,
+                      fontWeight: FontWeight.w700,
+                      fontSize: (style.fontSize ?? 18) - 3,
                     ),
                   ),
                 ),
@@ -273,14 +277,12 @@ class _Thinking extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _SectionCard(
+    return Padding(
+      padding: const EdgeInsets.all(4),
       child: Row(
         children: [
-          const SizedBox.square(
-            dimension: 22,
-            child: CircularProgressIndicator(strokeWidth: 3),
-          ),
-          const SizedBox(width: 12),
+          const CupertinoActivityIndicator(),
+          const SizedBox(width: 10),
           Flexible(
             child: Text('Nag-iisip si Buddy…', style: context.text.bodyLarge),
           ),
@@ -301,10 +303,10 @@ class _Note extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = color ?? context.palette.muted;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4, left: 4),
+      padding: const EdgeInsets.only(top: 8, left: 4),
       child: Row(
         children: [
-          Icon(icon, color: c, size: 20),
+          Icon(icon, color: c, size: 18),
           const SizedBox(width: 6),
           Flexible(
             child: Text(

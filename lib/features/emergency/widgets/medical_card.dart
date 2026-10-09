@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../../../core/contracts/contracts.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_card.dart';
+import '../../shared/widgets/grouped.dart';
 
 /// Info for responders: name, age, blood type, insurance.
 class MedicalCard extends StatelessWidget {
@@ -12,73 +12,57 @@ class MedicalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
     const none = 'Hindi nakalagay';
     final insurance = [
       profile.insurer,
       if (profile.policyNo != null) 'Policy ${profile.policyNo}',
     ].nonNulls.join(' · ');
 
-    Widget field(String label, String value, {TextStyle? style}) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: context.text.bodySmall),
-        Text(value, style: style ?? context.text.titleLarge),
-      ],
+    Widget row(String label, String value, {TextStyle? style}) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: context.text.bodySmall),
+          Text(value, style: style ?? context.text.titleMedium),
+        ],
+      ),
     );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return GroupedSection(
+      key: const Key('medical-card'),
+      header: 'Medical info',
       children: [
-        const SectionTitle(
-          'Medical info',
-          icon: Icons.medical_information_rounded,
-        ),
-        AppCard(
-          key: const Key('medical-card'),
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+        row('Pangalan', profile.name),
+        row('Edad', '${profile.age}'),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Row(
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: field('Pangalan', profile.name)),
-                  const SizedBox(width: 12),
-                  field('Edad', '${profile.age}'),
-                ],
+              IconSquare(
+                CupertinoIcons.drop_fill,
+                color: context.palette.elevated,
+                size: 44,
               ),
-              const SizedBox(height: 14),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: context.colors.surfaceContainer,
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                ),
-                child: Row(
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.bloodtype_rounded, size: 36, color: p.muted),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: field(
-                        'Blood type',
-                        profile.bloodType ?? none,
-                        style: profile.bloodType == null
-                            ? context.text.titleLarge
-                            : context.text.displayMedium,
-                      ),
+                    Text('Blood type', style: context.text.bodySmall),
+                    Text(
+                      profile.bloodType ?? none,
+                      style: profile.bloodType == null
+                          ? context.text.titleMedium
+                          : context.text.displaySmall,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
-              field('Insurance', insurance.isEmpty ? none : insurance),
             ],
           ),
         ),
+        row('Insurance', insurance.isEmpty ? none : insurance),
       ],
     );
   }

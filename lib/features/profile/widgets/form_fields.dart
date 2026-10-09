@@ -94,33 +94,3 @@ class BigDropdownField extends StatelessWidget {
     );
   }
 }
-
-/// Section title inside long forms.
-class FormSectionTitle extends StatelessWidget {
-  const FormSectionTitle(this.title, {super.key, this.icon});
-
-  final String title;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(top: 28, bottom: 12),
-      child: Row(
-        children: [
-          if (icon != null) ...[
-            Icon(icon, color: scheme.primary, size: 26),
-            const SizedBox(width: 10),
-          ],
-          Expanded(
-            child: Text(
-              title,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
