@@ -2,6 +2,8 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/contracts/contracts.dart';
+
 import '../ai/faq_answers.dart';
 import '../ai/local_ai_assistant.dart';
 import '../ai/local_llm.dart';
@@ -16,6 +18,7 @@ import '../rag/vector_index.dart';
 import '../sos/android_sos_service.dart';
 import '../sos/sos_platform.dart';
 import '../repositories/asset_hotline_repository.dart';
+import '../repositories/hybrid_fines_repository.dart';
 import '../repositories/prefs_profile_repository.dart';
 import '../repositories/sqlite_fines_repository.dart';
 import 'app_database.dart';
@@ -51,7 +54,7 @@ class LocalData {
   final AppDatabase database;
   final PrefsProfileRepository profiles;
   final AssetCodingService coding;
-  final SqliteFinesRepository fines;
+  final FinesRepository fines;
   final AssetHotlineRepository hotlines;
   final LocalModelManager models;
   final LocalAiAssistant ai;
@@ -120,7 +123,13 @@ class LocalData {
       database: database,
       profiles: profiles,
       coding: AssetCodingService.fromJson(coding),
-      fines: SqliteFinesRepository(database),
+      fines: HybridFinesRepository(
+        keyword: SqliteFinesRepository(database),
+        database: database,
+        index: hybrid?.index,
+        embedder: hybrid?.embedder,
+        isReady: () => hybrid != null && models.has(ModelCatalog.embedder),
+      ),
       hotlines: AssetHotlineRepository.fromJson(hotlines),
       models: models,
       ai: LocalAiAssistant(

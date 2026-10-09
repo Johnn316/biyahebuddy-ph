@@ -73,7 +73,10 @@ void main() {
     expect(find.byKey(const Key('violation-search')), findsNothing);
 
     await tapKey(tester, 'agency-lto'); // tap 1
-    expect(find.text('KARANIWANG VIOLATION'), findsOneWidget);
+    // All LTO violations, grouped, with a count.
+    expect(find.text('LISENSYA & REHISTRO'), findsOneWidget);
+    expect(find.text('HELMET & SEATBELT'), findsOneWidget);
+    expect(find.byKey(const Key('fine-count')), findsOneWidget);
     expect(find.text('Driving without a valid license'), findsOneWidget);
     // Only LTO violations.
     expect(find.text('Number coding (UVVRP) violation'), findsNothing);
@@ -113,6 +116,81 @@ void main() {
     await tapKey(tester, 'agency-chip-mmda');
     expect(find.text('Number coding (UVVRP) violation'), findsOneWidget);
     expect(find.text('Driving without a valid license'), findsNothing);
+  });
+
+  testWidgets('agency picker shows each agency violation count', (
+    tester,
+  ) async {
+    await openViolation(tester);
+    for (final a in Agency.values) {
+      final count = await FakeFinesRepository().search('', a);
+      expect(
+        find.text('${count.length} na violation'),
+        findsWidgets,
+        reason: a.name,
+      );
+    }
+  });
+
+  testWidgets('empty search lists every fine (no top-8 cut)', (tester) async {
+    await openViolation(tester);
+    await tapKey(tester, 'agency-mmda');
+    final all = await FakeFinesRepository().search('', Agency.mmda);
+    expect(
+      tester.widget<Text>(find.byKey(const Key('fine-count'))).data,
+      '${all.length} na violation',
+    );
+    for (final f in all) {
+      await tester.scrollUntilVisible(
+        find.text(f.violation),
+        200,
+        scrollable: find.descendant(
+          of: find.byKey(const Key('fine-list')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+    }
+  });
+
+  testWidgets('no match → "Itanong kay Buddy" opens Buddy with the query', (
+    tester,
+  ) async {
+    await openViolation(tester);
+    await tapKey(tester, 'agency-lto');
+    await tester.enterText(
+      find.byKey(const Key('violation-search')),
+      'binangga ako ng kalabaw',
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Walang nahanap'), findsOneWidget);
+    await tapKey(tester, 'ask-buddy-query');
+    expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
+    final input = tester.widget<TextField>(find.byKey(const Key('chat-input')));
+    expect(input.controller!.text, 'binangga ako ng kalabaw');
+  });
+
+  test('fines are grouped by category', () {
+    Fine f(String v) =>
+        Fine(violation: v, agency: Agency.mmda, amount: 1, legalBasis: '');
+    expect(fineCategory(f('Illegal parking')), FineCategory.parking);
+    expect(fineCategory(f('No seatbelt (driver)')), FineCategory.safety);
+    expect(
+      fineCategory(f('Distracted driving (mobile phone)')),
+      FineCategory.distracted,
+    );
+    expect(fineCategory(f('Disregarding traffic signs')), FineCategory.signs);
+    expect(fineCategory(f('Number coding (UVVRP)')), FineCategory.coding);
+    expect(fineCategory(f('Arrogance / discourteous')), FineCategory.other);
+    final groups = groupFines([
+      f('Illegal parking'),
+      f('No seatbelt'),
+      f('Obstruction of traffic'),
+    ]);
+    expect(groups.map((g) => g.$1), [
+      FineCategory.safety,
+      FineCategory.parking,
+    ]);
+    expect(groups.last.$2, hasLength(2));
   });
 
   testWidgets('no mic on the search when voice input is disabled', (
