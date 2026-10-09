@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../shared/speech/mic_controller.dart';
 import '../controllers/violation_controller.dart';
+
+const _micKey = 'violation';
 
 /// Search box + mic (on-device SpeechService). Transcript fills the box.
 class ViolationSearchField extends ConsumerWidget {
@@ -13,7 +16,7 @@ class ViolationSearchField extends ConsumerWidget {
   Future<void> _toggleMic(BuildContext context, WidgetRef ref) async {
     try {
       final transcript = await ref
-          .read(micControllerProvider.notifier)
+          .read(micControllerProvider(_micKey).notifier)
           .toggle();
       if (transcript == null) return;
       controller.text = transcript;
@@ -28,7 +31,7 @@ class ViolationSearchField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mic = ref.watch(micControllerProvider);
+    final mic = ref.watch(micControllerProvider(_micKey));
     ref.watch(violationQueryProvider); // rebuild for the clear (×) button
     final text = Theme.of(context).textTheme;
     final listening = mic == MicPhase.listening;
