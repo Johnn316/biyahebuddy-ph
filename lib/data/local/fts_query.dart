@@ -5,14 +5,14 @@
 /// prefix match so "walang helmet" or "nag-beating the red light" still hit.
 /// bm25 then ranks rows that match more words first.
 /// Returns null when nothing searchable is left.
-String? ftsQuery(String text) {
+String? ftsQuery(String text, {bool allWords = false}) {
   final words = RegExp(r'[\p{L}\p{N}]+', unicode: true)
       .allMatches(text.toLowerCase())
       .map((m) => m.group(0)!)
       .where((w) => w.length >= 2 && !_stopwords.contains(w))
       .toSet();
   if (words.isEmpty) return null;
-  return words.map((w) => '"$w"*').join(' OR ');
+  return words.map((w) => '"$w"*').join(allWords ? ' AND ' : ' OR ');
 }
 
 /// Filler words that would match almost everything.

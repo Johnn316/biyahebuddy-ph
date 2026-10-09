@@ -51,6 +51,24 @@ void main() {
     expect(hits.first, 'Disregarding traffic signs');
   });
 
+  test('all-words matches beat single-word matches', () async {
+    // "light" alone would also hit a "Light truck ban" row.
+    final db2 = AppDatabase.open(':memory:', lawsJson: '[]', finesJson: '''[
+      {"violation": "Light truck ban violation", "agency": "mmda", "amount": 2000,
+       "legal_basis": "TEST", "aliases": ["truck ban"]},
+      {"violation": "Disregarding traffic signs", "agency": "mmda", "amount": 1000,
+       "legal_basis": "TEST", "aliases": ["beating the red light"]}
+    ]''');
+    addTearDown(db2.close);
+    final hits = await SqliteFinesRepository(db2)
+        .search('beating the red light', Agency.mmda);
+    expect(hits.map((f) => f.violation), ['Disregarding traffic signs']);
+  });
+
+  test('falls back to any-word match when no row has every word', () async {
+    expect(await names('helmet ng anak', Agency.lto), ['No helmet']);
+  });
+
   test('prefix match on partial words', () async {
     expect(await names('lisens', Agency.lto), [
       'Driving without a valid license',
