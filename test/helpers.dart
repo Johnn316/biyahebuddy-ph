@@ -56,4 +56,10 @@ class RecordingSosService implements SosService {
 
   @override
   Future<void> enableVolumeTrigger() async {}
+
+  @override
+  Future<bool> canSendSms() async => true;
+
+  @override
+  Future<bool> canCall() async => true;
 }

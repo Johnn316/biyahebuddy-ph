@@ -24,6 +24,29 @@ final emergencyHotlinesProvider = FutureProvider.autoDispose<List<Hotline>>(
   (ref) => ref.watch(hotlineRepositoryProvider).forZone(null),
 );
 
+typedef SosCapabilities = ({bool sms, bool call});
+
+/// Can this device text / call? Used to grey out buttons. If a check itself
+/// fails we assume yes: the action then reports a clear [SosUnavailable].
+final sosCapabilitiesProvider = FutureProvider.autoDispose<SosCapabilities>((
+  ref,
+) async {
+  final sos = ref.watch(sosServiceProvider);
+  Future<bool> check(Future<bool> Function() f) async {
+    try {
+      return await f();
+    } catch (_) {
+      return true;
+    }
+  }
+
+  final (sms, call) = await (check(sos.canSendSms), check(sos.canCall)).wait;
+  return (sms: sms, call: call);
+});
+
+/// Emergency numbers work without a SIM, so these are never greyed out.
+const alwaysCallable = {'911', '112'};
+
 /// SOS SMS text. Status sentence is left out until "Ligtas ka ba?" is answered.
 String buildSosMessage(({double lat, double lng})? location, bool? injured) {
   final where = location == null

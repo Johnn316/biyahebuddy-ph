@@ -1,4 +1,5 @@
 import 'package:biyahebuddy_ph/app.dart';
+import 'package:biyahebuddy_ph/core/contracts/contracts.dart';
 import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
 import 'package:biyahebuddy_ph/features/emergency/controllers/emergency_controller.dart';
@@ -12,16 +13,45 @@ import 'helpers.dart';
 
 const _maps = 'https://maps.google.com/?q=14.554700,121.024400';
 
-/// Opens Home, then taps EMERGENCY once.
+/// Device without SIM / dialer: capability checks say no, actions throw
+/// [SosUnavailable] with a user-facing message.
+class LimitedSosService extends RecordingSosService {
+  LimitedSosService({this.sms = false, this.call = false});
+
+  final bool sms;
+  final bool call;
+
+  static const noDialer = 'Walang phone app sa device na ito.';
+  static const noSms = 'Walang SIM — hindi makapag-text.';
+
+  @override
+  Future<bool> canSendSms() async => sms;
+
+  @override
+  Future<bool> canCall() async => call;
+
+  @override
+  Future<void> openDialer(String number) async =>
+      throw const SosUnavailable(noDialer);
+
+  @override
+  Future<void> smsContacts(
+    List<EmergencyContact> contacts,
+    String message,
+  ) async => throw const SosUnavailable(noSms);
+}
+
+/// Opens Home, then taps SOS once.
 Future<RecordingSosService> openEmergency(
   WidgetTester tester, {
   Size logicalSize = const Size(412, 915),
+  RecordingSosService? sosService,
 }) async {
   tester.view.physicalSize = logicalSize * 2;
   tester.view.devicePixelRatio = 2;
   addTearDown(tester.view.reset);
 
-  final sos = RecordingSosService();
+  final sos = sosService ?? RecordingSosService();
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -185,6 +215,101 @@ void main() {
     expect(find.byKey(const Key('open-qr')), findsOneWidget); // back on screen
   });
 
+  testWidgets('SosUnavailable message is shown when calling fails', (
+    tester,
+  ) async {
+    // Says it can call, but the device has no dialer app (Wi-Fi tablet).
+    await openEmergency(
+      tester,
+      sosService: LimitedSosService(sms: true, call: true),
+    );
+    await tester.tap(find.byKey(const Key('call-contact-0')));
+    await tester.pump();
+    expect(find.text(LimitedSosService.noDialer), findsOneWidget);
+  });
+
+  testWidgets('SosUnavailable message is shown when texting fails', (
+    tester,
+  ) async {
+    await openEmergency(
+      tester,
+      sosService: LimitedSosService(sms: true, call: true),
+    );
+    await tester.tap(find.byKey(const Key('text-all')));
+    await tester.pump();
+    expect(find.text(LimitedSosService.noSms), findsOneWidget);
+  });
+
+  testWidgets('no SIM: text + call buttons greyed with a note; 911 still on', (
+    tester,
+  ) async {
+    final sos = await openEmergency(tester, sosService: LimitedSosService());
+
+    IconButton button(String key) => tester.widget<IconButton>(
+      find.descendant(
+        of: find.byKey(Key(key)),
+        matching: find.byType(IconButton),
+      ),
+    );
+    expect(button('call-contact-0').onPressed, isNull);
+    expect(button('text-contact-0').onPressed, isNull);
+    expect(
+      tester
+          .widget<ButtonStyleButton>(find.byKey(const Key('text-all')))
+          .onPressed,
+      isNull,
+    );
+    expect(
+      find.textContaining('Hindi makapag-text o makatawag ang device na ito'),
+      findsOneWidget,
+    );
+
+    // Hotlines: 911 stays enabled (works without SIM), others greyed.
+    await scrollTo(tester, find.byKey(const Key('hotline-143')));
+    expect(
+      find.textContaining('Gumagana pa rin ang 911', skipOffstage: false),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const Key('hotline-143')), warnIfMissed: false);
+    await tester.pump();
+    expect(find.text(LimitedSosService.noDialer), findsNothing); // disabled
+    await scrollTo(tester, find.byKey(const Key('hotline-911')));
+    await tester.tap(find.byKey(const Key('hotline-911')));
+    await tester.pump();
+    expect(find.text(LimitedSosService.noDialer), findsOneWidget); // tried
+
+    // Big "Tumawag sa 911" also stays enabled.
+    await scrollTo(tester, find.byKey(const Key('injured-yes')));
+    await tester.tap(find.byKey(const Key('injured-yes')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('call-911')), findsOneWidget);
+    expect(sos.dialed, isEmpty); // LimitedSosService throws, never records
+  });
+
+  testWidgets('only SMS missing: call works, text greyed', (tester) async {
+    final sos = await openEmergency(tester, sosService: _SmsOnlyMissing());
+    expect(
+      find.text(
+        'Hindi makapag-text ang device na ito (walang SIM?). Tawagan na lang.',
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const Key('call-contact-0')));
+    await tester.pump();
+    expect(sos.dialed, [FakeProfileRepository.sample.contacts[0].phone]);
+    expect(
+      tester
+          .widget<IconButton>(
+            find.descendant(
+              of: find.byKey(const Key('text-contact-0')),
+              matching: find.byType(IconButton),
+            ),
+          )
+          .onPressed,
+      isNull,
+    );
+  });
+
   test('QR text has name, plate, license, insurer, policy', () {
     final p = FakeProfileRepository.sample;
     final text = qrExchangeText(p);
@@ -199,4 +324,9 @@ void main() {
       'Naaksidente ako. Lokasyon: hindi makuha ang GPS.',
     );
   });
+}
+
+class _SmsOnlyMissing extends RecordingSosService {
+  @override
+  Future<bool> canSendSms() async => false;
 }

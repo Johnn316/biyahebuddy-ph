@@ -22,6 +22,11 @@ class ContactsSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sending = ref.watch(sosSmsControllerProvider).isLoading;
     final p = context.palette;
+    // While checking, assume yes (no flash of disabled buttons).
+    final caps =
+        ref.watch(sosCapabilitiesProvider).valueOrNull ??
+        (sms: true, call: true);
+    final note = contactsNote(caps);
 
     if (contacts.isEmpty) {
       return GroupedSection(
@@ -45,7 +50,7 @@ class ContactsSection extends ConsumerWidget {
       children: [
         GroupedSection(
           header: 'Emergency contacts',
-          footer: 'Ite-text ang iyong GPS location at kalagayan.',
+          footer: note ?? 'Ite-text ang iyong GPS location at kalagayan.',
           separatorIndent: 72,
           children: [
             for (final (i, c) in contacts.indexed)
@@ -82,7 +87,9 @@ class ContactsSection extends ConsumerWidget {
                       icon: CupertinoIcons.phone_fill,
                       color: p.success,
                       onColor: p.onSuccess,
-                      onTap: () => dialNumber(context, ref, c.phone),
+                      onTap: caps.call
+                          ? () => dialNumber(context, ref, c.phone)
+                          : null,
                     ),
                     const SizedBox(width: 8),
                     _RoundAction(
@@ -91,7 +98,7 @@ class ContactsSection extends ConsumerWidget {
                       icon: CupertinoIcons.chat_bubble_fill,
                       color: context.colors.primary,
                       onColor: context.colors.onPrimary,
-                      onTap: sending
+                      onTap: sending || !caps.sms
                           ? null
                           : () => textContacts(context, ref, [c]),
                     ),
@@ -108,7 +115,7 @@ class ContactsSection extends ConsumerWidget {
             foregroundColor: p.onAccent,
             minimumSize: const Size.fromHeight(64),
           ),
-          onPressed: sending
+          onPressed: sending || !caps.sms
               ? null
               : () {
                   HapticFeedback.mediumImpact();
@@ -162,3 +169,15 @@ class _RoundAction extends StatelessWidget {
     );
   }
 }
+
+/// Short note when this device can't text and/or call (e.g. no SIM).
+String? contactsNote(SosCapabilities caps) => switch (caps) {
+  (sms: false, call: false) =>
+    'Hindi makapag-text o makatawag ang device na ito (walang SIM?). '
+        'Gumamit ng ibang phone o ipakita ang QR.',
+  (sms: false, call: true) =>
+    'Hindi makapag-text ang device na ito (walang SIM?). Tawagan na lang.',
+  (sms: true, call: false) =>
+    'Hindi makatawag ang device na ito (walang SIM?). I-text na lang.',
+  _ => null,
+};

@@ -11,7 +11,7 @@ void showEmergencySnack(BuildContext context, String message) {
     ..showSnackBar(SnackBar(content: Text(message)));
 }
 
-/// One tap → phone dialer.
+/// One tap → phone dialer. [SosUnavailable] messages are shown as-is.
 Future<void> dialNumber(
   BuildContext context,
   WidgetRef ref,
@@ -19,6 +19,8 @@ Future<void> dialNumber(
 ) async {
   try {
     await ref.read(sosServiceProvider).openDialer(number);
+  } on SosUnavailable catch (e) {
+    if (context.mounted) showEmergencySnack(context, e.message);
   } catch (_) {
     if (context.mounted) {
       showEmergencySnack(context, 'Hindi mabuksan ang dialer. I-dial: $number');
@@ -27,6 +29,7 @@ Future<void> dialNumber(
 }
 
 /// Texts the SOS message (with GPS) to [contacts] and reports the result.
+/// [SosUnavailable] messages are shown as-is.
 Future<void> textContacts(
   BuildContext context,
   WidgetRef ref,
@@ -34,12 +37,15 @@ Future<void> textContacts(
 ) async {
   final ok = await ref.read(sosSmsControllerProvider.notifier).send(contacts);
   if (!context.mounted) return;
+  final error = ref.read(sosSmsControllerProvider).error;
   showEmergencySnack(
     context,
     ok
         ? (contacts.length == 1
               ? 'Na-text si ${contacts.single.name}'
               : 'Na-text ang ${contacts.length} contact')
+        : error is SosUnavailable
+        ? error.message
         : 'Hindi na-send ang text. Subukan ulit o tumawag.',
   );
 }
