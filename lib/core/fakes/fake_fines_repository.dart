@@ -47,6 +47,9 @@ class FakeFinesRepository implements FinesRepository {
     ),
   ];
 
+  /// Empty query = common violations for the agency. The query may be typed
+  /// keywords OR a whole spoken sentence (from SpeechService), so an alias
+  /// found inside the query also counts as a match.
   @override
   Future<List<Fine>> search(String query, Agency agency) async {
     final q = query.trim().toLowerCase();
@@ -56,7 +59,10 @@ class FakeFinesRepository implements FinesRepository {
           (f) =>
               q.isEmpty ||
               f.violation.toLowerCase().contains(q) ||
-              f.aliases.any((a) => a.toLowerCase().contains(q)),
+              f.aliases.any((a) {
+                final alias = a.toLowerCase();
+                return alias.contains(q) || q.contains(alias);
+              }),
         )
         .toList(growable: false);
   }

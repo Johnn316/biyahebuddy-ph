@@ -38,12 +38,15 @@ dependencies:
   go_router: ^17.5.0
   shared_preferences: ^2.5.6
   sqlite3: ^3.5.2
-  sqlite3_flutter_libs: ^0.6.0+eol
   path_provider: ^2.1.6
   geolocator: ^14.1.1
   url_launcher: ^6.3.3
   permission_handler: 12.0.1
   qr_flutter: ^4.1.0
+  # On-device AI (spike). Native libs fetched at BUILD time, never at runtime.
+  llamadart: ^0.11.1
+  whisper_ggml: ^2.7.1
+  record: ^7.1.1
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +73,20 @@ flutter:
   assets:
     - assets/data/
     - assets/images/
+
+  # Bundled (offline) — never fetch fonts at runtime. OFL: assets/fonts/OFL.txt
+  fonts:
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+        - asset: assets/fonts/PlusJakartaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans-ExtraBold.ttf
+          weight: 800
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -101,3 +118,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# llamadart: bundle only the llama.cpp runtime (GGUF). Skips LiteRT-LM and
+# stable-diffusion to keep the APK small.
+hooks:
+  user_defines:
+    llamadart:
+      llamadart_native_runtimes: [llama_cpp]

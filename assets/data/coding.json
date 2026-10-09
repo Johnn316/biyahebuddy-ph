@@ -1,5 +1,7 @@
 {
-  "scheme": "SAMPLE — MMDA UVVRP (number coding)",
+  "scheme": "MMDA Unified Vehicular Volume Reduction Program (UVVRP) - number coding",
+  "legal_basis": "MMDA Regulation No. 96-005, as amended; MMDA Resolution No. 22-14, s. 2022",
+  "effective": "2022-08-15",
   "hours": [
     {
       "start": "07:00",
@@ -11,26 +13,25 @@
     }
   ],
   "days": {
-    "1": [
-      1,
-      2
-    ],
-    "2": [
-      3,
-      4
-    ],
-    "3": [
-      5,
-      6
-    ],
-    "4": [
-      7,
-      8
-    ],
-    "5": [
-      9,
-      0
-    ]
+    "1": [1, 2],
+    "2": [3, 4],
+    "3": [5, 6],
+    "4": [7, 8],
+    "5": [9, 0]
   },
-  "notes": "SAMPLE DATA — verify with MMDA. Day keys are ISO weekdays (1=Monday). Digits are the last digit of the plate. Exemptions and LGU-specific rules not included."
+  "holidays_exempt": true,
+  "exempt_vehicles": [
+    "Public utility vehicles (including tricycles)",
+    "Transport network vehicle services (TNVS)",
+    "Motorcycles",
+    "Garbage trucks",
+    "Fuel trucks",
+    "Marked government vehicles",
+    "Trucks",
+    "Ambulances",
+    "Marked media vehicles",
+    "Vehicles carrying essential and/or perishable goods"
+  ],
+  "exempt_roads": [],
+  "notes": "Metro Manila (NCR). Coding applies on weekdays except holidays, 7:00-10:00 AM and 5:00-8:00 PM, based on the last digit of the plate. Day keys are ISO weekdays (1=Monday). The MMDA release lists no exempt roads; on secondary roads the number-coding ordinances of each LGU prevail, so city rules may differ. Source: MMDA press release PR-22-08-069 (Aug. 11, 2022); no later MMDA change found as of 2026-10-09 (see docs/SOURCES.md)."
 }
