@@ -74,13 +74,20 @@ Current files are **SAMPLE** data — not verified.
 
 ## AI answer-format rules (in-app assistant)
 
-Every `AiAssistant` answer must be, in order:
+Every `AiAssistant` answer must be, in order, each header on its own line
+as `**<Header>**` (the chat UI parses these exact headers; short forms
+`Batas` / `Gagawin` are also accepted):
 
 1. **Kalma muna** — short, calming opener (driver may be stressed).
-2. **Batas** — the relevant law **with citation** (source + section). Never
-   invent a law; if no chunk matches, say so plainly.
+2. **Ano ang sinasabi ng batas** — the relevant law **with citation**
+   (e.g. `RA 4136 Sec. 42`, `RA 10913 Sec. 4`, `LTO JAO 2014-01`,
+   `MMDA Reg. 96-005`; these are auto-highlighted as chips). Never invent a
+   law; if no chunk matches, say so plainly.
 3. **Pagsusuri** — analysis of the driver's situation.
-4. **Gagawin** — numbered, concrete next steps.
+4. **Ano ang gagawin** — numbered, concrete next steps.
+
+If no headers are found the UI shows plain text. Stream tokens as they are
+generated (`Stream<String>` chunks are appended in order).
 
 Also: Filipino/Taglish by default, short sentences, no legal-advice claims,
 cite only from `laws.json` / `fines.json` retrieved chunks, recommend 911 when
@@ -111,7 +118,7 @@ _Last updated: 2026-10-09_
 | Profile screen (edit + save) | John | ✅ On fakes |
 | Emergency screen (Ligtas ka ba, 911, contacts SMS+GPS, hotlines, checklist, medical, QR) | John | ✅ On fakes — branch `frontend/emergency` |
 | Na-flag ako (agency → violation → result, mic search, IPAKITA officer screen) | John | ✅ On fakes — branch `frontend/violation` |
-| Chat | John | ⬜ Placeholder (accepts `/chat?q=` prefill) |
+| Tanong kay Buddy (chat + Dalawang panig, streaming, 4-section answers, mic) | John | ✅ On fakes — branch `frontend/chat` |
 | Local DB + JSON loaders | Backend | ⬜ Not started |
 | CodingService (real) | Backend | ⬜ Not started |
 | AI / RAG (LLM package TBD after spike) | Backend | ⬜ Not started |

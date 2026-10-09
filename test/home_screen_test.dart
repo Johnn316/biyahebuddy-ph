@@ -71,7 +71,7 @@ void main() {
 
     for (final (key, title) in [
       ('home-emergency', 'Emergency'),
-      ('home-chat', 'Tanong kay Buddy'),
+      ('home-chat', 'Buddy'),
       ('home-violation', 'Na-flag ako'),
     ]) {
       await tester.tap(find.byKey(Key(key)));
@@ -90,6 +90,20 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     expect(find.text('EMERGENCY'), findsOneWidget);
+  });
+
+  testWidgets('small phone + 1.5x system font: no overflow', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpHome(tester, isCoding: true);
+    tester.view.physicalSize = const Size(720, 1280);
+    tester.view.devicePixelRatio = 2.0;
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getSize(find.byKey(const Key('home-emergency'))).height,
+      greaterThan(150),
+    );
   });
 
   testWidgets('profile icon opens prefilled profile', (tester) async {

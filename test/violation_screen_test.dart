@@ -207,7 +207,7 @@ void main() {
     await tapKey(tester, 'agency-city');
     await tapKey(tester, 'unknown-violation');
 
-    expect(find.widgetWithText(AppBar, 'Tanong kay Buddy'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
     final input = tester.widget<TextField>(find.byKey(const Key('chat-input')));
     expect(
       input.controller!.text,
