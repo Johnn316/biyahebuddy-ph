@@ -18,6 +18,7 @@ abstract final class AnswerParts {
   static const _fineWords = [
     'multa', 'magkano', 'fine', 'penalty', 'parusa', 'huli', 'nahuli',
     'flag', 'na-flag', 'naflag', 'tiket', 'ticket', 'tinikitan', 'violation',
+    'hinuli', 'hinuhuli', 'tiniketan',
   ];
 
   static const _accidentWords = [
