@@ -139,7 +139,7 @@ _Last updated: 2026-10-09_
 | Profile screen (edit + save) | John | ✅ On fakes |
 | Emergency screen (Ligtas ka ba, 911, contacts SMS+GPS, hotlines, checklist, medical, QR) | John | ✅ On fakes — branch `frontend/emergency` |
 | Na-flag ako (agency → violation → result, mic search, IPAKITA officer screen) | John | ✅ On fakes — branch `frontend/violation` |
-| Tanong kay Buddy (chat + Dalawang panig, streaming, 4-section answers, mic) | John | ✅ On fakes — branch `frontend/chat` |
+| Tanong kay Buddy (chat + Dalawang panig, streaming, 4-section answers, mic) | John | ✅ Dalawang panig + mic hidden in the demo build (`kTwoSidesEnabled` / `kVoiceInputEnabled` in `lib/core/config/features.dart`) |
 | UI refresh (light/dark theme, bundled font, modern cards, theme switch) | John | ✅ branch `frontend/ui-refresh` |
 | iOS-style redesign (tab bar, SOS hero, grouped lists, iMessage chat) | John | ✅ branch `frontend/ios-redesign` — touches `core/router` (tabs) |
 | Local DB + JSON loaders | Backend | ⬜ Not started |

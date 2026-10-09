@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/features.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../shared/widgets/grouped.dart';
@@ -246,38 +247,40 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-              child: CupertinoSlidingSegmentedControl<ChatMode>(
-                key: const Key('chat-mode'),
-                groupValue: state.mode,
-                thumbColor: context.colors.surface,
-                backgroundColor: p.elevated.withValues(alpha: 0.6),
-                padding: const EdgeInsets.all(3),
-                children: {
-                  for (final (m, label) in [
-                    (ChatMode.ask, 'Tanong'),
-                    (ChatMode.twoSides, 'Dalawang panig'),
-                  ])
-                    m: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Text(
-                        label,
-                        textAlign: TextAlign.center,
-                        style: context.text.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
+            // Hidden for the demo (kTwoSidesEnabled): Buddy is ask-only.
+            if (kTwoSidesEnabled)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                child: CupertinoSlidingSegmentedControl<ChatMode>(
+                  key: const Key('chat-mode'),
+                  groupValue: state.mode,
+                  thumbColor: context.colors.surface,
+                  backgroundColor: p.elevated.withValues(alpha: 0.6),
+                  padding: const EdgeInsets.all(3),
+                  children: {
+                    for (final (m, label) in [
+                      (ChatMode.ask, 'Tanong'),
+                      (ChatMode.twoSides, 'Dalawang panig'),
+                    ])
+                      m: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Text(
+                          label,
+                          textAlign: TextAlign.center,
+                          style: context.text.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                },
-                onValueChanged: (m) {
-                  if (m == null || busy) return;
-                  HapticFeedback.selectionClick();
-                  _input.clear();
-                  _chat.setMode(m);
-                },
+                  },
+                  onValueChanged: (m) {
+                    if (m == null || busy) return;
+                    HapticFeedback.selectionClick();
+                    _input.clear();
+                    _chat.setMode(m);
+                  },
+                ),
               ),
-            ),
             Expanded(
               child: Builder(
                 builder: (context) =>

@@ -10,7 +10,8 @@ An **offline** AI driving companion for Filipino drivers (Android, Flutter).
   location to emergency contacts by SMS and dials hotlines. No internet needed.
 - **Na-flag ako** — look up LTO / MMDA / city fines and the legal basis when
   you get flagged down, with calm step-by-step guidance.
-- **Tanong kay Buddy** — ask an on-device AI about traffic laws (voice or text).
+- **Tanong kay Buddy** — ask an on-device AI about traffic laws: tap a topic
+  or type a question.
   Answers follow: *Kalma muna → Batas (with citation) → Pagsusuri → Gagawin*.
 - **Number coding** status for your plate, always visible on the home screen.
 - **Profile** — license, plate, blood type, insurance, emergency contacts, QR card.

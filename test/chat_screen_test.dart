@@ -313,10 +313,25 @@ void main() {
   ) async {
     await pumpChat(tester, ai: ControlledAi());
     expect(find.byKey(const Key('chat-mic')), findsNothing);
-    await tester.tap(find.text('Dalawang panig'));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('chat-mic')), findsNothing);
+    if (kTwoSidesEnabled) {
+      await tester.tap(find.text('Dalawang panig'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('chat-mic')), findsNothing);
+    }
   }, skip: kVoiceInputEnabled);
+
+  testWidgets('no Tanong | Dalawang panig toggle when it is disabled', (
+    tester,
+  ) async {
+    await pumpChat(tester, ai: ControlledAi());
+    expect(find.byKey(const Key('chat-mode')), findsNothing);
+    expect(find.text('Dalawang panig'), findsNothing);
+    // Header still there; the chat starts right under it (no empty gap).
+    expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
+    final appBarBottom = tester.getRect(find.byType(AppBar)).bottom;
+    final title = tester.getRect(find.text('Ano ang tanong mo?'));
+    expect(title.top - appBarBottom, lessThan(40));
+  }, skip: kTwoSidesEnabled);
 
   group('natural reply (animations on)', () {
     Future<void> motionOn(WidgetTester tester) async {
@@ -678,7 +693,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Ano ang nangyari sa panig mo?'), findsOneWidget);
     expect(find.text('Nauna ako'), findsNothing);
-  });
+  }, skip: !kTwoSidesEnabled);
 
   testWidgets('auto-scrolls to the bottom while streaming', (tester) async {
     final ai = ControlledAi();
@@ -765,9 +780,11 @@ void main() {
       await typeAndSend(tester, 'Nabangga ako, sino may mali?');
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      await tester.tap(find.text('Dalawang panig'));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
+      if (kTwoSidesEnabled) {
+        await tester.tap(find.text('Dalawang panig'));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      }
     });
   }
 

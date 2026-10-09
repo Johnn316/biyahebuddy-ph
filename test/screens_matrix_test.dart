@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:biyahebuddy_ph/app.dart';
+import 'package:biyahebuddy_ph/core/config/features.dart';
 import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
 import 'package:biyahebuddy_ph/core/router/app_router.dart';
@@ -171,7 +172,9 @@ void main() {
         await app.settle();
       });
 
-      testWidgets('Chat: empty, answer, Dalawang panig', (tester) async {
+      testWidgets('Chat: empty, answer (+ Dalawang panig if enabled)', (
+        tester,
+      ) async {
         final app = await _pump(tester, c);
         await app.push(Routes.chat);
         await tester.enterText(
@@ -182,9 +185,11 @@ void main() {
         await app.tap('chat-send');
         expect(find.text('Ano ang sinasabi ng batas'), findsOneWidget);
         await app.scrollThrough();
-        await tester.tap(find.text('Dalawang panig'));
-        await app.settle();
-        expect(find.text('Ano ang nangyari sa panig mo?'), findsOneWidget);
+        if (kTwoSidesEnabled) {
+          await tester.tap(find.text('Dalawang panig'));
+          await app.settle();
+          expect(find.text('Ano ang nangyari sa panig mo?'), findsOneWidget);
+        }
       });
     });
   }
