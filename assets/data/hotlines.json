@@ -1,17 +1,57 @@
 [
   {
-    "name": "SAMPLE — National Emergency Hotline",
+    "name": "Emergency 911 National Hotline",
     "number": "911",
     "zone": null
   },
   {
-    "name": "SAMPLE — Philippine Red Cross",
+    "name": "Philippine Red Cross Emergency Hotline",
     "number": "143",
     "zone": null
   },
   {
-    "name": "SAMPLE — MMDA Metrobase",
+    "name": "PNP Highway Patrol Group (HPG) - Public Information Office",
+    "number": "02-8535-1931",
+    "zone": null
+  },
+  {
+    "name": "MMDA Hotline",
     "number": "136",
     "zone": "NCR"
+  },
+  {
+    "name": "NLEX Hotline (NLEX Corporation)",
+    "number": "1-35000",
+    "zone": "NLEX"
+  },
+  {
+    "name": "SCTEX Hotline (NLEX Corporation)",
+    "number": "1-35000",
+    "zone": "SCTEX"
+  },
+  {
+    "name": "SBMA Emergency - Rescue/Law Enforcement (Smart & Globe mobile)",
+    "number": "9111",
+    "zone": "SBMA"
+  },
+  {
+    "name": "SBMA Emergency - Rescue/Law Enforcement (Subictel landline)",
+    "number": "911",
+    "zone": "SBMA"
+  },
+  {
+    "name": "SBMA Fire",
+    "number": "160",
+    "zone": "SBMA"
+  },
+  {
+    "name": "SBMA Medical Emergency (Sagip Buhay)",
+    "number": "161",
+    "zone": "SBMA"
+  },
+  {
+    "name": "SBMA Public Health & Safety - Emergency Trunkline",
+    "number": "047-252-4169",
+    "zone": "SBMA"
   }
 ]
