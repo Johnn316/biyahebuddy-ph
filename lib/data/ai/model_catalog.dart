@@ -1,5 +1,5 @@
 /// On-device model files. Downloaded ONCE by [LocalModelManager]; never
-/// committed to git (see .gitignore). Both sources are public and ungated,
+/// committed to git (see .gitignore). All sources are public and ungated,
 /// so no Hugging Face token is needed.
 class ModelSpec {
   const ModelSpec({
@@ -38,5 +38,17 @@ abstract final class ModelCatalog {
     sizeBytes: 147951465,
   );
 
-  static const all = [llm, whisper];
+  /// EmbeddingGemma 300M, Q8_0 GGUF (~334 MB). License: Gemma Terms of Use.
+  /// Embeds the driver's question for semantic retrieval; documents are
+  /// pre-embedded in assets/data/embeddings.json (tools/build_embeddings.dart).
+  static const embedder = ModelSpec(
+    id: 'embedder',
+    fileName: 'embeddinggemma-300M-Q8_0.gguf',
+    url:
+        'https://huggingface.co/ggml-org/embeddinggemma-300M-GGUF/resolve/main/'
+        'embeddinggemma-300M-Q8_0.gguf',
+    sizeBytes: 333590944,
+  );
+
+  static const all = [llm, whisper, embedder];
 }

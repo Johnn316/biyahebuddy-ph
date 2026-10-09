@@ -12,8 +12,61 @@ String? ftsQuery(String text, {bool allWords = false}) {
       .where((w) => w.length >= 2 && !_stopwords.contains(w))
       .toSet();
   if (words.isEmpty) return null;
-  return words.map((w) => '"$w"*').join(allWords ? ' AND ' : ' OR ');
+  // A word and its Tagalog root(s) are alternatives: ("nakaparada"* OR
+  // "parada"*), so roots never become extra required words in AND mode.
+  return words
+      .map((w) {
+        final roots = tagalogRoots(w);
+        return roots.isEmpty
+            ? '"$w"*'
+            : '(${['"$w"*', for (final r in roots) '"$r"*'].join(' OR ')})';
+      })
+      .join(allWords ? ' AND ' : ' OR ');
 }
+
+/// Light Tagalog stemming so affixed forms meet their root:
+/// "nakaparada"/"pumarada" → "parada", "nagmamaneho" → "maneho",
+/// "nakainom" → "inom", "kumanan" → "kanan", "nabangga" → "bangga".
+/// Strips one common prefix, an -um-/-in- infix, and a reduplicated first
+/// syllable. Roots shorter than 4 letters are dropped (too ambiguous).
+Set<String> tagalogRoots(String word) {
+  var s = word;
+  for (final p in _prefixes) {
+    if (s.startsWith(p) && s.length - p.length >= 4) {
+      s = s.substring(p.length);
+      break;
+    }
+  }
+  final infix = _infix.firstMatch(s);
+  if (infix != null) s = '${infix[1]}${infix[3]}';
+  final redup = _reduplication.firstMatch(s);
+  if (redup != null) s = '${redup[1]}${redup[2]}';
+  return s != word && s.length >= 4 ? {s} : const {};
+}
+
+/// Longest first, so "naka" wins over "na".
+const _prefixes = [
+  'nakikipag',
+  'nakapag',
+  'makapag',
+  'pinaka',
+  'nagpa',
+  'magpa',
+  'naka',
+  'maka',
+  'nag',
+  'mag',
+  'pag',
+  'ipa',
+  'na',
+  'ma',
+];
+
+/// Consonant + "um"/"in" + vowel…: "pumarada" → "parada".
+final _infix = RegExp(r'^([bcdfghjklmnpqrstvwyz])(um|in)([aeiou].{2,})$');
+
+/// Repeated first (C)V syllable: "mamaneho" → "maneho", "tatawid" → "tawid".
+final _reduplication = RegExp(r'^([bcdfghjklmnpqrstvwyz]?[aeiou])\1(.{3,})$');
 
 /// Filler words that would match almost everything.
 const _stopwords = {

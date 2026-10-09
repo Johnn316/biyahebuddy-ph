@@ -1,0 +1,485 @@
+{
+  "summary": {
+    "label": "fts-roots",
+    "retriever": "FTS5 keyword (baseline)",
+    "llm": null,
+    "accuracy": 0.6333333333333333,
+    "lawHitRate": 0.6785714285714286,
+    "fineHitRate": 0.75,
+    "retrievalMsMedian": 1,
+    "answerMsMedian": null,
+    "answerMsMean": null,
+    "answerMsMax": null
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "intent": "accident",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s37",
+        "ra4136-s39",
+        "ra4136-s42"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q02",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra10054-s7",
+        "ra4136-s60",
+        "ra4136-s59"
+      ],
+      "fines": [
+        "No / non-standard motorcycle helmet — 1st offense",
+        "No / non-standard motorcycle helmet — 2nd offense"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q03",
+      "intent": "enforcer",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s12",
+        "ra11229-s10",
+        "ra10586-s16"
+      ],
+      "fines": [
+        "Distracted driving by a public utility, school service, or hazardous-cargo vehicle driver, or within 50 m of a school",
+        "Distracted driving (mobile phone / gadget use) — 1st offense"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q04",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra10586-s4",
+        "ra10586-s5",
+        "ra10586-s16"
+      ],
+      "fines": [
+        "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)",
+        "Number coding (UVVRP) violation"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q05",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra11229-s3",
+        "ra8750-s5",
+        "ra11229-s5"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q06",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s49",
+        "ra4136-s43"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q07",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s49",
+        "ra4136-s43",
+        "ra4136-s42"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q08",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s40",
+        "ra4136-s39",
+        "ra4136-s37"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q09",
+      "intent": "accident",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": null,
+      "laws": [],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q10",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s7",
+        "ra4136-s55",
+        "ra10054-s2"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q11",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s36",
+        "ra4136-s3-p1",
+        "ra4136-s40"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q12",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s3-p1",
+        "ra4136-s36",
+        "ra4136-s40"
+      ],
+      "fines": [
+        "Overspeeding",
+        "Overspeeding"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q13",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s46",
+        "ra4136-s52",
+        "ra4136-s47"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q14",
+      "intent": "fine",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": false,
+      "laws": [
+        "ra4136-s3-p3",
+        "ra4136-s3-p2",
+        "ra4136-s52"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q15",
+      "intent": "general",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s58",
+        "ra4136-s31",
+        "ra4136-s11"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q16",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s29",
+        "ra8750-s12",
+        "ra4136-s20"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q17",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s12",
+        "ra10586-s4",
+        "ra8750-s13"
+      ],
+      "fines": [
+        "No seatbelt (driver/front passenger) — 1st offense",
+        "No seatbelt (driver/front passenger) — 2nd offense"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q18",
+      "intent": "fine",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s12",
+        "ra10586-s16",
+        "ra4136-s60"
+      ],
+      "fines": [
+        "Illegal counterflow",
+        "Illegal counterflow"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q19",
+      "intent": "enforcer",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": false,
+      "laws": [
+        "ra4136-s48",
+        "ra4136-s56-p3",
+        "ra4136-s28"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q20",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s5-p1",
+        "ra4136-s50",
+        "ra4136-s51"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q21",
+      "intent": "general",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s6",
+        "ra10586-s9",
+        "ra10586-s3"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q22",
+      "intent": "fine",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": false,
+      "laws": [
+        "ra4136-s3-p1",
+        "ra4136-s3-p3",
+        "ra4136-s33"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q23",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s7",
+        "ra10586-s4",
+        "ra10586-s3"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q24",
+      "intent": "enforcer",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s53",
+        "ra10586-s7",
+        "ra10586-s5"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q25",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "laws": [],
+      "fines": [
+        "Number coding (UVVRP) violation",
+        "Number coding (UVVRP) violation"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q26",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s34-p4",
+        "ra4136-s34-p2",
+        "ra4136-s34-p3"
+      ],
+      "fines": [
+        "Disregarding traffic signs (incl. beating the red light)",
+        "Disregarding traffic signs (incl. beating the red light)"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q27",
+      "intent": "fine",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s3-p1",
+        "ra8750-s12",
+        "ra4136-s3-p3"
+      ],
+      "fines": [
+        "Overloading (passengers or cargo)",
+        "No seatbelt (driver/front passenger) — 1st offense"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q28",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s18",
+        "ra4136-s7-p1",
+        "ra11229-s5"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q29",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s45",
+        "ra4136-s37",
+        "ra4136-s42"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "q30",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s39",
+        "ra4136-s37",
+        "ra4136-s40"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    }
+  ]
+}

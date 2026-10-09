@@ -148,4 +148,5 @@ _Last updated: 2026-10-09_
 | Local speech (`SpeechService`, Whisper) | Backend | 🟡 `whisper_ggml` + ggml-base (148 MB), lang `tl`; written, not yet run on a phone |
 | Model download (`ModelManager`) | Backend | 🟡 `LocalModelManager`: public HF URLs, no token, resumable; not yet run on a phone |
 | Native volume SOS | Backend | ⬜ Not started |
+| Hybrid retrieval (FTS5 + EmbeddingGemma 300M, RRF, intent routing, FAQ boost, Tagalog roots) + citation guard + PC eval harness (`tools/eval/`) | John (backend code — needs teammate review) | 🟡 branch `feature/hybrid-retrieval`. Rebuild `assets/data/embeddings.json` with `tools/build_embeddings.dart` whenever laws/fines/faq change |
 | Verified data + SOURCES.md | Devin | 🟡 laws.json built from 6 RAs (LTO manual blocked); fines/hotlines/coding still SAMPLE |

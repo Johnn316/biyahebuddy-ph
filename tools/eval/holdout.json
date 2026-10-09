@@ -1,0 +1,12 @@
+[
+  {"id": "h01", "lang": "taglish", "intent": "right_of_way", "question": "May tumatawid na tao sa pedestrian lane, kailangan ko bang huminto?", "laws": ["ra4136-s42"]},
+  {"id": "h02", "lang": "taglish", "intent": "general", "question": "Sira ang headlight ko, bawal ba magmaneho sa gabi?", "laws": ["ra4136-s34"], "fines": ["accessories"]},
+  {"id": "h03", "lang": "english", "intent": "fine", "question": "How much is the fine for not wearing a seatbelt?", "laws": ["ra8750-s12", "ra8750-s4"], "fines": ["seatbelt"]},
+  {"id": "h04", "lang": "taglish", "intent": "general", "question": "Ilang taon dapat ang bata para makaangkas sa motor?", "fines": ["Child passenger on motorcycle"]},
+  {"id": "h05", "lang": "tagalog", "intent": "accident", "question": "Nasagi ko ang nakaparadang kotse at walang tao, ano ang dapat kong gawin?", "laws": ["ra4136-s55"]},
+  {"id": "h06", "lang": "taglish", "intent": "enforcer", "question": "Pinahinto ako sa checkpoint at pinapa-blow sa breathalyzer, required ba?", "laws": ["ra10586-s6", "ra10586-s8"]},
+  {"id": "h07", "lang": "taglish", "intent": "right_of_way", "question": "Sino ang mauuna sa rotonda o intersection, yung nasa kanan ba?", "laws": ["ra4136-s42"]},
+  {"id": "h08", "lang": "taglish", "intent": "fine", "question": "Naka-tsinelas lang ako nagmomotor, hinuli ako ng MMDA", "fines": ["dress code"]},
+  {"id": "h09", "lang": "english", "intent": "general", "question": "Can I use my phone as GPS while driving if it is mounted?", "laws": ["ra10913-s4", "ra10913-s6"]},
+  {"id": "h10", "lang": "tagalog", "intent": "two_sides", "question": "Huminto ako bigla dahil may tumawid na aso", "driverB": "Hindi ko naabutan ang preno kaya nabangga ko siya sa likod", "laws": ["ra4136-s35", "ra4136-s55", "ra4136-s44"]}
+]

@@ -16,6 +16,7 @@ class LocalModelManager implements ModelManager {
 
   Directory? _dir;
   bool _ready = false;
+  final _complete = <String>{};
 
   /// Last result of [refresh] or a finished download. Call [refresh] once at
   /// startup; the getter is sync because the contract is.
@@ -37,12 +38,17 @@ class LocalModelManager implements ModelManager {
     return await file.exists() && await file.length() == spec.sizeBytes;
   }
 
-  /// Re-checks the files on disk and updates [isReady].
+  /// Whether [spec]'s file is fully downloaded (as of the last [refresh]).
+  /// Lets each feature use its own model even if another is still missing.
+  bool has(ModelSpec spec) => _complete.contains(spec.id);
+
+  /// Re-checks the files on disk and updates [isReady] and [has].
   Future<bool> refresh() async {
+    _complete.clear();
     for (final spec in models) {
-      if (!await _isComplete(spec)) return _ready = false;
+      if (await _isComplete(spec)) _complete.add(spec.id);
     }
-    return _ready = true;
+    return _ready = _complete.length == models.length;
   }
 
   @override

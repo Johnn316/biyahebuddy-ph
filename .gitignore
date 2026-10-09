@@ -63,3 +63,6 @@ models/
 *.keystore
 *.jks
 key.properties
+
+# Eval scratch: per-model embedding builds (the shipped copy is assets/data/embeddings.json)
+tools/eval/embeddings/
