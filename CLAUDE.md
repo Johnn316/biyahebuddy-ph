@@ -95,10 +95,23 @@ anyone is hurt. `analyzeTwoSides` stays neutral between Driver A and Driver B.
 
 ## UI rules
 
-- High contrast, large text, min 64dp tap targets, one-thumb use.
-- Red (`AppColors.emergency`) is reserved for emergency actions ONLY. Warnings
-  (e.g. "Coding ka ngayon") use amber `AppColors.warning`.
-- Home screen fills the screen: status strip → big EMERGENCY → two equal buttons.
+- High contrast, large text, min 64dp tap targets, one-thumb use. Layouts fill
+  their space (no big empty areas) and must not overflow at the largest
+  system font — `test/screens_matrix_test.dart` checks every screen in light +
+  dark at 1.0x and 2.0x text on 360x640 and 412x915.
+- Theme lives in `lib/core/theme/` (frontend-owned): Material 3 light + dark,
+  bundled Plus Jakarta Sans (`assets/fonts/`, never runtime-fetched). ThemeMode
+  follows System by default; Light/Dark/System switch in Profile
+  (`themeModeProvider`, saved in shared_preferences).
+- **Never hardcode colors in features/.** Use `context.colors` (ColorScheme)
+  and `context.palette` (`AppPalette`: emergency, accent, success, muted,
+  cardShadow). Only exception: the QR code is always black on white.
+- Red (`palette.emergency`) is ONLY for emergency actions. Warnings (e.g.
+  "Coding ka ngayon") use amber `palette.accent`; safe/OK states use green
+  `palette.success`.
+- Shared UI building blocks: `lib/features/shared/widgets/` (`AppCard`,
+  `SectionTitle`, `Pressable`, `ScaleDownToFit`).
+- Home: status strip → red gradient EMERGENCY hero → two equal action cards.
 
 ## Workflow rule
 
@@ -119,6 +132,7 @@ _Last updated: 2026-10-09_
 | Emergency screen (Ligtas ka ba, 911, contacts SMS+GPS, hotlines, checklist, medical, QR) | John | ✅ On fakes — branch `frontend/emergency` |
 | Na-flag ako (agency → violation → result, mic search, IPAKITA officer screen) | John | ✅ On fakes — branch `frontend/violation` |
 | Tanong kay Buddy (chat + Dalawang panig, streaming, 4-section answers, mic) | John | ✅ On fakes — branch `frontend/chat` |
+| UI refresh (light/dark theme, bundled font, modern cards, theme switch) | John | ✅ branch `frontend/ui-refresh` |
 | Local DB + JSON loaders | Backend | ⬜ Not started |
 | CodingService (real) | Backend | ⬜ Not started |
 | AI / RAG (LLM package TBD after spike) | Backend | ⬜ Not started |
