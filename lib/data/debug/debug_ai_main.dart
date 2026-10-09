@@ -39,7 +39,9 @@ class DebugAiScreen extends StatefulWidget {
 
 class _DebugAiScreenState extends State<DebugAiScreen> {
   final _models = LocalModelManager();
-  final _llm = LocalLlm();
+  late final _llm = LocalLlm(
+    modelPath: () => _models.pathFor(ModelCatalog.llm),
+  );
   WhisperSpeechService? _speech;
   final _question = TextEditingController(text: _testQuestions.first);
 
@@ -88,7 +90,7 @@ class _DebugAiScreenState extends State<DebugAiScreen> {
     try {
       if (!_llm.isLoaded) {
         final sw = Stopwatch()..start();
-        await _llm.load(await _models.pathFor(ModelCatalog.llm));
+        await _llm.load();
         _note('LLM load: ${sw.elapsedMilliseconds} ms');
       }
       final sw = Stopwatch()..start();
@@ -116,7 +118,7 @@ class _DebugAiScreenState extends State<DebugAiScreen> {
   Future<void> _toggleMic() async {
     try {
       _speech ??= WhisperSpeechService(
-        modelPath: await _models.pathFor(ModelCatalog.whisper),
+        modelPath: () => _models.pathFor(ModelCatalog.whisper),
       );
       if (!_recording) {
         await _speech!.startListening();

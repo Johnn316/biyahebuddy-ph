@@ -9,10 +9,19 @@ import '../../core/contracts/contracts.dart';
 /// Local speech-to-text: records 16 kHz mono WAV with `record`, then runs
 /// whisper.cpp (whisper_ggml) on the downloaded model file. No network.
 class WhisperSpeechService implements SpeechService {
-  WhisperSpeechService({required this.modelPath, this.language = 'tl'});
+  WhisperSpeechService({
+    required this.modelPath,
+    this.isModelReady = _always,
+    this.language = 'tl',
+  });
+
+  static bool _always() => true;
 
   /// Absolute path to the ggml Whisper model (from LocalModelManager).
-  final String modelPath;
+  final Future<String> Function() modelPath;
+
+  /// False until the one-time model download is done.
+  final bool Function() isModelReady;
 
   /// 'tl' (Tagalog) handles Taglish best in testing; 'auto' is the fallback.
   final String language;
@@ -27,6 +36,9 @@ class WhisperSpeechService implements SpeechService {
 
   @override
   Future<void> startListening() async {
+    if (!isModelReady()) {
+      throw StateError('I-download muna ang AI models para sa boses.');
+    }
     if (!await _recorder.hasPermission()) {
       throw StateError('Microphone permission denied.');
     }
@@ -54,7 +66,7 @@ class WhisperSpeechService implements SpeechService {
         isNoTimestamps: true,
         initialPrompt: _initialPrompt,
       ),
-      modelPath: modelPath,
+      modelPath: await modelPath(),
     );
     return response.text.trim();
   }

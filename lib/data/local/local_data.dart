@@ -2,14 +2,22 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ai/local_ai_assistant.dart';
+import '../ai/local_llm.dart';
+import '../ai/local_model_manager.dart';
+import '../ai/model_catalog.dart';
+import '../ai/whisper_speech_service.dart';
 import '../coding/asset_coding_service.dart';
+import '../rag/law_retriever.dart';
 import '../repositories/asset_hotline_repository.dart';
 import '../repositories/prefs_profile_repository.dart';
 import '../repositories/sqlite_fines_repository.dart';
 import 'app_database.dart';
 
-/// Loads every local data source once at startup (fast: small JSON + sqlite).
-/// Needed because `CodingService.statusFor` is sync but assets load async.
+/// Loads every on-device backend piece once at startup (fast: small JSON,
+/// sqlite, and a file-size check of the models; the LLM itself loads lazily).
+/// Needed because `CodingService.statusFor` and `ModelManager.isReady` are
+/// sync but their data loads async.
 ///
 /// Call `await LocalData.init()` in main() before runApp; providers.dart then
 /// reads [LocalData.instance].
@@ -20,6 +28,9 @@ class LocalData {
     required this.coding,
     required this.fines,
     required this.hotlines,
+    required this.models,
+    required this.ai,
+    required this.speech,
   });
 
   static LocalData? _instance;
@@ -33,6 +44,9 @@ class LocalData {
   final AssetCodingService coding;
   final SqliteFinesRepository fines;
   final AssetHotlineRepository hotlines;
+  final LocalModelManager models;
+  final LocalAiAssistant ai;
+  final WhisperSpeechService speech;
 
   static Future<LocalData> init({AssetBundle? bundle}) async {
     if (_instance != null) return _instance!;
@@ -46,6 +60,9 @@ class LocalData {
       SharedPreferences.getInstance(),
     ).wait;
 
+    final models = LocalModelManager();
+    await models.refresh();
+
     final database = AppDatabase.open(
       '${dir.path}/biyahebuddy.db',
       lawsJson: laws,
@@ -57,6 +74,16 @@ class LocalData {
       coding: AssetCodingService.fromJson(coding),
       fines: SqliteFinesRepository(database),
       hotlines: AssetHotlineRepository.fromJson(hotlines),
+      models: models,
+      ai: LocalAiAssistant(
+        retriever: LawRetriever(database),
+        llm: LocalLlm(modelPath: () => models.pathFor(ModelCatalog.llm)),
+        isModelReady: () => models.isReady,
+      ),
+      speech: WhisperSpeechService(
+        modelPath: () => models.pathFor(ModelCatalog.whisper),
+        isModelReady: () => models.isReady,
+      ),
     );
   }
 }

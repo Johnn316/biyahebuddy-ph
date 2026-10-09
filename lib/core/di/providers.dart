@@ -31,7 +31,7 @@ final hotlineRepositoryProvider = Provider<HotlineRepository>(
 );
 
 final aiAssistantProvider = Provider<AiAssistant>(
-  (ref) => useFakes ? FakeAiAssistant() : _real('AiAssistant'),
+  (ref) => useFakes ? FakeAiAssistant() : LocalData.instance.ai,
 );
 
 final sosServiceProvider = Provider<SosService>(
@@ -39,11 +39,11 @@ final sosServiceProvider = Provider<SosService>(
 );
 
 final speechServiceProvider = Provider<SpeechService>(
-  (ref) => useFakes ? FakeSpeechService() : _real('SpeechService'),
+  (ref) => useFakes ? FakeSpeechService() : LocalData.instance.speech,
 );
 
 final modelManagerProvider = Provider<ModelManager>(
-  (ref) => useFakes ? FakeModelManager() : _real('ModelManager'),
+  (ref) => useFakes ? FakeModelManager() : LocalData.instance.models,
 );
 
 // ---------------------------------------------------------------------------

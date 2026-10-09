@@ -14,7 +14,7 @@ Everything here works in airplane mode.
 | Whisper base, multilingual (`ggerganov/whisper.cpp` `ggml-base.bin`, ~148 MB, MIT) | Model | Local speech recognition, Filipino + English |
 | whisper.cpp via `whisper_ggml` (MIT; bundles `ffmpeg_kit_flutter_new_min` for local audio conversion) | Package | Runs Whisper on the phone |
 | `record` | Package | Records 16 kHz mono WAV from the mic for Whisper |
-| Local RAG over `assets/data/laws.json` | Asset + code | Grounds answers in cited law sections |
+| Local RAG over `assets/data/laws.json` + `fines.json` (sqlite FTS5, bm25) | Asset + code | Picks the law sections; the cited law text in answers is copied from these files by code, never written by the LLM |
 | `assets/data/*.json` (laws, fines, hotlines, coding) | Asset | SAMPLE data; sources in [SOURCES.md](SOURCES.md) |
 | Flutter / Dart | Framework | App UI and logic |
 | flutter_riverpod, go_router | Package | State management, navigation |

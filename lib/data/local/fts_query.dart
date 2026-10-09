@@ -21,7 +21,9 @@ const _stopwords = {
   'ang', 'ng', 'sa', 'na', 'ay', 'mga', 'ko', 'ako', 'ka', 'mo', 'ba', 'po',
   'yung', 'iyong', 'pag', 'kapag', 'kung', 'ano', 'magkano', 'multa', 'ito',
   'yan', 'siya', 'kami', 'tayo', 'nang', 'para', 'may', 'ni', 'si', 'din',
-  'rin', 'lang', 'naman', 'dahil', 'kasi', 'ung', 'nag', 'ma',
+  'rin', 'lang', 'naman', 'dahil', 'kasi', 'ung', 'nag', 'ma', 'daw', 'raw',
+  'sabi', 'gagawin', 'gawin', 'dapat', 'pwede', 'puwede', 'kailangan',
+  'habang', 'akin', 'amin', 'namin', 'niya', 'nila', 'sila',
   // Negations: "walang helmet" must not match "walang lisensya".
   'wala', 'walang', 'hindi', 'di', 'no', 'not', 'without',
   // English

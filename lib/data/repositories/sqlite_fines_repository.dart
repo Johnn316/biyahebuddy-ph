@@ -31,10 +31,10 @@ class SqliteFinesRepository implements FinesRepository {
         [match, agency.toJson()],
       );
     }
-    return rows.map(_toFine).toList(growable: false);
+    return rows.map(fineFromRow).toList(growable: false);
   }
 
-  static Fine _toFine(Row r) => Fine(
+  static Fine fineFromRow(Row r) => Fine(
     violation: r['violation'] as String,
     agency: Agency.fromJson(r['agency'] as String),
     amount: r['amount'] as num,
