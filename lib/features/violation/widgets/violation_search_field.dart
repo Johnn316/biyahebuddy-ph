@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/config/features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../shared/speech/mic_controller.dart';
 import '../controllers/violation_controller.dart';
@@ -88,31 +89,33 @@ class ViolationSearchField extends ConsumerWidget {
             ),
           ),
         ),
-        const SizedBox(width: 10),
-        SizedBox.square(
-          dimension: 56,
-          child: IconButton.filled(
-            key: const Key('mic'),
-            tooltip: listening ? 'Itigil at isulat' : 'Magsalita',
-            style: IconButton.styleFrom(
-              backgroundColor: listening ? p.accent : context.colors.primary,
-              foregroundColor: listening
-                  ? p.onAccent
-                  : context.colors.onPrimary,
+        if (kVoiceInputEnabled) ...[
+          const SizedBox(width: 10),
+          SizedBox.square(
+            dimension: 56,
+            child: IconButton.filled(
+              key: const Key('mic'),
+              tooltip: listening ? 'Itigil at isulat' : 'Magsalita',
+              style: IconButton.styleFrom(
+                backgroundColor: listening ? p.accent : context.colors.primary,
+                foregroundColor: listening
+                    ? p.onAccent
+                    : context.colors.onPrimary,
+              ),
+              onPressed: mic == MicPhase.transcribing
+                  ? null
+                  : () => _toggleMic(context, ref),
+              icon: mic == MicPhase.transcribing
+                  ? const CupertinoActivityIndicator()
+                  : Icon(
+                      listening
+                          ? CupertinoIcons.stop_fill
+                          : CupertinoIcons.mic_fill,
+                      size: 28,
+                    ),
             ),
-            onPressed: mic == MicPhase.transcribing
-                ? null
-                : () => _toggleMic(context, ref),
-            icon: mic == MicPhase.transcribing
-                ? const CupertinoActivityIndicator()
-                : Icon(
-                    listening
-                        ? CupertinoIcons.stop_fill
-                        : CupertinoIcons.mic_fill,
-                    size: 28,
-                  ),
           ),
-        ),
+        ],
       ],
     );
   }

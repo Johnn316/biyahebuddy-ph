@@ -12,7 +12,7 @@ Everything here works in airplane mode.
 | Model | Size | License | Purpose |
 |---|---|---|---|
 | Gemma 3 1B IT, Q4_K_M GGUF (`ggml-org/gemma-3-1b-it-GGUF`) | ~806 MB | Gemma Terms of Use | Writes the short "Pagsusuri" (analysis) part of Buddy's answers |
-| Whisper base, multilingual (`ggerganov/whisper.cpp`, `ggml-base.bin`) | ~148 MB | MIT | Speech-to-text, Filipino/Taglish + English |
+| Whisper base, multilingual (`ggerganov/whisper.cpp`, `ggml-base.bin`) | ~148 MB | MIT | Speech-to-text, Filipino/Taglish + English. **Included in code, disabled in this build** (`kVoiceInputEnabled = false`): not downloaded, no mic buttons |
 | EmbeddingGemma 300M, Q8_0 GGUF (`ggml-org/embeddinggemma-300M-GGUF`) | ~334 MB | Gemma Terms of Use | Embeds the driver's question for semantic (meaning-based) retrieval of law sections and fines; runs via llama.cpp |
 
 The law text and citations in every answer are copied from `laws.json` /
@@ -24,8 +24,8 @@ The law text and citations in every answer are copied from `laws.json` /
 |---|---|---|
 | Flutter / Dart | Framework | App UI and logic |
 | llama.cpp via `llamadart` (MIT) | Package | Runs the GGUF LLM on the phone CPU |
-| whisper.cpp via `whisper_ggml` (MIT; bundles `ffmpeg_kit_flutter_new_min`, LGPL, for local audio conversion) | Package | Runs Whisper on the phone |
-| `record` | Package | Records 16 kHz mono WAV from the mic for Whisper |
+| whisper.cpp via `whisper_ggml` (MIT; bundles `ffmpeg_kit_flutter_new_min`, LGPL, for local audio conversion) | Package | Runs Whisper on the phone (included in code, disabled in this build) |
+| `record` | Package | Records 16 kHz mono WAV from the mic for Whisper (included in code, disabled in this build) |
 | Local hybrid RAG over `assets/data/laws.json` + `fines.json` (+ `faq.json` when present): sqlite FTS5/bm25 keywords with light Tagalog root matching, EmbeddingGemma vectors, reciprocal rank fusion, rule-based intent routing | Code | Picks the law sections and fines that answers cite |
 | `sqlite3` (bundles SQLite with FTS5), `shared_preferences`, `path_provider` | Package | Local storage, full-text search |
 | `flutter_riverpod`, `go_router` | Package | State management, navigation |
@@ -50,7 +50,7 @@ The law text and citations in every answer are copied from `laws.json` /
 
 | Item | When | Purpose |
 |---|---|---|
-| Model download (`ModelManager.downloadModels()`) | Once, on first launch | Fetches `gemma-3-1b-it-Q4_K_M.gguf`, `ggml-base.bin` and `embeddinggemma-300M-Q8_0.gguf` (~1.29 GB total) from huggingface.co (public, no account/token) into app storage. Resumable. |
+| Model download (`ModelManager.downloadModels()`) | Once, on first launch | Fetches `gemma-3-1b-it-Q4_K_M.gguf` and `embeddinggemma-300M-Q8_0.gguf` (~1.14 GB total; `ggml-base.bin` only when voice input is enabled) from huggingface.co (public, no account/token) into app storage. Resumable. |
 | `tools/build_data.py --download` (dev only, not in the app) | When rebuilding data | Fetches law texts from lawphil.net; uses pdfplumber, BeautifulSoup, lxml, requests |
 
 No other feature uses the network. No cloud AI APIs, analytics or remote

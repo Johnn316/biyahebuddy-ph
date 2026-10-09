@@ -180,11 +180,10 @@ class ChatController extends AutoDisposeNotifier<ChatState> {
 final chatControllerProvider =
     NotifierProvider.autoDispose<ChatController, ChatState>(ChatController.new);
 
-/// Quick chips for an empty chat. Ending in "…" = fill the box to finish;
-/// otherwise send right away.
+/// Suggestion cards for an empty chat; tap sends the question.
 const quickQuestions = [
-  'Magkano multa sa…',
-  'Pwede ba…',
+  'Magkano multa pag walang helmet?',
+  'Pwede ba mag-overtake sa double yellow?',
   'Nabangga ako, sino may mali?',
-  'Ano gagawin pag na-flag ako?',
+  'Na-flag ako ng MMDA, ano gagawin?',
 ];

@@ -5,15 +5,19 @@ import '../../../core/theme/app_theme.dart';
 /// Citation chip, e.g. "RA 4136 Sec. 44" (docs/DESIGN.md §8 "Law pill"):
 /// amber fill, dark text, book icon, tabular figures. Grows at most 1.4×.
 class LawPill extends StatelessWidget {
-  const LawPill(this.citation, {super.key});
+  const LawPill(this.citation, {super.key, this.onTap});
 
   final String citation;
+
+  /// Opens the law text (chat answers); null = not tappable.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return Semantics(
+    final pill = Semantics(
       label: 'Batas: $citation',
+      button: onTap != null,
       excludeSemantics: true,
       child: MediaQuery.withClampedTextScaling(
         maxScaleFactor: 1.4,
@@ -44,6 +48,16 @@ class LawPill extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+    if (onTap == null) return pill;
+    // A little taller hit area than the pill itself.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: pill,
       ),
     );
   }

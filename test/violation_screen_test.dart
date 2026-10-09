@@ -1,4 +1,5 @@
 import 'package:biyahebuddy_ph/app.dart';
+import 'package:biyahebuddy_ph/core/config/features.dart';
 import 'package:biyahebuddy_ph/core/contracts/contracts.dart';
 import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
@@ -110,6 +111,15 @@ void main() {
     expect(find.text('Driving without a valid license'), findsNothing);
   });
 
+  testWidgets('no mic on the search when voice input is disabled', (
+    tester,
+  ) async {
+    await openViolation(tester, speech: FakeSpeechService());
+    await tapKey(tester, 'agency-lto');
+    expect(find.byKey(const Key('violation-search')), findsOneWidget);
+    expect(find.byKey(const Key('mic')), findsNothing);
+  }, skip: kVoiceInputEnabled);
+
   testWidgets('mic: tap to listen, tap again → transcript fills search', (
     tester,
   ) async {
@@ -130,7 +140,7 @@ void main() {
       find.text('Failure to wear seatbelt (driver, 1st offense)'),
       findsOneWidget,
     );
-  });
+  }, skip: !kVoiceInputEnabled);
 
   testWidgets('spoken sentence still finds the violation (fake speech)', (
     tester,
@@ -143,7 +153,7 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
     expect(find.text('Disregarding traffic signs'), findsOneWidget);
-  });
+  }, skip: !kVoiceInputEnabled);
 
   testWidgets('IPAKITA → full-screen officer message → Tapos na', (
     tester,

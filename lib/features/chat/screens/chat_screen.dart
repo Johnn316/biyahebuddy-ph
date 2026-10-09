@@ -6,8 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/di/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../shared/widgets/grouped.dart';
+import '../../shared/widgets/pressable.dart';
+import '../../shared/widgets/status_chip.dart';
 import '../controllers/chat_controller.dart';
 import '../widgets/buddy_answer.dart';
 import '../widgets/chat_input_bar.dart';
@@ -29,6 +32,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _scroll = ScrollController();
   String? _appliedQ;
 
+  /// Tap on Stop → the answer being typed out freezes.
+  final _stopSignal = ValueNotifier<int>(0);
+
+  /// An answer is still being revealed word by word (stream may be done).
+  bool _revealing = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -44,17 +53,41 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _input.dispose();
     _inputFocus.dispose();
     _scroll.dispose();
+    _stopSignal.dispose();
     super.dispose();
   }
 
   ChatController get _chat => ref.read(chatControllerProvider.notifier);
 
   void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scroll.hasClients) {
-        _scroll.jumpTo(_scroll.position.maxScrollExtent);
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _follow(force: true));
+  }
+
+  /// Keeps the newest words in view: a short glide (a jump under reduce
+  /// motion). Doesn't fight a driver who scrolled up to re-read.
+  void _follow({bool force = false}) {
+    if (!mounted || !_scroll.hasClients) return;
+    final pos = _scroll.position;
+    final gap = pos.maxScrollExtent - pos.pixels;
+    if (gap <= 0.5 || (!force && gap > 240)) return;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _scroll.jumpTo(pos.maxScrollExtent);
+    } else {
+      _scroll.animateTo(
+        pos.maxScrollExtent,
+        duration: AppMotion.quick,
+        curve: AppMotion.enter,
+      );
+    }
+  }
+
+  void _setRevealing(bool v) {
+    if (mounted && v != _revealing) setState(() => _revealing = v);
+  }
+
+  void _stop() {
+    if (ref.read(chatControllerProvider).streaming) _chat.stop();
+    _stopSignal.value++;
   }
 
   void _submit(String text) {
@@ -72,15 +105,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _quickQuestion(String q) {
-    HapticFeedback.selectionClick();
-    if (q.endsWith('…')) {
-      // Unfinished question: put it in the box for the driver to complete.
-      _input.text = '${q.substring(0, q.length - 1)} ';
-      _input.selection = TextSelection.collapsed(offset: _input.text.length);
-      _inputFocus.requestFocus();
-    } else {
-      _chat.ask(q);
-    }
+    HapticFeedback.lightImpact();
+    _chat.ask(q);
   }
 
   Future<void> _newCase() async {
@@ -107,21 +133,34 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final showResult = twoSides && state.twoSidesStep == TwoSidesStep.result;
     // Room for the frosted input area (body extends behind it).
     final bottom = MediaQuery.paddingOf(context).bottom;
+    final busy = state.streaming || _revealing;
 
     final Widget body = switch (state) {
       ChatState(mode: ChatMode.ask, askMessages: []) => _EmptyAsk(
         bottom: bottom,
+        onAsk: _quickQuestion,
       ),
       _ when !twoSides || showResult => ListView.separated(
         controller: _scroll,
-        padding: EdgeInsets.fromLTRB(14, 12, 14, bottom + 16),
+        padding: EdgeInsets.fromLTRB(
+          AppSpace.md,
+          AppSpace.sm,
+          AppSpace.md,
+          bottom + AppSpace.md,
+        ),
         itemCount: state.visibleMessages.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 14),
+        separatorBuilder: (_, _) => const SizedBox(height: AppSpace.md),
         itemBuilder: (_, i) {
           final m = state.visibleMessages[i];
           return m.role == ChatRole.user
               ? UserBubble(message: m)
-              : BuddyAnswer(message: m);
+              : BuddyAnswer(
+                  key: ValueKey('answer-${state.mode.name}-$i'),
+                  message: m,
+                  stopSignal: _stopSignal,
+                  onRevealing: _setRevealing,
+                  onGrow: _follow,
+                );
         },
       ),
       _ => _TwoSidesPrompt(
@@ -144,35 +183,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         title: Row(
           children: [
             const BuddyAvatar(size: 40),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Buddy', style: context.text.titleLarge),
-                  Row(
-                    children: [
-                      Icon(
-                        CupertinoIcons.wifi_slash,
-                        size: 14,
-                        color: p.success,
-                      ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Gumagana kahit walang signal',
-                            style: context.text.labelMedium?.copyWith(
-                              color: p.success,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+            const SizedBox(width: AppSpace.sm),
+            Text('Buddy', maxLines: 1, style: context.text.titleLarge),
+            const SizedBox(width: AppSpace.xs),
+            // The badge gives way (ellipsis) before the name does.
+            Flexible(
+              child: OfflineReadyBadge(
+                ready: ref.watch(modelManagerProvider).isReady,
+                compact: true,
               ),
             ),
           ],
@@ -219,7 +237,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                 },
                 onValueChanged: (m) {
-                  if (m == null || state.streaming) return;
+                  if (m == null || busy) return;
                   HapticFeedback.selectionClick();
                   _input.clear();
                   _chat.setMode(m);
@@ -236,9 +254,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (state.mode == ChatMode.ask && state.askMessages.isEmpty)
-                _QuickChips(onTap: _quickQuestion),
-              if (showResult && !state.streaming)
+              if (showResult && !busy)
                 FilledButton.icon(
                   key: const Key('new-case'),
                   onPressed: _newCase,
@@ -259,9 +275,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     (_, TwoSidesStep.sideA) => 'Susunod',
                     _ => 'Suriin',
                   },
-                  streaming: state.streaming,
+                  streaming: busy,
                   onSubmit: _submit,
-                  onStop: _chat.stop,
+                  onStop: _stop,
                 ),
             ],
           ),
@@ -304,76 +320,189 @@ class _FrostedBottom extends StatelessWidget {
 }
 
 class _EmptyAsk extends StatelessWidget {
-  const _EmptyAsk({required this.bottom});
+  const _EmptyAsk({required this.bottom, required this.onAsk});
 
   final double bottom;
+  final ValueChanged<String> onAsk;
 
   @override
   Widget build(BuildContext context) {
     // Fills the space; scrolls instead of overflowing on short screens.
     return LayoutBuilder(
-      builder: (context, box) => SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(24, 16, 24, bottom + 16),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: (box.maxHeight - bottom - 32).clamp(0, double.infinity),
+      builder: (context, box) {
+        final room = box.maxHeight - bottom;
+        return SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            AppSpace.md,
+            AppSpace.md,
+            AppSpace.md,
+            bottom + AppSpace.md,
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (box.maxHeight - bottom > 280)
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: BuddyAvatar(size: 88),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: (room - 2 * AppSpace.md).clamp(0, double.infinity),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (room > 420)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: AppSpace.md),
+                    child: Center(child: BuddyAvatar(size: 76)),
+                  ),
+                Text(
+                  'Ano ang gusto mong itanong?',
+                  textAlign: TextAlign.center,
+                  style: context.text.headlineMedium,
                 ),
-              Text(
-                'Ano ang gusto mong itanong kay Buddy?',
-                textAlign: TextAlign.center,
-                style: context.text.headlineMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Batas trapiko, multa, aksidente — magsalita o mag-type.',
-                textAlign: TextAlign.center,
-                style: context.text.bodyLarge?.copyWith(
-                  color: context.palette.muted,
+                const SizedBox(height: AppSpace.xs),
+                Text(
+                  'Batas trapiko, multa, aksidente — sagot kahit offline.',
+                  textAlign: TextAlign.center,
+                  style: context.text.bodyLarge?.copyWith(
+                    color: context.palette.muted,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: AppSpace.lg),
+                _Suggestions(
+                  width: box.maxWidth - 2 * AppSpace.md,
+                  onTap: onAsk,
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-class _QuickChips extends StatelessWidget {
-  const _QuickChips({required this.onTap});
+/// 2×2 suggestion cards (one column when text is huge); tap = send.
+class _Suggestions extends StatelessWidget {
+  const _Suggestions({required this.width, required this.onTap});
 
+  final double width;
   final ValueChanged<String> onTap;
 
   @override
   Widget build(BuildContext context) {
-    // One swipeable row: keeps the input visible even with the keyboard open.
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
+    final p = context.palette;
+    final scale = MediaQuery.textScalerOf(context).scale(1);
+    final icons = [
+      (CupertinoIcons.tag_fill, p.cautionText),
+      (CupertinoIcons.car_detailed, context.colors.primary),
+      (CupertinoIcons.exclamationmark_triangle_fill, p.cautionText),
+      (CupertinoIcons.flag_fill, p.success),
+    ];
+    final cards = [
+      for (final (i, q) in quickQuestions.indexed)
+        _SuggestionCard(
+          tapKey: Key('quick-$i'),
+          text: q,
+          icon: icons[i].$1,
+          color: icons[i].$2,
+          onTap: () => onTap(q),
+        ),
+    ];
+    if ((width - AppSpace.sm) / 2 < 150 * scale) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final (i, q) in quickQuestions.indexed)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: ActionChip(
-                key: Key('quick-$i'),
-                label: Text(q),
-                labelStyle: context.text.titleSmall?.copyWith(
-                  color: context.colors.primary,
+          for (final (i, c) in cards.indexed) ...[
+            if (i > 0) const SizedBox(height: AppSpace.sm),
+            c,
+          ],
+        ],
+      );
+    }
+    Widget row(Widget a, Widget b) => IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(child: a),
+          const SizedBox(width: AppSpace.sm),
+          Expanded(child: b),
+        ],
+      ),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        row(cards[0], cards[1]),
+        const SizedBox(height: AppSpace.sm),
+        row(cards[2], cards[3]),
+      ],
+    );
+  }
+}
+
+class _SuggestionCard extends StatelessWidget {
+  const _SuggestionCard({
+    required this.tapKey,
+    required this.text,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  final Key tapKey;
+  final String text;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final radius = BorderRadius.circular(AppRadius.md);
+    return Semantics(
+      button: true,
+      label: 'Itanong: $text',
+      excludeSemantics: true,
+      child: Pressable(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: context.colors.surface,
+            borderRadius: radius,
+            boxShadow: p.cardShadow,
+            border: Border(top: BorderSide(color: p.highlight, width: 0.5)),
+          ),
+          child: Material(
+            type: MaterialType.transparency,
+            borderRadius: radius,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              key: tapKey,
+              onTap: onTap,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpace.sm + 2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                      ),
+                      child: Icon(icon, size: 18, color: color),
+                    ),
+                    const SizedBox(height: AppSpace.xs),
+                    Text(
+                      text,
+                      style: context.text.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                onPressed: () => onTap(q),
               ),
             ),
-        ],
+          ),
+        ),
       ),
     );
   }

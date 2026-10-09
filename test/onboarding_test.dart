@@ -44,7 +44,7 @@ void main() {
 
     // (a) Model download.
     expect(
-      find.textContaining('Isang beses lang kailangan ng internet'),
+      find.textContaining('Isang beses lang: ~1.15 GB'),
       findsOneWidget,
     );
     expect(find.byKey(const Key('model-continue')), findsNothing);

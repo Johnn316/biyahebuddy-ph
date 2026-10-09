@@ -77,8 +77,7 @@ class ModelDownloadStep extends ConsumerWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Isang beses lang kailangan ng internet para '
-                        'i-download si Buddy.',
+                        'Isang beses lang: ~1.15 GB. Gumamit ng Wi-Fi.',
                         textAlign: TextAlign.center,
                         style: context.text.titleLarge,
                       ),
@@ -90,8 +89,8 @@ class ModelDownloadStep extends ConsumerWidget {
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
-                              'Pagkatapos nito, gagana na ang app kahit '
-                              'naka-airplane mode.',
+                              'Pagkatapos nito, gumagana na si Buddy kahit '
+                              'walang internet.',
                               textAlign: TextAlign.center,
                               style: context.text.bodyLarge?.copyWith(
                                 color: p.muted,
