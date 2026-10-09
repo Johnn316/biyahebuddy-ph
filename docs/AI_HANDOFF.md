@@ -233,3 +233,18 @@ analysis appears in the shown law/fines.
 | 2. Fine→law links: tag/title evidence re-ranks each fine's top-6 nearest sections (embeddings rebuilt; q12 fixed) | 93.3% (28/30) | 80.0% (8/10) | 4/4 retrieval |
 | 3. Enforcer questions: unanimous keyword fine accepted; fine's topic links kept, penalty provision dropped; generic "to drive" verbs are stopwords (q19 fixed) | 96.7% (29/30) | 80.0% (8/10) | 4/4 retrieval |
 | 4. Answer quality with Gemma 1B (checker: blame only in the LLM's analysis — verbatim law may say "liable") | quality 96.7% (29/30): format 0, blame 0, invented 0, amount 0 bad; only q18's law missing | quality 80.0% (8/10): only h02/h04 fines missing | — |
+| **Final (this PR)** | **96.7% (29/30)** | **80.0% (8/10)** | **4/4 retrieval + 4/4 answer quality, on all 3 runs** |
+
+Answer time with the 1B on this PC: median ~11 s, max ~18 s (busier machine
+than the section-1 numbers); phone still to be measured.
+
+### Still failing after this PR
+
+| Id | Why | Next step |
+|---|---|---|
+| q18 counterflow → RA 4136 Sec. 37 | No word or vector links "counterflow" to "Driving on right side of highway". Tried `counterflow → right side` (also fixed a bug where hyphenated words like "nag-counterflow" skip the synonym table): no gain — "right"/"side" are too common, and the counterflow fine's links (Sec. 54/41) win. Reverted. | Data: add `counterflow`, `kontra-flow`, `wrong way` tags to `ra4136-s37`, or a `faq.json` entry → `ra4136-s37`, then rebuild embeddings. (Devin) |
+| h02, h04 (held-out) | Unchanged; not tuned on. "bawal ba" questions get no fine; RA 10666 missing from `laws.json`. | See section 4. |
+
+Note: `expandQuery` doesn't look up hyphen parts ("nag-counterflow"), so
+synonyms miss prefixed words. Worth fixing together with the q18 data fix and
+measuring.
