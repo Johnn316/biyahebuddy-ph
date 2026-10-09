@@ -55,9 +55,12 @@ class HybridRetriever {
       question,
       vectors,
       intents,
+      // A fine brings its topic sections (fine→law links). Its penalty
+      // provision (legal basis) only when the driver asked about a fine:
+      // for "na-flag ako…" it pushed out the rule actually asked about.
       citedByFines: [
         for (final (row, f) in fines) ...[
-          ...lawIdsInLegalBasis(f.legalBasis),
+          if (!enforcerOnly) ...lawIdsInLegalBasis(f.legalBasis),
           ...index.lawsForFine(row - 1),
         ],
       ],
@@ -182,9 +185,17 @@ class HybridRetriever {
       ..sort((a, b) => scores[b]!.compareTo(scores[a]!));
     if (consensusOnly) {
       final ftsTop = ftsFams.take(5).toSet();
+      // Keyword evidence that names exactly one violation type in its top 5
+      // rows ("kaskasero" → Reckless only) is unambiguous on its own.
+      final topRows = families(fts.take(5).toList());
+      final unanimous = fts.length >= 2 && topRows.length == 1
+          ? topRows.toSet()
+          : const <String>{};
       ranked = [
         for (final f in ranked)
-          if (ftsTop.contains(f) && semanticTop.contains(f)) f,
+          if (unanimous.contains(f) ||
+              (ftsTop.contains(f) && semanticTop.contains(f)))
+            f,
       ];
     }
 

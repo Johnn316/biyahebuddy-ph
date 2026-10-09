@@ -77,6 +77,10 @@ const _stopwords = {
   'rin', 'lang', 'naman', 'dahil', 'kasi', 'ung', 'nag', 'ma', 'daw', 'raw',
   'sabi', 'gagawin', 'gawin', 'dapat', 'pwede', 'puwede', 'kailangan',
   'habang', 'akin', 'amin', 'namin', 'niya', 'nila', 'sila',
+  // Generic "to drive": nearly every fine's aliases say "habang nagmamaneho",
+  // so these drowned the word that matters ("kaskasero" → Reckless).
+  'maneho', 'magmaneho', 'nagmamaneho', 'nagmaneho', 'pagmamaneho',
+  'mamaneho', 'minamaneho', 'driving', 'drive', 'driver',
   // Negations: "walang helmet" must not match "walang lisensya".
   'wala', 'walang', 'hindi', 'di', 'no', 'not', 'without',
   // English

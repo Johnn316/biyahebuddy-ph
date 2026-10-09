@@ -1,0 +1,6 @@
+[
+  {"id": "d1", "lang": "taglish", "intent": "fine", "question": "Magkano multa pag walang helmet?", "laws": ["ra10054-s7"], "fines": ["helmet"]},
+  {"id": "d2", "lang": "taglish", "intent": "general", "question": "Pwede ba mag-overtake sa double yellow line?", "laws": ["ra4136-s41"]},
+  {"id": "d3", "lang": "taglish", "intent": "two_sides", "question": "Bigla siyang kumanan nang walang signal light, umabante ako.", "driverB": "Naka-signal ako, mabilis siya.", "laws": ["ra4136-s44"]},
+  {"id": "d4", "lang": "taglish", "intent": "enforcer", "question": "Na-flag ako ng MMDA dahil sa beating the red light.", "fines": ["red light"]}
+]

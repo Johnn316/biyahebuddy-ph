@@ -79,19 +79,90 @@ Future<void> main(List<String> args) async {
         in (jsonDecode(lawsJson) as List<dynamic>).cast<Map<String, dynamic>>())
       l['id'] as String: l['title'] as String,
   };
+  // Tags written for each law section (Taglish keywords). A fine whose
+  // aliases contain a section's tags is about that section — a stronger
+  // link than vector similarity (which tied Overspeeding to Sec. 40/48).
+  final lawTags = {
+    for (final l
+        in (jsonDecode(lawsJson) as List<dynamic>).cast<Map<String, dynamic>>())
+      l['id'] as String: [
+        for (final t in (l['tags'] as List<dynamic>? ?? const []))
+          (t as String).toLowerCase(),
+      ],
+  };
+  // Rare tags say more (IDF): "speed limit" beats "overspeeding", which is
+  // on 7 sections.
+  final tagDocs = <String, int>{};
+  for (final tags in lawTags.values) {
+    for (final t in tags.toSet()) {
+      tagDocs[t] = (tagDocs[t] ?? 0) + 1;
+    }
+  }
+  final fineRows = (jsonDecode(finesJson) as List<dynamic>)
+      .cast<Map<String, dynamic>>();
+  final boilerplate = RegExp(
+    r'^(short title|title of|declaration of policy|definition|penalt|'
+    r'separability|repealing|effectivity|implementing|appropriation)',
+    caseSensitive: false,
+  );
+
+  // Tags are often shared by a whole topic group (7 sections carry
+  // "overspeeding"), so the section title separates them: "Restriction as to
+  // speed" shares "speed" with "overspeeding"; "Driver to give way" doesn't.
+  const genericTitleWords = {
+    'driver', 'drivers', 'vehicle', 'vehicles', 'motor', 'highway',
+    'highways', 'other', 'upon', 'with', 'from', 'shall', 'their', 'certain',
+  };
+  int titleHits(String title, List<String> terms) => {
+    for (final w in title.toLowerCase().split(RegExp('[^a-z]+')))
+      if (w.length >= 4 &&
+          !genericTitleWords.contains(w) &&
+          terms.any((t) => t.contains(w)))
+        w,
+  }.length;
+
   final fineLaws = <List<String>>[];
-  for (final fv in fines) {
+  for (final (i, fv) in fines.indexed) {
     final f = Uint8List.fromList(base64Decode(fv)).buffer.asFloat32List();
+    final row = fineRows[i];
+    final head = (row['violation'] as String)
+        .split(' — ')
+        .first
+        .split(' (')
+        .first
+        .toLowerCase();
+    final terms = [
+      head,
+      for (final a in (row['aliases'] as List<dynamic>? ?? const []))
+        (a as String).toLowerCase(),
+    ];
+    bool covers(String tag) => terms.any(
+      (t) => RegExp('(^|[^a-z])${RegExp.escape(tag)}(\$|[^a-z])').hasMatch(t),
+    );
+
     final scored = [
       for (final e in lawVecs.entries)
-        if (!RegExp(
-          r'^(short title|title of|declaration of policy|definition|penalt|'
-          r'separability|repealing|effectivity|implementing|appropriation)',
-          caseSensitive: false,
-        ).hasMatch(lawTitles[e.key]!))
-          (id: e.key, score: VectorIndex.dot(f, e.value)),
-    ]..sort((a, b) => b.score.compareTo(a.score));
-    fineLaws.add([for (final s in scored.take(2)) s.id]);
+        if (!boilerplate.hasMatch(lawTitles[e.key]!))
+          (
+            id: e.key,
+            tags: [
+                  for (final t in lawTags[e.key]!.toSet())
+                    if (t.length >= 4 && covers(t)) 1 / tagDocs[t]!,
+                ].fold<double>(0, (a, b) => a + b) +
+                0.5 * titleHits(lawTitles[e.key]!, terms),
+            vec: VectorIndex.dot(f, e.value),
+          ),
+    ];
+    // Semantic shortlist first (keeps links sensible), then let tag/title
+    // evidence re-rank within it; ties keep the vector order.
+    final shortlist = ([...scored]..sort((a, b) => b.vec.compareTo(a.vec)))
+        .take(6)
+        .toList();
+    final ranked = [
+      for (final (rank, s) in shortlist.indexed)
+        (id: s.id, key: s.tags - rank * 0.01),
+    ]..sort((a, b) => b.key.compareTo(a.key));
+    fineLaws.add([for (final s in ranked.take(2)) s.id]);
   }
 
   // FAQ phrasings are questions, so embed them like queries.
