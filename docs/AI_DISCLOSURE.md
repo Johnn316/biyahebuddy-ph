@@ -12,7 +12,8 @@ Everything here works in airplane mode.
 | On-device LLM (TBD after spike) | Model | Traffic-law Q&A, two-sides analysis |
 | Whisper (variant TBD) | Model | Local speech recognition, Filipino + English |
 | Local RAG over `assets/data/laws.json` | Asset + code | Grounds answers in cited law sections |
-| `assets/data/*.json` (laws, fines, hotlines, coding) | Asset | SAMPLE data; sources in [SOURCES.md](SOURCES.md) |
+| `assets/data/laws.json` | Asset | Law sections built from official texts; sources in [SOURCES.md](SOURCES.md) |
+| `assets/data/*.json` (fines, hotlines, coding) | Asset | SAMPLE data; sources in [SOURCES.md](SOURCES.md) |
 | Flutter / Dart | Framework | App UI and logic |
 | flutter_riverpod, go_router | Package | State management, navigation |
 | sqlite3, sqlite3_flutter_libs, shared_preferences, path_provider | Package | Local storage |
@@ -27,6 +28,7 @@ Everything here works in airplane mode.
 | Item | When | Purpose |
 |---|---|---|
 | Model download (`ModelManager.downloadModels()`) | Once, on first launch | Fetches the LLM + Whisper model files (source URL TBD) |
+| `tools/build_data.py --download` (dev only, not in the app) | When rebuilding data | Fetches law texts from lawphil.net; uses pdfplumber, BeautifulSoup, lxml, requests |
 
 No other feature uses the network. No cloud AI APIs are used.
 
