@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../controllers/home_controller.dart';
 
-/// Plate + MMDA coding status. Red = coding now, green = not coding.
+/// Plate + MMDA coding status. Amber = coding now, green = not coding.
+/// Never red: red is reserved for EMERGENCY.
 class StatusStrip extends ConsumerWidget {
   const StatusStrip({super.key});
 
@@ -20,7 +21,7 @@ class StatusStrip extends ConsumerWidget {
         s.plateNo,
         'Coding ka ngayon',
         s.coding.message,
-        AppColors.emergency,
+        AppColors.warning, // amber — red is reserved for EMERGENCY
       ),
       (final s?, _) => (
         s.plateNo,

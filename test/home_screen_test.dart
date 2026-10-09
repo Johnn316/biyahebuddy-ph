@@ -1,6 +1,7 @@
 import 'package:biyahebuddy_ph/app.dart';
 import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
+import 'package:biyahebuddy_ph/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -39,9 +40,21 @@ void main() {
     expect(tester.takeException(), isNull); // no overflow
   });
 
-  testWidgets('coding day shows red "Coding ka ngayon"', (tester) async {
+  testWidgets('coding day shows AMBER (never red) "Coding ka ngayon"', (
+    tester,
+  ) async {
     await pumpHome(tester, isCoding: true);
     expect(find.text('Coding ka ngayon'), findsOneWidget);
+    final badge = tester.widget<Container>(
+      find
+          .ancestor(
+            of: find.text('Coding ka ngayon'),
+            matching: find.byType(Container),
+          )
+          .first,
+    );
+    expect(badge.color, AppColors.warning);
+    expect(badge.color, isNot(AppColors.emergency));
   });
 
   testWidgets('emergency is the largest button', (tester) async {
