@@ -38,7 +38,7 @@ The law text and citations in every answer are copied from `laws.json` /
 | `cupertino_icons`, Material Icons | Font asset | Icons (bundled) |
 | Plus Jakarta Sans (`assets/fonts/`, SIL OFL 1.1) | Font asset | App typography; bundled, never fetched at runtime |
 | App logo (`assets/icon/`: `biyahebuddy_logo.png`, `app_icon.png`, `app_icon_background.png`, `app_icon_foreground.png`) | Image asset | App logo: generated with ChatGPT image generation (OpenAI), edited for app icon sizes. Bundled; launcher icons generated from it with `flutter_launcher_icons` (dev-only, build time) |
-| Android SmsManager, TelecomManager, LocationManager, MediaSession foreground service (Kotlin) | Platform API | SOS SMS/call, GPS fix, volume-button trigger (all offline; skipped with a message on devices without a SIM) |
+| Android SmsManager, TelecomManager, LocationManager, MediaSession foreground service (Kotlin) | Platform API | SOS SMS with GPS, dialer, GPS fix (all offline; skipped with a message on devices without a SIM). Volume-button SOS trigger: in code, not enabled in this build |
 
 ### Data (bundled assets, sources in [SOURCES.md](SOURCES.md))
 
@@ -49,7 +49,7 @@ The law text and citations in every answer are copied from `laws.json` /
 | `assets/data/hotlines.json`, `assets/data/coding.json` | Emergency hotlines and MMDA number coding, with official sources |
 | `assets/data/embeddings.json` | Precomputed EmbeddingGemma vectors for every law section and fine (and FAQ phrasing), built on a PC by `tools/build_embeddings.dart`; only the question is embedded on the phone |
 
-## Requires internet
+## Requires internet (one-time model download only)
 
 | Item | When | Purpose |
 |---|---|---|
@@ -71,12 +71,15 @@ MIT) — neither ships in the app.
 
 ## AI dev tools
 
+AI tools used to build the app and its materials (none of them run in the app):
+
 | Tool | Used for |
 |---|---|
-| Claude Code | Project scaffold, backend and frontend code, refactoring, tests, docs |
-| Claude (chat) | Planning, design discussion, prompts, copywriting |
-| ChatGPT image generation (OpenAI) | App logo artwork |
-| Devin | Legal data pipeline (`tools/build_data.py`) and data collection/structuring for `assets/data/` |
+| Claude Code (Anthropic) | Project scaffold, backend and frontend code, on-device AI pipeline, tests, eval harness, docs |
+| Claude (chat, Anthropic) | Planning, design discussion, prompts, copywriting |
+| ChatGPT (OpenAI) | App logo artwork (image generation); architecture review of the local-AI approach |
+| Devin (Cognition) | Legal data pipeline (`tools/build_data.py`) and data collection/structuring for `assets/data/` |
+| AI-assisted video editing | Demo video editing |
 
 All AI-generated legal content is checked against the official sources in
 [SOURCES.md](SOURCES.md) before shipping.
