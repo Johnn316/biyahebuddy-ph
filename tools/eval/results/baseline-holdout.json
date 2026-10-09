@@ -1,0 +1,169 @@
+{
+  "summary": {
+    "label": "baseline-holdout",
+    "retriever": "FTS5 keyword (baseline)",
+    "llm": null,
+    "accuracy": 0.4,
+    "lawHitRate": 0.625,
+    "fineHitRate": 0.25,
+    "retrievalMsMedian": 0,
+    "answerMsMedian": null,
+    "answerMsMean": null,
+    "answerMsMax": null
+  },
+  "questions": [
+    {
+      "id": "h01",
+      "intent": "right_of_way",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": null,
+      "laws": [
+        "ra10054-s2",
+        "ra4136-s41",
+        "ra4136-s48"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h02",
+      "intent": "general",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": false,
+      "laws": [
+        "ra4136-s34-p2",
+        "ra4136-s34-p4",
+        "ra4136-s34-p3"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h03",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s12",
+        "ra8750-s13",
+        "ra11229-s10"
+      ],
+      "fines": [
+        "No seatbelt (driver/front passenger) — 1st offense",
+        "No seatbelt (driver/front passenger) — 2nd offense"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h04",
+      "intent": "general",
+      "pass": false,
+      "lawHit": null,
+      "fineHit": false,
+      "laws": [
+        "ra11229-s3",
+        "ra10054-s3",
+        "ra11229-s7"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h05",
+      "intent": "accident",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s5-p2",
+        "ra4136-s46",
+        "ra4136-s34-p3"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h06",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s11",
+        "ra10586-s7",
+        "ra10586-s6"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h07",
+      "intent": "right_of_way",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s37",
+        "ra4136-s39",
+        "ra4136-s45"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h08",
+      "intent": "fine",
+      "pass": false,
+      "lawHit": null,
+      "fineHit": false,
+      "laws": [
+        "ra10586-s10",
+        "ra4136-s53",
+        "ra10586-s5"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h09",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10913-s2",
+        "ra10913-s6",
+        "ra10913-s3"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h10",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra10586-s7",
+        "ra10913-s2"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    }
+  ]
+}
