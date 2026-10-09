@@ -104,7 +104,7 @@ class BrandRow extends StatelessWidget {
     final p = context.palette;
     return Semantics(
       header: true,
-      label: 'BiyaheBuddy PH. Ang AI driving buddy mo, kahit walang signal.',
+      label: 'BiyaheBuddy PH. AI Driving Buddy.',
       excludeSemantics: true,
       child: Row(
         key: const Key('home-brand'),
@@ -126,17 +126,16 @@ class BrandRow extends StatelessWidget {
           ),
           const SizedBox(width: AppSpace.sm),
           Expanded(
-            // Clamped + scale-down: one line each, never cut off.
+            // Clamped + scale-down: always one line, never cut off.
             child: MediaQuery.withClampedTextScaling(
               maxScaleFactor: 1.3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text.rich(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text.rich(
                       TextSpan(
                         text: 'BiyaheBuddy',
                         children: [
@@ -150,25 +149,40 @@ class BrandRow extends StatelessWidget {
                           (compact
                                   ? context.text.titleSmall
                                   : context.text.titleMedium)
-                              ?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                height: compact ? 1.1 : null,
-                              ),
+                              ?.copyWith(fontWeight: FontWeight.w800),
                     ),
-                  ),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Ang AI driving buddy mo — kahit walang signal',
-                      style:
-                          (compact
-                                  ? context.text.labelSmall
-                                  : context.text.bodySmall)
-                              ?.copyWith(color: p.muted),
+                    const SizedBox(width: AppSpace.xs),
+                    Container(
+                      key: const Key('ai-badge'),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpace.xs,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: p.primaryTint,
+                        borderRadius: BorderRadius.circular(AppRadius.full),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            CupertinoIcons.sparkles,
+                            size: 13,
+                            color: context.colors.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'AI Driving Buddy',
+                            style: context.text.labelSmall?.copyWith(
+                              color: context.colors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

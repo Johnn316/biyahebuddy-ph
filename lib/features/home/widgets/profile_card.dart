@@ -51,12 +51,7 @@ class ProfileCard extends ConsumerWidget {
                 onTap();
               },
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpace.md,
-                  AppSpace.md,
-                  AppSpace.sm,
-                  AppSpace.md,
-                ),
+                padding: const EdgeInsets.all(AppSpace.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.min,
@@ -150,8 +145,12 @@ class _Identity extends StatelessWidget {
             s?.greeting ?? 'Magandang araw',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: context.text.bodySmall,
+            style: context.text.labelMedium?.copyWith(
+              color: context.palette.muted,
+              fontWeight: FontWeight.w500,
+            ),
           ),
+          const SizedBox(height: 2),
           // Name never cuts off: it shrinks to fit one line.
           FittedBox(
             fit: BoxFit.scaleDown,
@@ -168,9 +167,18 @@ class _Identity extends StatelessWidget {
             const SizedBox(height: 6),
             Row(
               children: [
-                PlateBadge(plate: s.plateNo),
+                // The plate shrinks a little rather than overflow.
+                Flexible(
+                  flex: 3,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: PlateBadge(plate: s.plateNo),
+                  ),
+                ),
                 const SizedBox(width: AppSpace.xs),
                 Flexible(
+                  flex: 2,
                   child: Text(
                     s.vehicleType,
                     maxLines: 1,
@@ -262,28 +270,29 @@ class _ChipsRow extends ConsumerWidget {
             ),
           },
           const SizedBox(width: AppSpace.xs),
-          OfflineReadyBadge(ready: modelsReady, short: true),
+          OfflineReadyBadge(ready: modelsReady),
           const SizedBox(width: AppSpace.xs),
           switch (gps) {
+            // Map pin + words (the old arrow icon read as an airplane).
             AsyncData(value: true) => const StatusChip(
               key: Key('gps-chip'),
-              tone: ChipTone.info,
-              icon: CupertinoIcons.location_fill,
-              label: '',
+              tone: ChipTone.success,
+              icon: Icons.location_on_rounded,
+              label: 'GPS',
               semanticsLabel: 'GPS handa',
             ),
             AsyncData() || AsyncError() => const StatusChip(
               key: Key('gps-chip'),
               tone: ChipTone.neutral,
-              icon: CupertinoIcons.location_slash_fill,
-              label: '',
+              icon: Icons.location_off_rounded,
+              label: 'Walang GPS',
               semanticsLabel: 'Walang GPS',
             ),
             _ => const StatusChip(
               key: Key('gps-chip'),
               tone: ChipTone.neutral,
-              icon: CupertinoIcons.location,
-              label: '',
+              icon: Icons.location_searching_rounded,
+              label: 'GPS…',
               semanticsLabel: 'Hinahanap ang GPS',
             ),
           },

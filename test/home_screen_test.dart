@@ -55,17 +55,21 @@ void main() {
     );
     // Fakes: models not downloaded yet; GPS from the recording SOS fake
     // (icon-only chip, so its meaning is in the semantics label).
-    expect(find.text('I-download'), findsOneWidget);
+    expect(find.text('I-download si Buddy'), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp('GPS handa')), findsOneWidget);
+    // GPS chip: map pin + word, green when ready (not an icon-only chip).
+    expect(find.text('GPS'), findsOneWidget);
     expect(find.text('SOS'), findsOneWidget);
     expect(find.text('Pindutin kapag naaksidente'), findsOneWidget);
     // Short tile labels; full names for screen readers.
     expect(find.text('AI Buddy'), findsOneWidget); // first tile
     // Brand row: this is an AI driving buddy.
     expect(find.text('BiyaheBuddy PH'), findsOneWidget);
+    expect(find.byKey(const Key('ai-badge')), findsOneWidget);
+    expect(find.text('AI Driving Buddy'), findsOneWidget);
     expect(
       find.text('Ang AI driving buddy mo — kahit walang signal'),
-      findsOneWidget,
+      findsNothing,
     );
     expect(find.text('Na-flag ako'), findsOneWidget);
     expect(find.text('QR'), findsOneWidget);
