@@ -1,0 +1,5 @@
+package ph.biyahebuddy.biyahebuddy_ph
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()

@@ -1,0 +1,36 @@
+[
+  {
+    "id": "SAMPLE-ra4136-35",
+    "source": "SAMPLE — RA 4136 (Land Transportation and Traffic Code)",
+    "section": "Sec. 35",
+    "title": "Restriction as to speed",
+    "text": "SAMPLE TEXT — verify against official source. Any person driving a motor vehicle shall drive at a careful and prudent speed...",
+    "tags": [
+      "speed",
+      "bilis",
+      "overspeeding"
+    ]
+  },
+  {
+    "id": "SAMPLE-ra10913-4",
+    "source": "SAMPLE — RA 10913 (Anti-Distracted Driving Act)",
+    "section": "Sec. 4",
+    "title": "Use of mobile devices while driving",
+    "text": "SAMPLE TEXT — verify against official source. Prohibits using a mobile communications device to make calls or text while in motion or temporarily stopped at a red light...",
+    "tags": [
+      "cellphone",
+      "texting",
+      "distracted"
+    ]
+  },
+  {
+    "id": "SAMPLE-ra8750-4",
+    "source": "SAMPLE — RA 8750 (Seat Belts Use Act of 1999)",
+    "section": "Sec. 4",
+    "title": "Mandatory use of seat belts",
+    "text": "SAMPLE TEXT — verify against official source. The driver and front seat passengers of a public or private motor vehicle are required to wear seat belts...",
+    "tags": [
+      "seatbelt"
+    ]
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "name": "SAMPLE — National Emergency Hotline",
+    "number": "911",
+    "zone": null
+  },
+  {
+    "name": "SAMPLE — Philippine Red Cross",
+    "number": "143",
+    "zone": null
+  },
+  {
+    "name": "SAMPLE — MMDA Metrobase",
+    "number": "136",
+    "zone": "NCR"
+  }
+]

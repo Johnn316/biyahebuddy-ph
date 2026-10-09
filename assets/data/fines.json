@@ -1,0 +1,42 @@
+[
+  {
+    "violation": "SAMPLE — Driving without a valid license",
+    "agency": "lto",
+    "amount": 3000,
+    "legal_basis": "SAMPLE — LTO JAO 2014-01",
+    "aliases": [
+      "walang lisensya",
+      "no license"
+    ]
+  },
+  {
+    "violation": "SAMPLE — Using mobile phone while driving",
+    "agency": "lto",
+    "amount": 5000,
+    "legal_basis": "SAMPLE — RA 10913, Sec. 4",
+    "aliases": [
+      "cellphone",
+      "texting"
+    ]
+  },
+  {
+    "violation": "SAMPLE — Number coding (UVVRP) violation",
+    "agency": "mmda",
+    "amount": 300,
+    "legal_basis": "SAMPLE — MMDA Reg. 96-005",
+    "aliases": [
+      "coding",
+      "number coding"
+    ]
+  },
+  {
+    "violation": "SAMPLE — Illegal parking",
+    "agency": "city",
+    "amount": 1000,
+    "legal_basis": "SAMPLE — City ordinance",
+    "aliases": [
+      "parking",
+      "bawal pumarada"
+    ]
+  }
+]

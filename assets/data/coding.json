@@ -1,0 +1,36 @@
+{
+  "scheme": "SAMPLE — MMDA UVVRP (number coding)",
+  "hours": [
+    {
+      "start": "07:00",
+      "end": "10:00"
+    },
+    {
+      "start": "17:00",
+      "end": "20:00"
+    }
+  ],
+  "days": {
+    "1": [
+      1,
+      2
+    ],
+    "2": [
+      3,
+      4
+    ],
+    "3": [
+      5,
+      6
+    ],
+    "4": [
+      7,
+      8
+    ],
+    "5": [
+      9,
+      0
+    ]
+  },
+  "notes": "SAMPLE DATA — verify with MMDA. Day keys are ISO weekdays (1=Monday). Digits are the last digit of the plate. Exemptions and LGU-specific rules not included."
+}
