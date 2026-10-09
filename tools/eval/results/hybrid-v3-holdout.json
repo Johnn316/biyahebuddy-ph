@@ -1,0 +1,172 @@
+{
+  "summary": {
+    "label": "hybrid-v3-holdout",
+    "retriever": "Hybrid FTS5 + embeddinggemma-300m-q8 (RRF, intent, FAQ: 0 phrasings)",
+    "llm": null,
+    "accuracy": 0.8,
+    "lawHitRate": 1.0,
+    "fineHitRate": 0.5,
+    "retrievalMsMedian": 51,
+    "answerMsMedian": null,
+    "answerMsMean": null,
+    "answerMsMax": null
+  },
+  "questions": [
+    {
+      "id": "h01",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s41",
+        "ra4136-s44"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h02",
+      "intent": "general",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": false,
+      "laws": [
+        "ra4136-s34-p2",
+        "ra10054-s3",
+        "ra4136-s48"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h03",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra11229-s4",
+        "ra11229-s10"
+      ],
+      "fines": [
+        "No seatbelt (driver/front passenger) — 1st offense",
+        "No child restraint system / child under 12 in front seat — 3rd offense and subsequent (+ 1-year license suspension)"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h04",
+      "intent": "general",
+      "pass": false,
+      "lawHit": null,
+      "fineHit": false,
+      "laws": [
+        "ra10054-s3",
+        "ra10054-s5",
+        "ra4136-s8-p2"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h05",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra4136-s48",
+        "ra4136-s46"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h06",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s6",
+        "ra10586-s8",
+        "ra10586-s7"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h07",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s37",
+        "ra4136-s45"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h08",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "laws": [
+        "ra10054-s3",
+        "ra10586-s12",
+        "ra4136-s56-p1"
+      ],
+      "fines": [
+        "Motorcycle dress code violation (slippers, sando/shorts) — 1st offense",
+        "No / non-standard motorcycle helmet — 1st offense"
+      ],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h09",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10913-s2",
+        "ra10913-s5",
+        "ra10913-s6"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    },
+    {
+      "id": "h10",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra4136-s21",
+        "ra4136-s47"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null
+    }
+  ]
+}

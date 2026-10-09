@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:sqlite3/sqlite3.dart';
 
+import 'fts_query.dart';
+
 /// Local sqlite DB built from the bundled JSON assets (laws.json, fines.json).
 ///
 /// The DB is rebuilt whenever the asset content changes: a hash of the JSON
@@ -10,7 +12,7 @@ class AppDatabase {
   AppDatabase._(this.db);
 
   /// Bump when the table layout below changes.
-  static const schemaVersion = 1;
+  static const schemaVersion = 2; // 2: Tagalog roots in FTS aliases/tags
 
   final Database db;
 
@@ -100,7 +102,7 @@ class AppDatabase {
           m['legal_basis'],
           jsonEncode(aliases),
         ]);
-        insertFineFts.execute([id, m['violation'], aliases.join(' ; ')]);
+        insertFineFts.execute([id, m['violation'], withRoots(aliases.join(' ; '))]);
       }
       insertFine.close();
       insertFineFts.close();
@@ -124,7 +126,7 @@ class AppDatabase {
           m['text'],
           jsonEncode(tags),
         ]);
-        insertLawFts.execute([m['id'], m['title'], m['text'], tags.join(' ')]);
+        insertLawFts.execute([m['id'], m['title'], m['text'], withRoots(tags.join(' '))]);
       }
       insertLaw.close();
       insertLawFts.close();
@@ -134,6 +136,16 @@ class AppDatabase {
       db.execute('ROLLBACK');
       rethrow;
     }
+  }
+
+  /// Appends Tagalog roots so affixed index words meet affixed queries:
+  /// "bawal pumarada" also indexes "parada" (query "nakaparada" → "parada").
+  static String withRoots(String text) {
+    final roots = <String>{
+      for (final m in RegExp(r'[\p{L}]+', unicode: true).allMatches(text.toLowerCase()))
+        ...tagalogRoots(m.group(0)!),
+    };
+    return roots.isEmpty ? text : '$text ; ${roots.join(' ')}';
   }
 
   void close() => db.close();

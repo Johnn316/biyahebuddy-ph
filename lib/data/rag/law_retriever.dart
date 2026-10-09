@@ -42,6 +42,48 @@ class LawRetriever {
       .map(_toChunk)
       .toList(growable: false);
 
+  /// Law chunks for [ids], in the given order (unknown ids are skipped).
+  List<LawChunk> lawsByIds(List<String> ids) {
+    if (ids.isEmpty) return const [];
+    final rows = _database.db.select(
+      'SELECT * FROM laws WHERE id IN (${List.filled(ids.length, '?').join(',')})',
+      ids,
+    );
+    final byId = {for (final r in rows) r['id'] as String: _toChunk(r)};
+    return [for (final id in ids) ?byId[id]];
+  }
+
+  /// FTS-ranked fine row ids (fines.json order, 1-based) for [question].
+  List<int> fineRows(String question, {int k = 15}) {
+    final match = ftsQuery(question);
+    if (match == null) return const [];
+    return _database.db
+        .select(
+          'SELECT f.id FROM fines_fts JOIN fines f ON f.id = fines_fts.rowid '
+          'WHERE fines_fts MATCH ? '
+          'ORDER BY bm25(fines_fts, 1.0, 2.0) LIMIT ?',
+          [match, k],
+        )
+        .map((r) => r['id'] as int)
+        .toList(growable: false);
+  }
+
+  /// Fines for row ids, in the given order.
+  List<Fine> finesByRows(List<int> rows) {
+    if (rows.isEmpty) return const [];
+    final result = _database.db.select(
+      'SELECT * FROM fines WHERE id IN (${List.filled(rows.length, '?').join(',')})',
+      rows,
+    );
+    final byRow = {
+      for (final r in result)
+        r['id'] as int: SqliteFinesRepository.fineFromRow(r),
+    };
+    return [for (final row in rows) ?byRow[row]];
+  }
+
+  static bool isBoilerplate(String title) => _boilerplate.hasMatch(title);
+
   /// Sections that never answer a driver's question.
   static final _boilerplate = RegExp(
     r'^(short title|title of (the )?act|separability|repealing|effectivity'
@@ -77,6 +119,16 @@ class LawRetriever {
     'bangga': 'collision accident',
     'nabangga': 'collision accident',
     'nagkabanggaan': 'collision accident',
+    'aksidente': 'accident',
+    'bangketa': 'sidewalk',
+    'kalsada': 'highway',
+    'preno': 'brakes',
+    'busina': 'horn',
+    'ilaw': 'lights',
+    'tawiran': 'pedestrian crossing',
+    'tumawid': 'pedestrian crossing',
+    'pulis': 'police',
+    'plaka': 'number plates',
   };
 
   /// Adds the law-text wording for Taglish words in [question].
@@ -84,7 +136,13 @@ class LawRetriever {
     final words = question
         .toLowerCase()
         .split(RegExp(r'[^\p{L}\p{N}-]+', unicode: true));
-    final extra = <String>{for (final w in words) ?_synonyms[w]};
+    // Roots too: "nakaparada" → "parada" → "parking".
+    final extra = <String>{
+      for (final w in words) ...[
+        ?_synonyms[w],
+        for (final r in tagalogRoots(w)) ?_synonyms[r],
+      ],
+    };
     return extra.isEmpty ? question : '$question ${extra.join(' ')}';
   }
 

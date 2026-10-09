@@ -157,8 +157,9 @@ abstract final class AnswerParts {
   static const _rules =
       'Ikaw si Buddy, kalmadong gabay ng mga Pilipinong driver. Sumagot sa '
       'Taglish, maiikling pangungusap. Gamitin LAMANG ang batas na ibinigay; '
-      'huwag mag-imbento ng batas, section, o halaga. Banggitin ang citation '
-      '(hal. "RA 4136 Sec. 44"). Hindi ito legal advice.';
+      'huwag mag-imbento ng batas, section, o halaga. Kung babanggit ng '
+      'citation, kopyahin ito nang eksakto mula sa BATAS sa ibaba. Hindi ito '
+      'legal advice.';
 
   static const askSystem =
       '$_rules\nIsulat LAMANG ang pagsusuri: 2-3 pangungusap kung paano '

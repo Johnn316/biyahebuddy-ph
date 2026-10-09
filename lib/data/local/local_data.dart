@@ -8,7 +8,10 @@ import '../ai/local_model_manager.dart';
 import '../ai/model_catalog.dart';
 import '../ai/whisper_speech_service.dart';
 import '../coding/asset_coding_service.dart';
+import '../rag/hybrid_retriever.dart';
 import '../rag/law_retriever.dart';
+import '../rag/text_embedder.dart';
+import '../rag/vector_index.dart';
 import '../sos/android_sos_service.dart';
 import '../sos/sos_platform.dart';
 import '../repositories/asset_hotline_repository.dart';
@@ -54,6 +57,38 @@ class LocalData {
   final WhisperSpeechService speech;
   final AndroidSosService sos;
 
+  /// Semantic retrieval, if the bundled embeddings match the bundled data and
+  /// the embedding model. Otherwise null → keyword (FTS5) retrieval only.
+  static Future<HybridRetriever?> _hybrid(
+    AssetBundle assets,
+    LawRetriever keyword,
+    LocalModelManager models,
+    String laws,
+    String fines,
+  ) async {
+    try {
+      final (embeddings, faq) = await (
+        assets.loadString('assets/data/embeddings.json'),
+        assets.loadString('assets/data/faq.json').catchError((_) => '[]'),
+      ).wait;
+      final index = VectorIndex.fromJson(embeddings);
+      final spec = EmbeddingSpec.byId(index.modelId);
+      if (index.sourceHash != VectorIndex.hashSources(laws, fines, faq)) {
+        return null; // stale: rerun tools/build_embeddings.dart
+      }
+      return HybridRetriever(
+        keyword: keyword,
+        index: index,
+        embedder: LlamaTextEmbedder(
+          spec: spec,
+          modelPath: () => models.pathFor(ModelCatalog.embedder),
+        ),
+      );
+    } on Object {
+      return null;
+    }
+  }
+
   static Future<LocalData> init({AssetBundle? bundle}) async {
     if (_instance != null) return _instance!;
     final assets = bundle ?? rootBundle;
@@ -75,6 +110,8 @@ class LocalData {
       lawsJson: laws,
       finesJson: fines,
     );
+    final keyword = LawRetriever(database);
+    final hybrid = await _hybrid(assets, keyword, models, laws, fines);
     return _instance = LocalData._(
       database: database,
       profiles: profiles,
@@ -83,13 +120,15 @@ class LocalData {
       hotlines: AssetHotlineRepository.fromJson(hotlines),
       models: models,
       ai: LocalAiAssistant(
-        retriever: LawRetriever(database),
+        retriever: keyword,
         llm: LocalLlm(modelPath: () => models.pathFor(ModelCatalog.llm)),
-        isModelReady: () => models.isReady,
+        isModelReady: () => models.has(ModelCatalog.llm),
+        hybrid: hybrid,
+        isHybridReady: () => models.has(ModelCatalog.embedder),
       ),
       speech: WhisperSpeechService(
         modelPath: () => models.pathFor(ModelCatalog.whisper),
-        isModelReady: () => models.isReady,
+        isModelReady: () => models.has(ModelCatalog.whisper),
       ),
       sos: AndroidSosService(
         platform: ChannelSosPlatform(),
