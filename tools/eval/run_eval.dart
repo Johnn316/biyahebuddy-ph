@@ -20,6 +20,7 @@ import 'dart:io';
 import 'package:biyahebuddy_ph/data/ai/local_ai_assistant.dart';
 import 'package:biyahebuddy_ph/data/ai/local_llm.dart';
 import 'package:biyahebuddy_ph/data/local/app_database.dart';
+import 'package:biyahebuddy_ph/data/rag/intent.dart';
 
 import 'eval_setup.dart';
 
@@ -115,7 +116,11 @@ Future<void> main(List<String> args) async {
       // Citations the LLM wrote vs. what retrieval gave it.
       answered++;
       final cited = _citations(answer);
-      final allowed = {for (final l in got.laws) _citationOf(l.id)};
+      // Same definition as CitationGuard: shown laws + shown fines' RA basis.
+      final allowed = {
+        for (final l in got.laws) _citationOf(l.id),
+        for (final f in got.fines) ...lawIdsInLegalBasis(f.legalBasis),
+      };
       if (cited.any((c) => !allowed.contains(c))) invented++;
       if (expLaws.isNotEmpty) {
         onTargetTotal++;
