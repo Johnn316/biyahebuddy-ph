@@ -229,3 +229,4 @@ analysis appears in the shown law/fines.
 | Step | Main (30) | Held-out (10) | Demo, 3 runs (1B) |
 |---|---|---|---|
 | Baseline on `main` (reproduced) | 86.7% (26/30) | 80.0% (8/10) | 4/4 retrieval, 4/4 quality, every run |
+| 1. Enforcer-only fines no longer push their laws (q23 fixed) | 90.0% (27/30) | 80.0% (8/10) | 4/4 retrieval |

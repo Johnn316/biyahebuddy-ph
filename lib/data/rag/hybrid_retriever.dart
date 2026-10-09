@@ -55,12 +55,16 @@ class HybridRetriever {
       question,
       vectors,
       intents,
-      citedByFines: [
-        for (final (row, f) in fines) ...[
-          ...lawIdsInLegalBasis(f.legalBasis),
-          ...index.lawsForFine(row - 1),
-        ],
-      ],
+      // Only when the driver asked about a fine: an enforcer-only fine is a
+      // guess and its law would push out the section actually asked about.
+      citedByFines: enforcerOnly
+          ? const []
+          : [
+              for (final (row, f) in fines) ...[
+                ...lawIdsInLegalBasis(f.legalBasis),
+                ...index.lawsForFine(row - 1),
+              ],
+            ],
     );
     return (laws: laws, fines: [for (final (_, f) in fines) f]);
   }
