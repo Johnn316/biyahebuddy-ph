@@ -1,0 +1,545 @@
+{
+  "summary": {
+    "label": "t5-main-1b",
+    "retriever": "Hybrid FTS5 + embeddinggemma-300m-q8 (RRF, intent, FAQ: 0 phrasings)",
+    "llm": "models/gemma-3-1b-it-Q4_K_M.gguf",
+    "accuracy": 0.9666666666666667,
+    "lawHitRate": 0.9642857142857143,
+    "fineHitRate": 1.0,
+    "retrievalMsMedian": 76,
+    "answerMsMedian": 11124,
+    "answerMsMean": 11200,
+    "inventedCitationRate": 0.0,
+    "answerQualityRate": 0.9666666666666667,
+    "badFormat": 0,
+    "blame": 0,
+    "shownWrong": 1,
+    "badAmount": 0,
+    "onTargetCitationRate": 0.0,
+    "answerMsMax": 18407
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra4136-s42",
+        "ra4136-s44"
+      ],
+      "fines": [],
+      "answerMs": 18407,
+      "answer": "Dapat mong i-stop ang sasakyan at magbigay ng malinaw na signal sa iyong kalye para maiwasang masira pa ang sitwasyon. Maghintay ka muna bago lumabas, saka magpatuloy sa pagmamaneho. Ipagtanggol din ang iyong sarili kung may mga pedestrian o iba pang sasakyan na maaaring maapektuhan.",
+      "answerProblems": []
+    },
+    {
+      "id": "q02",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra10054-s3",
+        "ra10054-s5",
+        "ra10054-s7"
+      ],
+      "fines": [
+        "No / non-standard motorcycle helmet — 1st offense",
+        "Motorcycle dress code violation (slippers, sando/shorts) — 1st offense"
+      ],
+      "answerMs": 13396,
+      "answer": "Ang hindi pagsusuot ng standard protective motorcycle helmet ay may fine na Php1,500 para sa unang pagkakataon,Php3,000 para sa pangalawa, at Php5,000 para sa ikatlo. Ang kaso rin nito'y may confiscation ng driver’s license kung hindi sumusuot ng standard protective helmet.",
+      "answerProblems": []
+    },
+    {
+      "id": "q03",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra10913-s4",
+        "ra10913-s10",
+        "ra10913-s8"
+      ],
+      "fines": [
+        "Distracted driving (mobile phone / gadget use) — 1st offense",
+        "Distracted driving by a public utility, school service, or hazardous-cargo vehicle driver, or within 50 m of a school"
+      ],
+      "answerMs": 13467,
+      "answer": "Ang MMDA ay may kaso ka na, pero dapat mag-focus sa batas. Ang unang pagkilos ay kailangan mong iwasan ang paggamit ng mobile phone o gadget sa driving. Kung nakakita ka ng multa, dapat itong gawin mo agad at huwag kang gumamit ng device para makapag-drive.",
+      "answerProblems": []
+    },
+    {
+      "id": "q04",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s53",
+        "ra10586-s12",
+        "ra10586-s7"
+      ],
+      "fines": [
+        "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)",
+        "Number coding (UVVRP) violation"
+      ],
+      "answerMs": 14240,
+      "answer": "Kung nahulog sa pagkainom habang nagmamaneho, mayroon kang penalized na threefold – mula 3 buwan ng imprisonment at multa hanggang ₱80,000.  Ang batas ay nagsasaad na kung walang physical injuries o homicide, ang parusa ay tatlong buwang pang-imprisonment. Ang pagsubok sa blood test para malaman kung may alcohol, dangerous drugs, or similar substances ay magiging obligasyon ng MMDA.",
+      "answerProblems": []
+    },
+    {
+      "id": "q05",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra8750-s5",
+        "ra11229-s5",
+        "ra11229-s3"
+      ],
+      "fines": [],
+      "answerMs": 9767,
+      "answer": "Hindi pinapayagan ang pagturo sa mga bata na may edad na anim na taong gulang o mas matanda sa front seat ng motor vehicle, kailangan nilang secured gamit ang regular seatbelt. Ang batas ay nagbabawal sa mga bata na mag-upo sa harap kung hindi sila nakatugma sa height requirement at secure gamitin ang normal na seat belt.",
+      "answerProblems": []
+    },
+    {
+      "id": "q06",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s49",
+        "ra4136-s43"
+      ],
+      "fines": [],
+      "answerMs": 10697,
+      "answer": "Ang driver ng mas malaking sasakyan ay may karapatan na yuko ang kalayaan sa daanan kung magka-collision sila, ngunit dapat isaalang-alang ang batas tungkol sa pagtatalaga ng kalayaang daan. Kung walang signal o traffic lights, kailangan pa ring lumipat para makapag-navigate sa intersection nang ligtas at hindi mapinsala ang ibang sasakyan.",
+      "answerProblems": []
+    },
+    {
+      "id": "q07",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s49",
+        "ra4136-s43"
+      ],
+      "fines": [],
+      "answerMs": 4688,
+      "answer": "Kung pareho kayo ng oras, dapat mong i-yield ang right of way sa kanila para mapanatili ang kaligtasan. Kung hindi ka makakagawa nito, mag-stop at manatiling malayo sa intersection hanggang sa maubos ang signal ng police officer.",
+      "answerProblems": []
+    },
+    {
+      "id": "q08",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s39",
+        "ra4136-s40",
+        "ra4136-s41"
+      ],
+      "fines": [],
+      "answerMs": 10316,
+      "answer": "Ang pag-overtaking ay dapat gawin nang may sapat na distansya at hindi bumalik sa kanan ng highway maliban kung ito'y nasa isang lugar na may dalawang o higit pang lane para sa daan. Dapat magbigay ka ng signal sa driver ng kurbada upang bigyan sila ng pagkakataon na makapag-overtake.",
+      "answerProblems": []
+    },
+    {
+      "id": "q09",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra10586-s7",
+        "ra4136-s56-p3"
+      ],
+      "fines": [],
+      "answerMs": 11124,
+      "answer": "Kung may banggaan, mag-uulat ka sa police at ipaalam ang sitwasyon. Magbigay ng tamang dokumento tulad ng driver’s license at address ng owner ng sasakyan para maibigay ang impormasyong kailangan nila.  Huwag umalis nang hindi nagbibigay pa ng karagdagang detalye.",
+      "answerProblems": []
+    },
+    {
+      "id": "q10",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra4136-s35",
+        "ra10586-s7"
+      ],
+      "fines": [],
+      "answerMs": 9410,
+      "answer": "Ang driver ay dapat mag-initiate ng paghahanap ng tulong at pagsisiguro na ligtas ang lahat. Dapat ipagpatuloy ang pag-investiga kung mayroong sakripisyo o pinsala. Ang pagiging responsable sa kaligtasan ay mahalaga, kahit hindi huminto para tumulong.",
+      "answerProblems": []
+    },
+    {
+      "id": "q11",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s36",
+        "ra4136-s35",
+        "ra4136-s40"
+      ],
+      "fines": [],
+      "answerMs": 9290,
+      "answer": "Ang batas ay nagtatakda ng uniform na bilis sa mga highway at hindi nagbibigay ng specific maximum allowable speeds. Dapat mag-drive ang driver nang maingat at may pag-iingatan para sa trapiko, lapad ng daan, at iba pang kondisyon. Kailangan ding bigyan ng signal ang driver kapag nakarating na siya sa ibang sasakyan.",
+      "answerProblems": []
+    },
+    {
+      "id": "q12",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s36",
+        "ra4136-s35",
+        "ra10586-s12"
+      ],
+      "fines": [
+        "Overspeeding",
+        "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)"
+      ],
+      "answerMs": 9523,
+      "answer": "Ang overspeeding ay may multa na Php 1,000 kung hindi nagdulot ng physical injuries o homicide. Kung may injury o homicide, maaaring magkaroon ng multa mulaPhp 20,000 hanggang Php 80,000 plus 3 buwan bago pa man makapag-detrahe sa paglabas.",
+      "answerProblems": []
+    },
+    {
+      "id": "q13",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s46",
+        "ra4136-s52",
+        "ra4136-s49"
+      ],
+      "fines": [],
+      "answerMs": 10581,
+      "answer": "Hindi dapat pumasadtet ka sa fire hydrant. Ang pagpaparada sa malapit na lugar nito ay labag sa batas dahil nakakaabala ito sa right-of-way para sa mga emergency vehicles at police. \n\nAng batas ay nagbabawal ng pagpapadarang sa sidewalk, path o alley kung hindi ito partikular na dinisenyo para sa vehicular traffic or parking.",
+      "answerProblems": []
+    },
+    {
+      "id": "q14",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s52",
+        "ra4136-s46",
+        "ra4136-s56-p3"
+      ],
+      "fines": [
+        "Illegal parking, unattended (+ impoundment)",
+        "Illegal parking, attended by the driver"
+      ],
+      "answerMs": 14104,
+      "answer": "Oo, maaaring maipasok ka ng multa dahil ilegal na nakaparkado ang iyong sasakyan sa bangketa, at ito ay labag sa batas. Ang batas ay nagtatakda ng multa kung hindi pinapayagan ang pag-park sa sidewalk o bangketa.  Ang multa ay magiging ₱2,000 (CITY) kung hindi mo maibabawas ang multa na itinakdang sa batas.",
+      "answerProblems": []
+    },
+    {
+      "id": "q15",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s24",
+        "ra4136-s31",
+        "ra4136-s19"
+      ],
+      "fines": [],
+      "answerMs": 9429,
+      "answer": "Batay sa batas, maaari mong isagawa ang mga motor vehicles na binili o pinagkakatiwalaan mo. Kung may expired na license ka, kailangan mong makakuha ng bagong lisensya bago umexcel.",
+      "answerProblems": []
+    },
+    {
+      "id": "q16",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s29",
+        "ra4136-s19",
+        "ra10586-s4"
+      ],
+      "fines": [
+        "Arrogance / discourteous conduct by driver (+ driver's seminar)",
+        "Driving without a valid driver's license or conductor's permit"
+      ],
+      "answerMs": 12167,
+      "answer": "Oo, kung kinumpiskado ka ng enforcers at nakakakuha sila ng lisensya, maaaring kailangan mong mag-apply para muling makakuha. Ang batas ay nagtataguyod na dapat isaalang-alang ang pagkuha ng lisensya bago umandar.",
+      "answerProblems": []
+    },
+    {
+      "id": "q17",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra8750-s5",
+        "ra11229-s4"
+      ],
+      "fines": [
+        "No seatbelt (driver/front passenger) — 1st offense",
+        "No child restraint system / child under 12 in front seat — 1st offense"
+      ],
+      "answerMs": 12241,
+      "answer": "Hindi ka dapat magmulta dahil hindi naka-seatbelts ang pasahero mo. Ang pagiging responsible driver ay mahalaga at kailangan mong gamitin ang seat belt para sa kaligtasan ng lahat. Kung hindi ito ginagawa, maaaring may multa na ipasa sa iyo.  Ang LTO naman ay nagtatakda ng multa kung hindi naka-seatbelt ang pasahero.",
+      "answerProblems": []
+    },
+    {
+      "id": "q18",
+      "intent": "fine",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s54",
+        "ra4136-s41",
+        "ra4136-s48"
+      ],
+      "fines": [
+        "Illegal counterflow",
+        "Illegal counterflow causing physical injury or property damage"
+      ],
+      "answerMs": 12358,
+      "answer": "Ang pag-counterflow ay ilegal at maaaring humantong sa multa. Ang MMDA ay nagtatakda ng multa na PHP 2,000 bilang parusa dahil ito'y nakakalikha ng physical injury o property damage.  Kung mayroon pa ring problema, magandang kumunsulta sa MMDA para sa karagdagang gabay.",
+      "answerProblems": [
+        "shown law: none of ra4136-s37"
+      ]
+    },
+    {
+      "id": "q19",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s48",
+        "ra10586-s6",
+        "ra4136-s49"
+      ],
+      "fines": [
+        "Reckless driving — 1st offense"
+      ],
+      "answerMs": 13536,
+      "answer": "Kung nagkaroon ng pagkaantala sa kalsada at may nakita kang pulis na nag-uulat kayo, dapat itigil ang sasakyan nang mabilis at tumalikod para maiwasan ang problema.  Ipagtanggol mo ang iyong sarili sa pulis sa pamamagitan ng magandang paghingi ng pahayag at hindi magkaroon ng lab trouble. Kung may nagawa kang mali, ipaliwanag ito sa pulis nang maayos.",
+      "answerProblems": []
+    },
+    {
+      "id": "q20",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s50",
+        "ra4136-s51",
+        "ra4136-s39"
+      ],
+      "fines": [],
+      "answerMs": 9481,
+      "answer": "Hindi ito ilegal. Ang pag-overtake ay dapat gawin nang ligtas at may sapat na distansya para maiwasan ang collision.  Ang pagsabog ng horn o anumang uri ng tampering ay labag sa batas. Dapat maging maingat sa pagmamaneho upang hindi makapagdulot ng panganib sa ibang sasakyan.",
+      "answerProblems": []
+    },
+    {
+      "id": "q21",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s49",
+        "ra10913-s6"
+      ],
+      "fines": [],
+      "answerMs": 10472,
+      "answer": "Kung may ambulansya kang nakatayo sa likod mo, kailangan mong agad itong ilipat patungo sa gilid ng daan o curb para magkaroon ka ng sapat na espasyo at iwasan ang intersection. Huwag mag-drive nang mas mabilis pa dahil ito ay isang emergency situation.",
+      "answerProblems": []
+    },
+    {
+      "id": "q22",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s54",
+        "ra4136-s32",
+        "ra4136-s46"
+      ],
+      "fines": [
+        "Loading/unloading in a prohibited zone",
+        "Overloading (passengers or cargo)"
+      ],
+      "answerMs": 12381,
+      "answer": "Ang paghinto mo ay labag sa batas dahil hindi ka pinapayagang huminto sa gitna ng kalsada. Ang batas ay nagbabawal na mag-interrupt o makapinsala sa daloy ng trapiko at dapat kang lumapag mula sa kalsada para maibigay ang pasahero nang ligtas.  Ang paglabag dito ay may multa na ₱1,000.",
+      "answerProblems": []
+    },
+    {
+      "id": "q23",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s7",
+        "ra4136-s53",
+        "ra10586-s6"
+      ],
+      "fines": [
+        "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)"
+      ],
+      "answerMs": 10990,
+      "answer": "Kailangan po ng drug and chemical tests kung may aksidenteng vehicular accident. Ang batas ay nagbabawal sa pagmamaneho habang nasa alkohol o dangerous drugs, kaya’t kailangang suriin ang blood or breath para malaman kung nakakainom o gumamit. Mahalaga rin na magkaroon ng test upang matiyak ang kaligtasan at legalidad ng driver.",
+      "answerProblems": []
+    },
+    {
+      "id": "q24",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s6",
+        "ra10586-s7",
+        "ra10586-s8"
+      ],
+      "fines": [],
+      "answerMs": 9431,
+      "answer": "Kung tumatalikod ka sa breathalyzer test, maaaring ma-confiscate ang iyong driver’s license at magkaroon ng iba pang penalties ayon sa batas. Ang pagtanggi na ito ay may legal consequence dahil sumusunod ka sa mga patakaran para maiwasan ang panganib sa trapiko.",
+      "answerProblems": []
+    },
+    {
+      "id": "q25",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s57",
+        "ra4136-s50",
+        "ra10054-s3"
+      ],
+      "fines": [
+        "Number coding (UVVRP) violation",
+        "Motorcycle dress code violation (slippers, sando/shorts) — 1st offense"
+      ],
+      "answerMs": 12813,
+      "answer": "Ang pag-coding sa Makati ay maaaring magresulta sa multa na PHP 500. Ang violation ng number coding ay dapat iulat sa MMDA at ang pagsusuot ng slippers o sando/shorts ay may kasamang multa na PHP 500 rin. Mahalaga pa ring tandaan na ang mga batas ay nagtatakda ng mga panuntunan para sa kaligtasan, kaya't mahalagang sundin ang lahat ng regulasyon.",
+      "answerProblems": []
+    },
+    {
+      "id": "q26",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s34-p3",
+        "ra4136-s37",
+        "ra4136-s49"
+      ],
+      "fines": [
+        "Disregarding traffic signs (incl. beating the red light)",
+        "Defective motor vehicle accessories (lights, mirrors, horn)"
+      ],
+      "answerMs": 11224,
+      "answer": "Ang paglabag mo ay nagreresulta sa multa na ₱1,000. Ang batas ay nagsasaad na ang paglabag sa red light ay may multa ng ₱1,000.",
+      "answerProblems": []
+    },
+    {
+      "id": "q27",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra4136-s54",
+        "ra4136-s32"
+      ],
+      "fines": [
+        "No seatbelt (driver/front passenger) — 1st offense",
+        "Overloading (passengers or cargo)"
+      ],
+      "answerMs": 11286,
+      "answer": "Oo, kung sobra ang pasahod sa iyong jeep, maaaring magkaroon ka ng multa. Batas na ito ay nagtatakda ng multa para sa overage ng pasahero, at malinaw itong nakasaad sa MMDA Res. No. 23-02, Sec. 19.",
+      "answerProblems": []
+    },
+    {
+      "id": "q28",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s18",
+        "ra4136-s34-p2",
+        "ra4136-s7-p3"
+      ],
+      "fines": [],
+      "answerMs": 10091,
+      "answer": "Ang batas ay nagsasaad na dapat magpakita ng numero ng plate sa parehong harap at likod ng iyong sasakyan. Kailangan ding panatilihing malinis, cared for, at nakapatibay ang mga ito upang madali itong makita.  Kailangan din na mayroon kang headlight para sa kaligtasan, lalo na sa gabi.",
+      "answerProblems": []
+    },
+    {
+      "id": "q29",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s45",
+        "ra4136-s55"
+      ],
+      "fines": [],
+      "answerMs": 11427,
+      "answer": "Hindi ito pinal na hatol kung sino ang may sala. Ito ang tinitingnan ng batas sa kuwento ng bawat isa:\nKung totoo ang kuwento ni Driver A, dapat na mag-yield si Driver A sa pagpapalit ng direksyon dahil sa Right of Way law. Kung totoo ang kuwento ni Driver B, dapat na iwasan ni Driver B ang kumaliwa at manatili sa lane para hindi makapagdulot ng aksidente.",
+      "answerProblems": []
+    },
+    {
+      "id": "q30",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s39",
+        "ra4136-s40",
+        "ra4136-s42"
+      ],
+      "fines": [],
+      "answerMs": 7680,
+      "answer": "Hindi ito pinal na hatol kung sino ang may sala. Ito ang tinitingnan ng batas sa kuwento ng bawat isa:\nKung totoo ang kuwento ni Driver A, dapat magbigay ng sapat na espasyo para makapag-overtake. Kung totoo ang kuwento ni Driver B, dapat ibigay ang signal sa driver na may hawak nito.",
+      "answerProblems": []
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "summary": {
+    "label": "t5-holdout-1b",
+    "retriever": "Hybrid FTS5 + embeddinggemma-300m-q8 (RRF, intent, FAQ: 0 phrasings)",
+    "llm": "models/gemma-3-1b-it-Q4_K_M.gguf",
+    "accuracy": 0.8,
+    "lawHitRate": 1.0,
+    "fineHitRate": 0.5,
+    "retrievalMsMedian": 82,
+    "answerMsMedian": 10056,
+    "answerMsMean": 9979,
+    "inventedCitationRate": 0.0,
+    "answerQualityRate": 0.8,
+    "badFormat": 0,
+    "blame": 0,
+    "shownWrong": 2,
+    "badAmount": 0,
+    "onTargetCitationRate": 0.0,
+    "answerMsMax": 13130
+  },
+  "questions": [
+    {
+      "id": "h01",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s44",
+        "ra4136-s41"
+      ],
+      "fines": [],
+      "answerMs": 10998,
+      "answer": "Kung may tumatawid na tao sa pedestrian lane at hindi ka makita ang kaligtasan, dapat kang huminto. Ang pag-iingat ay mahalaga para maiwasan ang aksidente. Huwag magpasyang lumapag o umalis ng sasakyan maliban kung ito’y ligtas.)",
+      "answerProblems": []
+    },
+    {
+      "id": "h02",
+      "intent": "general",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": false,
+      "laws": [
+        "ra4136-s34-p2",
+        "ra10054-s3",
+        "ra4136-s48"
+      ],
+      "fines": [],
+      "answerMs": 9085,
+      "answer": "Hindi babala kung sisisihan mo ng reckless driving dahil nakatutok sa ilalim ng batas na nagbabantay sa kaligtasan at seguridad ng daan-daanan. Ang paglalakbay sa gabi ay maaaring hindi ligtas, kaya dapat maging maingat sa iyong pagmamaneho.",
+      "answerProblems": [
+        "shown fine: none of accessories"
+      ]
+    },
+    {
+      "id": "h03",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra11229-s4",
+        "ra11229-s10"
+      ],
+      "fines": [
+        "No seatbelt (driver/front passenger) — 1st offense",
+        "No child restraint system / child under 12 in front seat — 3rd offense and subsequent (+ 1-year license suspension)"
+      ],
+      "answerMs": 13130,
+      "answer": "The fine for not wearing a seat belt is One thousand pesos (₱1,000.00) for the first offense; Two thousand pesos (₱2,000.00) for the second offense and five thousand pesos (₱5,000.00) and suspension of the driver’s license for a period of one year for the third and succeeding offenses.",
+      "answerProblems": []
+    },
+    {
+      "id": "h04",
+      "intent": "general",
+      "pass": false,
+      "lawHit": null,
+      "fineHit": false,
+      "laws": [
+        "ra10054-s3",
+        "ra10054-s5",
+        "ra4136-s8-p2"
+      ],
+      "fines": [],
+      "answerMs": 7238,
+      "answer": "Hindi ito nakasaad sa batas. Ang batas ay tungkol sa paggamit ng motorcycle helmet at registration fees. Hindi ito relevant sa pag-aaral o pagiging driver.",
+      "answerProblems": [
+        "shown fine: none of Child passenger on motorcycle"
+      ]
+    },
+    {
+      "id": "h05",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra4136-s48",
+        "ra4136-s46"
+      ],
+      "fines": [],
+      "answerMs": 9753,
+      "answer": "Kung hindi ka makakahanap ng tao sa lugar, mag-park ka sa pinakamalapit na ligtas na espasyo. Ipagtanggol mo rin ang iyong sarili kung may mga taong nagmamaneho at kailangan mong ipaalam sa kanila ang sitwasyon para maiwasan ang aksidente.",
+      "answerProblems": []
+    },
+    {
+      "id": "h06",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s6",
+        "ra10586-s8",
+        "ra10586-s7"
+      ],
+      "fines": [],
+      "answerMs": 10056,
+      "answer": "Ang batas ay nagtatakda ng mga obligasyon para sa driver na magbigay ng pagsusuri. Kung nakuhang ang resulta mula sa breathalyzer, dapat itong ipagpatuloy nang may pagpapatupad ng batas at maaaring kailanganin pang magsagawa ng karagdagang pagsusuri o test kung kinakailangan ayon sa batas.",
+      "answerProblems": []
+    },
+    {
+      "id": "h07",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s37",
+        "ra4136-s45"
+      ],
+      "fines": [],
+      "answerMs": 10109,
+      "answer": "Kung magkadikit ang mga sasakyan at halos pareho ang oras ng pagdating, dapat lumabas ang driver na nasa kaliwa. Ang driver na nagmamaneho ay dapat lumapag sa kaliwang lane kung mayroon siyang karapatan pumasok o umalis sa intersection. Dapat laging sundin ang batas para maiwasan ang aksidente at maging ligtas ang lahat.",
+      "answerProblems": []
+    },
+    {
+      "id": "h08",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "laws": [
+        "ra10054-s3",
+        "ra10054-s5",
+        "ra10586-s12"
+      ],
+      "fines": [
+        "Motorcycle dress code violation (slippers, sando/shorts) — 1st offense",
+        "No / non-standard motorcycle helmet — 1st offense"
+      ],
+      "answerMs": 9386,
+      "answer": "Ang paggamit ng slippers o sando/shorts ay itinuturing na violation sa motor vehicle dress code.  Magkakaroon ng multa na ₱500.",
+      "answerProblems": []
+    },
+    {
+      "id": "h09",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10913-s2",
+        "ra10913-s5",
+        "ra10913-s6"
+      ],
+      "fines": [],
+      "answerMs": 9143,
+      "answer": "Hindi ka maaaring gumamit ng iyong telepono bilang GPS habang nagmamaneho kung ito ay nakakabit. Ang paggamit nito ay itinuturing na distracted driving at labag sa batas, partikular na ang Section 2 ng BATAS.",
+      "answerProblems": []
+    },
+    {
+      "id": "h10",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra4136-s48",
+        "ra4136-s47"
+      ],
+      "fines": [],
+      "answerMs": 10900,
+      "answer": "Hindi ito pinal na hatol kung sino ang may sala. Ito ang tinitingnan ng batas sa kuwento ng bawat isa:\nKung totoo ang kuwento ni Driver A, hindi dapat huminto si Driver A kung nag-tumawa ng aso. Kung totoo ang kuwento ni Driver B, dapat tumigil si Driver B at magbigay ng sapat na paghihintay bago umalis sa lugar para maiwasan ang mas malaking pinsala.",
+      "answerProblems": []
+    }
+  ]
+}

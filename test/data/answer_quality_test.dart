@@ -37,6 +37,13 @@ void main() {
     ]);
   });
 
+  test('"liable" in the verbatim law text is not blame', () {
+    final law = '• RA 10054 Sec. 7 — Penalties\n'
+        '  "the owner shall be liable for a fine (Php1,500.00)"\n'
+        '• Multa (LTO): ₱1,500 — No / non-standard motorcycle helmet\n';
+    expect(check(answer(batas: law)), isEmpty);
+  });
+
   test('wrong law or fine shown is flagged', () {
     final problems = check(
       answer(batas: '• RA 4136 Sec. 35 — Speed\n• Multa (LTO): ₱500 — Overspeeding\n'),

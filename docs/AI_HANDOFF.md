@@ -232,3 +232,4 @@ analysis appears in the shown law/fines.
 | 1. Enforcer-only fines no longer push their laws (q23 fixed) | 90.0% (27/30) | 80.0% (8/10) | 4/4 retrieval |
 | 2. Fine→law links: tag/title evidence re-ranks each fine's top-6 nearest sections (embeddings rebuilt; q12 fixed) | 93.3% (28/30) | 80.0% (8/10) | 4/4 retrieval |
 | 3. Enforcer questions: unanimous keyword fine accepted; fine's topic links kept, penalty provision dropped; generic "to drive" verbs are stopwords (q19 fixed) | 96.7% (29/30) | 80.0% (8/10) | 4/4 retrieval |
+| 4. Answer quality with Gemma 1B (checker: blame only in the LLM's analysis — verbatim law may say "liable") | quality 96.7% (29/30): format 0, blame 0, invented 0, amount 0 bad; only q18's law missing | quality 80.0% (8/10): only h02/h04 fines missing | — |

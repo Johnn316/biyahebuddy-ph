@@ -59,8 +59,13 @@ List<String> answerProblems(
     }
   }
 
-  // blame
-  var text = full;
+  // blame — only in the analysis (the LLM's text); the Batas section is
+  // verbatim law, which can say "shall be liable".
+  final aStart = full.indexOf(answerHeaders[2]);
+  final aEnd = full.indexOf(answerHeaders[3]);
+  var text = aStart < 0
+      ? full
+      : full.substring(aStart, aEnd < aStart ? full.length : aEnd);
   for (final s in _neutralSentences) {
     text = text.replaceAll(s, '');
   }
