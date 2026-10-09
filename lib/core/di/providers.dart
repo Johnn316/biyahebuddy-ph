@@ -1,3 +1,6 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local/local_data.dart';
@@ -8,36 +11,44 @@ import '../fakes/fakes.dart';
 /// backends (lib/data/). When false, main() awaits `LocalData.init()`.
 const bool useFakes = false;
 
+/// Widget tests don't run main(), so LocalData is never initialised there;
+/// they get the fakes for any provider they don't override. Only under
+/// `flutter test` (FLUTTER_TEST is set) — the real app never falls back.
+final bool _inFlutterTest =
+    !kIsWeb && Platform.environment.containsKey('FLUTTER_TEST');
+
+bool get _fake => useFakes || (_inFlutterTest && !LocalData.isReady);
+
 final profileRepositoryProvider = Provider<ProfileRepository>(
-  (ref) => useFakes ? FakeProfileRepository() : LocalData.instance.profiles,
+  (ref) => _fake ? FakeProfileRepository() : LocalData.instance.profiles,
 );
 
 final codingServiceProvider = Provider<CodingService>(
-  (ref) => useFakes ? FakeCodingService() : LocalData.instance.coding,
+  (ref) => _fake ? FakeCodingService() : LocalData.instance.coding,
 );
 
 final finesRepositoryProvider = Provider<FinesRepository>(
-  (ref) => useFakes ? FakeFinesRepository() : LocalData.instance.fines,
+  (ref) => _fake ? FakeFinesRepository() : LocalData.instance.fines,
 );
 
 final hotlineRepositoryProvider = Provider<HotlineRepository>(
-  (ref) => useFakes ? FakeHotlineRepository() : LocalData.instance.hotlines,
+  (ref) => _fake ? FakeHotlineRepository() : LocalData.instance.hotlines,
 );
 
 final aiAssistantProvider = Provider<AiAssistant>(
-  (ref) => useFakes ? FakeAiAssistant() : LocalData.instance.ai,
+  (ref) => _fake ? FakeAiAssistant() : LocalData.instance.ai,
 );
 
 final sosServiceProvider = Provider<SosService>(
-  (ref) => useFakes ? FakeSosService() : LocalData.instance.sos,
+  (ref) => _fake ? FakeSosService() : LocalData.instance.sos,
 );
 
 final speechServiceProvider = Provider<SpeechService>(
-  (ref) => useFakes ? FakeSpeechService() : LocalData.instance.speech,
+  (ref) => _fake ? FakeSpeechService() : LocalData.instance.speech,
 );
 
 final modelManagerProvider = Provider<ModelManager>(
-  (ref) => useFakes ? FakeModelManager() : LocalData.instance.models,
+  (ref) => _fake ? FakeModelManager() : LocalData.instance.models,
 );
 
 // ---------------------------------------------------------------------------

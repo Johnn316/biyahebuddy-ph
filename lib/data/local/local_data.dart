@@ -38,6 +38,8 @@ class LocalData {
 
   static LocalData? _instance;
 
+  static bool get isReady => _instance != null;
+
   static LocalData get instance =>
       _instance ??
       (throw StateError('LocalData.init() was not awaited in main().'));
