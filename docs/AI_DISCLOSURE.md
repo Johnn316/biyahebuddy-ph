@@ -19,11 +19,11 @@ Everything here works in airplane mode.
 | Flutter / Dart | Framework | App UI and logic |
 | flutter_riverpod, go_router | Package | State management, navigation |
 | sqlite3 (bundles SQLite with FTS5), shared_preferences, path_provider | Package | Local storage, FTS5 search for RAG |
-| geolocator | Package | GPS location for SOS (no network geocoding) |
+| geolocator (forced onto Android LocationManager; no Google Play Services) | Package | GPS location for SOS (no network geocoding) |
 | url_launcher | Package | Opens the phone dialer / SMS app |
 | permission_handler | Package | Runtime permissions |
 | qr_flutter | Package | Driver profile QR card |
-| Android SmsManager, foreground service (Kotlin) | Platform API | SOS SMS, volume-button trigger |
+| Android SmsManager, TelecomManager, LocationManager, MediaSession foreground service (Kotlin) | Platform API | SOS SMS/call, GPS fix, volume-button trigger (all offline; skipped with a message on devices without SIM) |
 
 ## Requires internet
 

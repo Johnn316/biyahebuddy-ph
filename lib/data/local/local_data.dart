@@ -9,6 +9,8 @@ import '../ai/model_catalog.dart';
 import '../ai/whisper_speech_service.dart';
 import '../coding/asset_coding_service.dart';
 import '../rag/law_retriever.dart';
+import '../sos/android_sos_service.dart';
+import '../sos/sos_platform.dart';
 import '../repositories/asset_hotline_repository.dart';
 import '../repositories/prefs_profile_repository.dart';
 import '../repositories/sqlite_fines_repository.dart';
@@ -31,6 +33,7 @@ class LocalData {
     required this.models,
     required this.ai,
     required this.speech,
+    required this.sos,
   });
 
   static LocalData? _instance;
@@ -47,6 +50,7 @@ class LocalData {
   final LocalModelManager models;
   final LocalAiAssistant ai;
   final WhisperSpeechService speech;
+  final AndroidSosService sos;
 
   static Future<LocalData> init({AssetBundle? bundle}) async {
     if (_instance != null) return _instance!;
@@ -60,6 +64,7 @@ class LocalData {
       SharedPreferences.getInstance(),
     ).wait;
 
+    final profiles = PrefsProfileRepository(prefs);
     final models = LocalModelManager();
     await models.refresh();
 
@@ -70,7 +75,7 @@ class LocalData {
     );
     return _instance = LocalData._(
       database: database,
-      profiles: PrefsProfileRepository(prefs),
+      profiles: profiles,
       coding: AssetCodingService.fromJson(coding),
       fines: SqliteFinesRepository(database),
       hotlines: AssetHotlineRepository.fromJson(hotlines),
@@ -83,6 +88,10 @@ class LocalData {
       speech: WhisperSpeechService(
         modelPath: () => models.pathFor(ModelCatalog.whisper),
         isModelReady: () => models.isReady,
+      ),
+      sos: AndroidSosService(
+        platform: ChannelSosPlatform(),
+        loadContacts: () async => (await profiles.load())?.contacts ?? const [],
       ),
     );
   }

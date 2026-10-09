@@ -9,11 +9,6 @@ import '../fakes/fakes.dart';
 /// When false, main() must `await LocalData.init()` before runApp.
 const bool useFakes = true;
 
-T _real<T>(String name) => throw UnimplementedError(
-  '$name: real implementation not merged yet. '
-  'Set useFakes = true or wire lib/data/ here.',
-);
-
 final profileRepositoryProvider = Provider<ProfileRepository>(
   (ref) => useFakes ? FakeProfileRepository() : LocalData.instance.profiles,
 );
@@ -35,7 +30,7 @@ final aiAssistantProvider = Provider<AiAssistant>(
 );
 
 final sosServiceProvider = Provider<SosService>(
-  (ref) => useFakes ? FakeSosService() : _real('SosService'),
+  (ref) => useFakes ? FakeSosService() : LocalData.instance.sos,
 );
 
 final speechServiceProvider = Provider<SpeechService>(
