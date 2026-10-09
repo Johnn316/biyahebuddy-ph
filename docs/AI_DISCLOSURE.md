@@ -20,6 +20,7 @@ Everything here works in airplane mode.
 | url_launcher | Package | Opens the phone dialer / SMS app |
 | permission_handler | Package | Runtime permissions |
 | qr_flutter | Package | Driver profile QR card |
+| Plus Jakarta Sans (`assets/fonts/`, SIL OFL 1.1) | Font asset | App typography; bundled, never fetched at runtime |
 | Android SmsManager, foreground service (Kotlin) | Platform API | SOS SMS, volume-button trigger |
 
 ## Requires internet
