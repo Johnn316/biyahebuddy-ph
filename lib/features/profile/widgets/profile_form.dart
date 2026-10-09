@@ -111,12 +111,14 @@ class _ProfileFormState extends State<ProfileForm> {
 
   void _submit() {
     FocusScope.of(context).unfocus();
-    if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('May kulang o mali. Pakitingnan.')),
-        );
+    final invalid = _formKey.currentState!.validateGranularly();
+    if (invalid.isNotEmpty) {
+      // Scroll to the first problem (no snackbar: it would cover the button).
+      Scrollable.ensureVisible(
+        invalid.first.context,
+        alignment: 0.2,
+        duration: const Duration(milliseconds: 300),
+      );
       return;
     }
     widget.onSubmit(
