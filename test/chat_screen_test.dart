@@ -7,6 +7,7 @@ import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
 import 'package:biyahebuddy_ph/core/router/app_router.dart';
 import 'package:biyahebuddy_ph/features/chat/controllers/answer_format.dart';
+import 'package:biyahebuddy_ph/features/chat/controllers/flag_flow.dart';
 import 'package:biyahebuddy_ph/features/chat/controllers/answer_reveal.dart';
 import 'package:biyahebuddy_ph/features/chat/widgets/buddy_answer.dart';
 import 'package:biyahebuddy_ph/features/chat/widgets/law_sheet.dart';
@@ -216,10 +217,10 @@ void main() {
     for (var i = 0; i < 4; i++) {
       expect(find.byKey(Key('quick-$i')), findsOneWidget);
     }
-    await tester.tap(find.byKey(const Key('quick-3')));
+    await tester.tap(find.byKey(const Key('quick-0')));
     await tester.pump();
-    expect(ai.asked, ['Na-flag ako ng MMDA, ano gagawin?']);
-    expect(find.text('Na-flag ako ng MMDA, ano gagawin?'), findsOneWidget);
+    expect(ai.asked, ['Magkano multa pag walang helmet?']);
+    expect(find.text('Magkano multa pag walang helmet?'), findsOneWidget);
   });
 
   testWidgets('no mic anywhere in chat when voice input is disabled', (
@@ -422,6 +423,95 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('law-sheet')), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  group('guided na-flag flow', () {
+    Future<ControlledAi> startFlow(WidgetTester tester, String q) async {
+      final ai = ControlledAi();
+      await pumpChat(tester, ai: ai);
+      await typeAndSend(tester, q);
+      await tester.pumpAndSettle();
+      return ai;
+    }
+
+    testWidgets('flagged without a violation → follow-up question + chips', (
+      tester,
+    ) async {
+      final ai = await startFlow(
+        tester,
+        'Na-flag ako ng MMDA, ano ang dapat gawin ko?',
+      );
+      expect(ai.asked, isEmpty); // code-driven, no LLM
+      expect(find.textContaining(flagQuestion), findsOneWidget);
+      expect(find.byKey(const Key('flag-chip-0')), findsOneWidget);
+      expect(find.text('Disregarding traffic signs'), findsOneWidget); // MMDA
+      expect(find.text('Driving without a valid license'), findsNothing); // LTO
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('chip tap → fine card with ₱, steps and IPAKITA', (
+      tester,
+    ) async {
+      final ai = await startFlow(tester, 'Pinara ako ng MMDA');
+      await tester.tap(find.text('Disregarding traffic signs'));
+      await tester.pumpAndSettle();
+      expect(ai.asked, isEmpty);
+      expect(find.byKey(const Key('flag-fine-card')), findsOneWidget);
+      expect(find.text('₱1,000'), findsOneWidget);
+      expect(find.textContaining('official ticket'), findsOneWidget);
+      expect(find.textContaining('Huwag magbayad on the spot'), findsOneWidget);
+      await tester.ensureVisible(find.byKey(const Key('flag-ipakita')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('flag-ipakita')));
+      await tester.pumpAndSettle();
+      expect(find.text('Magandang araw po.'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('typed violation is matched with the Na-flag fine search', (
+      tester,
+    ) async {
+      final ai = await startFlow(tester, 'Hinuli ako ng LTO enforcer');
+      expect(find.text('Driving without a valid license'), findsOneWidget);
+      await typeAndSend(tester, 'cellphone');
+      await tester.pumpAndSettle();
+      expect(ai.asked, isEmpty);
+      expect(find.byKey(const Key('flag-fine-card')), findsOneWidget);
+      expect(find.text('Using mobile phone while driving'), findsOneWidget);
+      expect(find.text('₱5,000'), findsOneWidget);
+    });
+
+    testWidgets('no match → message, chips again, open Na-flag ako', (
+      tester,
+    ) async {
+      await startFlow(tester, 'Na-flag ako');
+      await typeAndSend(tester, 'kalabaw sa kalsada');
+      await tester.pumpAndSettle();
+      expect(find.textContaining(flagNoMatch), findsOneWidget);
+      expect(find.byKey(const Key('flag-fine-card')), findsNothing);
+      expect(find.byKey(const Key('flag-chip-0')), findsWidgets);
+      await tester.ensureVisible(find.byKey(const Key('flag-open-violation')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('flag-open-violation')));
+      await tester.pumpAndSettle();
+      expect(find.text("Sino ang nag-flag sa'yo?"), findsOneWidget);
+    });
+
+    test('intent + agency detection', () {
+      expect(
+        isFlaggedWithoutViolation('Na-flag ako ng MMDA, ano gagawin?'),
+        isTrue,
+      );
+      expect(isFlaggedWithoutViolation('Pinara ako ng enforcer'), isTrue);
+      expect(
+        isFlaggedWithoutViolation('Na-flag ako kasi walang helmet'),
+        isFalse,
+      );
+      expect(isFlaggedWithoutViolation('Magkano multa sa helmet?'), isFalse);
+      expect(detectAgency('hinuli ako ng LTO'), Agency.lto);
+      expect(detectAgency('enforcer ng QC'), Agency.city);
+      expect(detectAgency('na-flag ako'), Agency.mmda);
+    });
   });
 
   test('lawIdFor maps citations to laws.json ids', () {

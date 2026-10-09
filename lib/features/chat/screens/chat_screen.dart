@@ -13,6 +13,7 @@ import '../../shared/widgets/pressable.dart';
 import '../controllers/chat_controller.dart';
 import '../widgets/buddy_answer.dart';
 import '../widgets/chat_input_bar.dart';
+import '../widgets/flag_widgets.dart';
 import '../widgets/user_bubble.dart';
 
 /// "Tanong kay Buddy" tab. `/chat?q=<text>` prefills the box (never
@@ -166,6 +167,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   stopSignal: _stopSignal,
                   onRevealing: _setRevealing,
                   onGrow: _follow,
+                  footer: m.flag == null
+                      ? null
+                      : FlagFooter(
+                          message: m,
+                          onChip: (violation, agency) {
+                            if (busy) return;
+                            _chat.answerViolation(violation, agency);
+                          },
+                        ),
                 );
         },
       ),

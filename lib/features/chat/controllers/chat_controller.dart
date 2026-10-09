@@ -2,7 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/contracts/contracts.dart';
 import '../../../core/di/providers.dart';
+import 'flag_flow.dart';
+
+export 'flag_flow.dart';
 
 enum ChatRole { user, buddy }
 
@@ -14,6 +18,10 @@ class ChatMessage {
     this.streaming = false,
     this.stopped = false,
     this.failed = false,
+    this.flag,
+    this.agency,
+    this.fine,
+    this.chips = const [],
   });
 
   final ChatRole role;
@@ -25,11 +33,25 @@ class ChatMessage {
   final bool stopped;
   final bool failed;
 
+  /// Guided na-flag flow: what this Buddy message shows under its text.
+  final FlagStep? flag;
+  final Agency? agency;
+
+  /// The matched fine ([FlagStep.fine]).
+  final Fine? fine;
+
+  /// Tappable violations ([FlagStep.askViolation] / [FlagStep.noMatch]).
+  final List<String> chips;
+
   ChatMessage copyWith({
     String? text,
     bool? streaming,
     bool? stopped,
     bool? failed,
+    FlagStep? flag,
+    Agency? agency,
+    Fine? fine,
+    List<String>? chips,
   }) => ChatMessage(
     role: role,
     text: text ?? this.text,
@@ -37,6 +59,10 @@ class ChatMessage {
     streaming: streaming ?? this.streaming,
     stopped: stopped ?? this.stopped,
     failed: failed ?? this.failed,
+    flag: flag ?? this.flag,
+    agency: agency ?? this.agency,
+    fine: fine ?? this.fine,
+    chips: chips ?? this.chips,
   );
 }
 
@@ -99,9 +125,24 @@ class ChatController extends AutoDisposeNotifier<ChatState> {
   }
 
   /// Ask mode: send a question.
+  /// Agency of an open "Ano ang sinabing violation?" question; the next
+  /// typed message is matched against that agency's fines.
+  Agency? _awaitingViolation;
+
   void ask(String question) {
     final q = question.trim();
     if (q.isEmpty || state.streaming) return;
+    final awaiting = _awaitingViolation;
+    // A long new question leaves the flow instead of being matched.
+    if (awaiting != null && q.split(RegExp(r'\s+')).length <= 10) {
+      answerViolation(q, awaiting);
+      return;
+    }
+    _awaitingViolation = null;
+    if (isFlaggedWithoutViolation(q)) {
+      _askWhichViolation(q);
+      return;
+    }
     state = state.copyWith(
       askMessages: [
         ...state.askMessages,
@@ -110,6 +151,72 @@ class ChatController extends AutoDisposeNotifier<ChatState> {
       ],
     );
     _listen(ref.read(aiAssistantProvider).ask(q));
+  }
+
+  /// Flagged without a violation: ask which one, with the agency's most
+  /// common violations as chips.
+  Future<void> _askWhichViolation(String q) async {
+    final agency = detectAgency(q);
+    _pushExchange(q);
+    final all = await ref.read(finesRepositoryProvider).search('', agency);
+    _awaitingViolation = agency;
+    _updateStreaming(
+      (m) => m.copyWith(
+        text: '$flagQuestion\n$flagQuestionHint',
+        streaming: false,
+        flag: FlagStep.askViolation,
+        agency: agency,
+        chips: commonViolations(all),
+      ),
+    );
+  }
+
+  /// The driver named the violation (typed or chip): match it with the
+  /// Na-flag fine search for [agency].
+  Future<void> answerViolation(String text, Agency agency) async {
+    final q = text.trim();
+    if (q.isEmpty || state.streaming) return;
+    _pushExchange(q);
+    final repo = ref.read(finesRepositoryProvider);
+    final found = await repo.search(q, agency);
+    if (found.isNotEmpty) {
+      _awaitingViolation = null;
+      final fine = found.first;
+      _updateStreaming(
+        (m) => m.copyWith(
+          text:
+              'Ito ang multa para sa "${violationLabel(fine)}" '
+              '(${agency.name.toUpperCase()}):',
+          streaming: false,
+          flag: FlagStep.fine,
+          agency: agency,
+          fine: fine,
+        ),
+      );
+    } else {
+      _awaitingViolation = agency;
+      final all = await repo.search('', agency);
+      _updateStreaming(
+        (m) => m.copyWith(
+          text: '$flagNoMatch\n$flagQuestionHint',
+          streaming: false,
+          flag: FlagStep.noMatch,
+          agency: agency,
+          chips: commonViolations(all),
+        ),
+      );
+    }
+  }
+
+  /// User message + an empty, "typing" Buddy message (dots, then reveal).
+  void _pushExchange(String q) {
+    state = state.copyWith(
+      askMessages: [
+        ...state.askMessages,
+        ChatMessage(role: ChatRole.user, text: q),
+        const ChatMessage(role: ChatRole.buddy, text: '', streaming: true),
+      ],
+    );
   }
 
   /// Two sides, step A → B.

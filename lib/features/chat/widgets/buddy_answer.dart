@@ -69,6 +69,7 @@ class BuddyAnswer extends StatefulWidget {
     this.stopSignal,
     this.onRevealing,
     this.onGrow,
+    this.footer,
   });
 
   final ChatMessage message;
@@ -81,6 +82,10 @@ class BuddyAnswer extends StatefulWidget {
 
   /// The answer got taller (for smooth auto-scroll).
   final VoidCallback? onGrow;
+
+  /// Extra content under the text once it is fully shown (na-flag chips,
+  /// fine card).
+  final Widget? footer;
 
   @override
   State<BuddyAnswer> createState() => _BuddyAnswerState();
@@ -308,6 +313,11 @@ class _BuddyAnswerState extends State<BuddyAnswer>
               'Hindi nakasagot si Buddy. Subukan ulit.',
               icon: CupertinoIcons.exclamationmark_circle,
               color: p.cautionText,
+            ),
+          if (settled && widget.footer != null)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpace.sm),
+              child: widget.footer,
             ),
           if (settled || _frozen)
             Padding(
