@@ -30,3 +30,30 @@ void usePhoneScreen(WidgetTester tester) {
   tester.view.devicePixelRatio = 2.625;
   addTearDown(tester.view.reset);
 }
+
+/// Records SOS calls instead of logging them.
+class RecordingSosService implements SosService {
+  RecordingSosService({this.location = (lat: 14.5547, lng: 121.0244)});
+
+  final ({double lat, double lng})? location;
+  final dialed = <String>[];
+  final texts = <({List<String> phones, String message})>[];
+
+  @override
+  Future<({double lat, double lng})?> currentLocation() async => location;
+
+  @override
+  Future<void> smsContacts(
+    List<EmergencyContact> contacts,
+    String message,
+  ) async => texts.add((
+    phones: [for (final c in contacts) c.phone],
+    message: message,
+  ));
+
+  @override
+  Future<void> openDialer(String number) async => dialed.add(number);
+
+  @override
+  Future<void> enableVolumeTrigger() async {}
+}

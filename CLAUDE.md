@@ -86,7 +86,8 @@ anyone is hurt. `analyzeTwoSides` stays neutral between Driver A and Driver B.
 ## UI rules
 
 - High contrast, large text, min 64dp tap targets, one-thumb use.
-- Red (`AppColors.emergency`) is reserved for emergency actions.
+- Red (`AppColors.emergency`) is reserved for emergency actions ONLY. Warnings
+  (e.g. "Coding ka ngayon") use amber `AppColors.warning`.
 - Home screen fills the screen: status strip → big EMERGENCY → two equal buttons.
 
 ## Workflow rule
@@ -105,7 +106,8 @@ _Last updated: 2026-10-09_
 | Home screen | John | ✅ On fakes — coding strip, EMERGENCY, Buddy / Na-flag, profile icon |
 | Onboarding (model download + profile form) | John | ✅ On fakes |
 | Profile screen (edit + save) | John | ✅ On fakes |
-| Emergency / Violation / Chat | John | ⬜ Placeholder screens |
+| Emergency screen (Ligtas ka ba, 911, contacts SMS+GPS, hotlines, checklist, medical, QR) | John | ✅ On fakes — branch `frontend/emergency` |
+| Violation / Chat | John | ⬜ Placeholder screens |
 | Local DB + JSON loaders | Backend | ⬜ Not started |
 | CodingService (real) | Backend | ⬜ Not started |
 | AI / RAG (LLM package TBD after spike) | Backend | ⬜ Not started |
