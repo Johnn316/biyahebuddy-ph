@@ -38,7 +38,8 @@ class VectorIndex {
       : const [];
 
   /// FAQ phrasings (question + aliases), each linked to law sections.
-  final List<({Float32List vec, List<String> sections, String text})> faq;
+  final List<({String id, Float32List vec, List<String> sections, String text})>
+  faq;
 
   static VectorIndex fromJson(String json) {
     final m = jsonDecode(json) as Map<String, dynamic>;
@@ -60,7 +61,8 @@ class VectorIndex {
       faq: [
         for (final f in m['faq'] as List<dynamic>? ?? const [])
           (
-            vec: vec((f as Map<String, dynamic>)['vec'] as String),
+            id: (f as Map<String, dynamic>)['id'] as String? ?? '',
+            vec: vec(f['vec'] as String),
             sections: (f['sections'] as List<dynamic>).cast<String>(),
             text: f['text'] as String,
           ),
@@ -107,13 +109,13 @@ class VectorIndex {
   }
 
   /// Best FAQ phrasings, best first.
-  List<({List<String> sections, double score, String text})> topFaq(
+  List<({String id, List<String> sections, double score, String text})> topFaq(
     List<double> q,
     int k,
   ) {
     final scored = [
       for (final f in faq)
-        (sections: f.sections, score: dot(q, f.vec), text: f.text),
+        (id: f.id, sections: f.sections, score: dot(q, f.vec), text: f.text),
     ]..sort((a, b) => b.score.compareTo(a.score));
     return scored.take(k).toList(growable: false);
   }

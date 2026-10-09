@@ -1,0 +1,12 @@
+[
+  {"id": "fh01", "lang": "taglish", "intent": "general", "question": "Legal ba mag overtake sa double yellow kung walang kasalubong?", "faq": "double-solid-yellow", "laws": ["ra4136-s41"]},
+  {"id": "fh02", "lang": "en", "intent": "fine", "question": "What happens if I get caught driving drunk?", "faq": "drunk-driving", "laws": ["ra10586-s12", "ra10586-s5"]},
+  {"id": "fh03", "lang": "taglish", "intent": "general", "question": "Need ba naka helmet pati yung backride ko?", "faq": "helmet", "laws": ["ra10054-s3"]},
+  {"id": "fh04", "lang": "taglish", "intent": "general", "question": "Required ba seatbelt sa passenger sa harap?", "faq": "seatbelt", "laws": ["ra8750-s4"]},
+  {"id": "fh05", "lang": "taglish", "intent": "general", "question": "Pwede ba sumagot ng tawag habang nagda-drive?", "faq": "cellphone", "laws": ["ra10913-s4"]},
+  {"id": "fh06", "lang": "en", "intent": "general", "question": "Do I have to pull over for a fire truck?", "faq": "emergency-vehicle", "laws": ["ra4136-s49"]},
+  {"id": "fh07", "lang": "taglish", "intent": "general", "question": "Coding ako ngayon, anong oras pwede na bumiyahe?", "faq": "coding-hours"},
+  {"id": "fh08", "lang": "taglish", "intent": "enforcer", "question": "Kinuha ng enforcer ang license ko, pwede pa ba ko mag drive pauwi?", "faq": "license-confiscated", "laws": ["ra4136-s29"]},
+  {"id": "fh09", "lang": "taglish", "intent": "general", "question": "Pwede ba mag-drive sa sidewalk para makaiwas sa traffic?", "faq": null},
+  {"id": "fh10", "lang": "en", "intent": "general", "question": "Can I drive with an open can of beer in the car?", "faq": null}
+]

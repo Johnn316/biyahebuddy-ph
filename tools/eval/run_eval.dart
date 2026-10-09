@@ -17,6 +17,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:biyahebuddy_ph/data/ai/faq_answers.dart';
 import 'package:biyahebuddy_ph/data/ai/local_ai_assistant.dart';
 import 'package:biyahebuddy_ph/data/ai/local_llm.dart';
 import 'package:biyahebuddy_ph/data/local/app_database.dart';
@@ -51,6 +52,7 @@ Future<void> main(List<String> args) async {
     hybrid: setup.hybrid,
     llm: llm ?? _NoLlm(),
     isModelReady: () => llm != null,
+    faq: FaqEntry.parse(File('assets/data/faq.json').readAsStringSync()),
   );
 
   if (llm != null) {
@@ -63,6 +65,9 @@ Future<void> main(List<String> args) async {
   var passed = 0, lawTotal = 0, lawHits = 0, fineTotal = 0, fineHits = 0;
   var answered = 0, invented = 0, onTarget = 0, onTargetTotal = 0;
   var qualityOk = 0, badFormat = 0, blame = 0, shownWrong = 0, badAmount = 0;
+  // Curated FAQ answers: entries with a "faq" key (an id, or null = must
+  // NOT get a curated answer).
+  var faqTotal = 0, faqHits = 0, faqWrong = 0;
   final retrievalMs = <int>[];
   final answerMs = <int>[];
   final rows = <Map<String, dynamic>>[];
@@ -92,7 +97,17 @@ Future<void> main(List<String> args) async {
             (e) =>
                 fineNames.any((v) => v.toLowerCase().contains(e.toLowerCase())),
           );
-    final ok = (lawHit ?? true) && (fineHit ?? true);
+    final curated = driverB == null ? await assistant.curatedFor(text) : null;
+    final best = driverB == null ? await assistant.hybrid?.bestFaq(text) : null;
+    bool? faqHit;
+    if (q.containsKey('faq')) {
+      final want = q['faq'] as String?;
+      faqTotal++;
+      faqHit = curated?.entry.id == want;
+      if (faqHit) faqHits++;
+      if (curated != null && curated.entry.id != want) faqWrong++;
+    }
+    final ok = (lawHit ?? true) && (fineHit ?? true) && (faqHit ?? true);
     if (lawHit != null) {
       lawTotal++;
       if (lawHit) lawHits++;
@@ -152,6 +167,13 @@ Future<void> main(List<String> args) async {
       '     laws: ${lawIds.join(', ')}'
       '${expLaws.isEmpty ? '' : '  (want ${expLaws.join('/')}: ${_mark(lawHit)})'}',
     );
+    if (q.containsKey('faq') || curated != null) {
+      stdout.writeln(
+        '     faq: ${curated?.entry.id ?? '-'}'
+        ' (best ${best?.id} ${best?.score.toStringAsFixed(3)})'
+        '${q.containsKey('faq') ? '  (want ${q['faq']}: ${_mark(faqHit)})' : ''}',
+      );
+    }
     if (fineNames.isNotEmpty || expFines.isNotEmpty) {
       stdout.writeln(
         '     fines: ${fineNames.map((v) => v.split(' — ').first).join('; ')}'
@@ -172,6 +194,8 @@ Future<void> main(List<String> args) async {
       'pass': ok,
       'lawHit': lawHit,
       'fineHit': fineHit,
+      'faq': curated?.entry.id,
+      'faqHit': faqHit,
       'laws': lawIds,
       'fines': fineNames,
       'answerMs': ms,
@@ -190,6 +214,8 @@ Future<void> main(List<String> args) async {
     'accuracy': passed / n,
     'lawHitRate': lawTotal == 0 ? null : lawHits / lawTotal,
     'fineHitRate': fineTotal == 0 ? null : fineHits / fineTotal,
+    'faqHitRate': faqTotal == 0 ? null : faqHits / faqTotal,
+    'faqWrong': faqWrong,
     'retrievalMsMedian': _median(retrievalMs),
     'answerMsMedian': answerMs.isEmpty ? null : _median(answerMs),
     'answerMsMean': answerMs.isEmpty
@@ -216,6 +242,10 @@ Future<void> main(List<String> args) async {
   );
   stdout.writeln('  law section hit@cited:  ${pct(lawHits, lawTotal)}');
   stdout.writeln('  fine hit@cited:         ${pct(fineHits, fineTotal)}');
+  if (faqTotal > 0) {
+    stdout.writeln('  curated FAQ correct:    ${pct(faqHits, faqTotal)}');
+    stdout.writeln('  curated FAQ WRONG:      $faqWrong');
+  }
   stdout.writeln(
     '  retrieval time median:  ${summary['retrievalMsMedian']} ms',
   );

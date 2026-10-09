@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ai/faq_answers.dart';
 import '../ai/local_ai_assistant.dart';
 import '../ai/local_llm.dart';
 import '../ai/local_model_manager.dart';
@@ -112,6 +113,9 @@ class LocalData {
     );
     final keyword = LawRetriever(database);
     final hybrid = await _hybrid(assets, keyword, models, laws, fines);
+    final faq = FaqEntry.parse(
+      await assets.loadString('assets/data/faq.json').catchError((_) => '[]'),
+    );
     return _instance = LocalData._(
       database: database,
       profiles: profiles,
@@ -125,6 +129,7 @@ class LocalData {
         isModelReady: () => models.has(ModelCatalog.llm),
         hybrid: hybrid,
         isHybridReady: () => models.has(ModelCatalog.embedder),
+        faq: faq,
       ),
       speech: WhisperSpeechService(
         modelPath: () => models.pathFor(ModelCatalog.whisper),

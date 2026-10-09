@@ -1,0 +1,585 @@
+{
+  "summary": {
+    "label": "final-faq_eval",
+    "retriever": "Hybrid FTS5 + embeddinggemma-300m-q8 (RRF, intent, FAQ: 212 phrasings)",
+    "llm": null,
+    "accuracy": 0.9,
+    "lawHitRate": 1.0,
+    "fineHitRate": 1.0,
+    "faqHitRate": 0.9,
+    "faqWrong": 0,
+    "retrievalMsMedian": 30,
+    "answerMsMedian": null,
+    "answerMsMean": null,
+    "inventedCitationRate": null,
+    "answerQualityRate": null,
+    "badFormat": 0,
+    "blame": 0,
+    "shownWrong": 0,
+    "badAmount": 0,
+    "onTargetCitationRate": null,
+    "answerMsMax": null
+  },
+  "questions": [
+    {
+      "id": "f01",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "double-solid-yellow",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s41",
+        "ra4136-s39",
+        "ra4136-s37"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f02",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "double-solid-yellow",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s41",
+        "ra4136-s39",
+        "ra4136-s9"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f03",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "double-solid-yellow",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s41",
+        "ra4136-s39",
+        "ra4136-s42"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f04",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "broken-line",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s39",
+        "ra4136-s41",
+        "ra4136-s40"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f05",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": "solid-white",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s41",
+        "ra4136-s37",
+        "ra4136-s42"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f06",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": "yellow-box",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s54",
+        "ra4136-s46",
+        "ra4136-s39"
+      ],
+      "fines": [
+        "Obstruction of traffic",
+        "Disregarding traffic signs (incl. beating the red light)"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f07",
+      "intent": "rightOfWay",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "pedestrian-lane",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s44",
+        "ra4136-s41"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f08",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "faq": "counterflow",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s37",
+        "ra4136-s54",
+        "ra4136-s52"
+      ],
+      "fines": [
+        "Truck ban violation",
+        "Illegal counterflow"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f09",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "faq": "helmet",
+      "faqHit": true,
+      "laws": [
+        "ra10054-s3",
+        "ra10054-s7",
+        "ra10054-s5"
+      ],
+      "fines": [
+        "No / non-standard motorcycle helmet — 1st offense",
+        "Child passenger on motorcycle in prohibited conditions — 1st offense"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f10",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "faq": "seatbelt",
+      "faqHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra8750-s12",
+        "ra11229-s10"
+      ],
+      "fines": [
+        "No seatbelt (driver/front passenger) — 1st offense",
+        "No child restraint system / child under 12 in front seat — 1st offense"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f11",
+      "intent": "general",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra11229-s5",
+        "ra11229-s4",
+        "ra11229-s10"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f12",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "cellphone",
+      "faqHit": true,
+      "laws": [
+        "ra10913-s4",
+        "ra10913-s8",
+        "ra4136-s34-p4"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f13",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "phone-gps",
+      "faqHit": true,
+      "laws": [
+        "ra10913-s6",
+        "ra10913-s5",
+        "ra10913-s4"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f14",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "drunk-driving",
+      "faqHit": true,
+      "laws": [
+        "ra10586-s12",
+        "ra10586-s5",
+        "ra4136-s19"
+      ],
+      "fines": [
+        "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)",
+        "Illegal parking, attended by the driver"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f15",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "breathalyzer",
+      "faqHit": true,
+      "laws": [
+        "ra10586-s8",
+        "ra10586-s6",
+        "ra10586-s7"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f16",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "accident-duty",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s55",
+        "ra10586-s7",
+        "ra4136-s21"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f17",
+      "intent": "rightOfWay",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "right-of-way",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s43",
+        "ra4136-s41"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f18",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "emergency-vehicle",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s49",
+        "ra4136-s42",
+        "ra4136-s43"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f19",
+      "intent": "enforcer",
+      "pass": false,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra4136-s29",
+        "ra10586-s8",
+        "ra10586-s6"
+      ],
+      "fines": [
+        "Arrogance / discourteous conduct by driver (+ driver's seminar)"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f20",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "faq": "no-license",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s19",
+        "ra4136-s24",
+        "ra4136-s29"
+      ],
+      "fines": [
+        "Driving without a valid driver's license or conductor's permit",
+        "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f21",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "expired-license",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s19",
+        "ra4136-s26",
+        "ra4136-s24"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f22",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "student-permit",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s30",
+        "ra4136-s21",
+        "ra4136-s10"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f23",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": "coding-hours",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s18",
+        "ra4136-s17",
+        "ra4136-s14"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f24",
+      "intent": "general",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra4136-s46",
+        "ra4136-s52",
+        "ra11229-s5"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f25",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra4136-s55",
+        "ra10586-s7",
+        "ra4136-s47"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f26",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra4136-s5-p1",
+        "ra11229-s5",
+        "ra11229-s4"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f27",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra4136-s55",
+        "ra10054-s3",
+        "ra10586-s7"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f28",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra4136-s34-p3",
+        "ra8750-s10",
+        "ra11229-s5"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f29",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra8750-s10",
+        "ra4136-s34-p1"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "f30",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s45",
+        "ra4136-s44"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    }
+  ]
+}

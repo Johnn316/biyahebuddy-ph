@@ -11,6 +11,8 @@ files.
 | File | Use |
 |---|---|
 | `questions.json` | 30 Taglish / Tagalog / English questions with the expected law sections and/or fines. Used while improving retrieval. |
+| `faq_eval.json` | 30 paraphrases of curated FAQ questions (24 should get a curated answer, 6 must not). Entries have `faq: <id or null>`. Used to tune aliases. |
+| `faq_holdout.json` | 10 FAQ paraphrases written before alias tuning. Don't tune on it. |
 | `holdout.json` | 10 more questions written **before** any tuning and never used to tune. Shows whether gains generalize. Don't tune on it. |
 
 Each entry: `{id, lang, intent, question, driverB?, laws?: [ids], fines?: [keywords]}`.
