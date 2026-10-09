@@ -36,7 +36,7 @@ The law text and citations in every answer are copied from `laws.json` /
 | `qr_flutter` | Package | Driver profile QR card |
 | `cupertino_icons`, Material Icons | Font asset | Icons (bundled) |
 | Plus Jakarta Sans (`assets/fonts/`, SIL OFL 1.1) | Font asset | App typography; bundled, never fetched at runtime |
-| App logo (`assets/icon/`: `biyahebuddy_logo.png`, `app_icon.png`, `app_icon_foreground.png`) | Image asset | App logo: original artwork generated with Claude for this project. Bundled; launcher icons generated from it with `flutter_launcher_icons` (dev-only, build time) |
+| App logo (`assets/icon/`: `biyahebuddy_logo.png`, `app_icon.png`, `app_icon_background.png`, `app_icon_foreground.png`) | Image asset | App logo: generated with ChatGPT image generation (OpenAI), edited for app icon sizes. Bundled; launcher icons generated from it with `flutter_launcher_icons` (dev-only, build time) |
 | Android SmsManager, TelecomManager, LocationManager, MediaSession foreground service (Kotlin) | Platform API | SOS SMS/call, GPS fix, volume-button trigger (all offline; skipped with a message on devices without a SIM) |
 
 ### Data (bundled assets, sources in [SOURCES.md](SOURCES.md))
@@ -73,7 +73,8 @@ MIT) — neither ships in the app.
 | Tool | Used for |
 |---|---|
 | Claude Code | Project scaffold, backend and frontend code, refactoring, tests, docs |
-| Claude (chat) | Planning, design discussion, prompts, copywriting, app logo artwork |
+| Claude (chat) | Planning, design discussion, prompts, copywriting |
+| ChatGPT image generation (OpenAI) | App logo artwork |
 | Devin | Legal data pipeline (`tools/build_data.py`) and data collection/structuring for `assets/data/` |
 
 All AI-generated legal content is checked against the official sources in
