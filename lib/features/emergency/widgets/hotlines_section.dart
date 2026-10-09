@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../shared/widgets/app_card.dart';
 import '../controllers/emergency_controller.dart';
 import 'emergency_common.dart';
 
@@ -12,12 +13,12 @@ class HotlinesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hotlines = ref.watch(emergencyHotlinesProvider);
-    final text = Theme.of(context).textTheme;
+    final p = context.palette;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SectionHeader('Hotlines'),
+        const SectionTitle('Hotlines', icon: Icons.support_agent_rounded),
         ...hotlines.when(
           loading: () => const [
             Padding(
@@ -28,45 +29,44 @@ class HotlinesSection extends ConsumerWidget {
           error: (_, _) => [
             Text(
               'Hindi ma-load ang hotlines. I-dial ang 911.',
-              style: text.titleLarge,
+              style: context.text.titleLarge,
             ),
           ],
           data: (list) => [
             for (final h in list)
-              Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  key: Key('hotline-${h.number}'),
-                  onTap: () => dialNumber(context, ref, h.number),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 72),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      child: Row(
+              AppCard(
+                tapKey: Key('hotline-${h.number}'),
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                onTap: () => dialNumber(context, ref, h.number),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(h.name, style: text.bodyLarge),
-                                Text(
-                                  h.number,
-                                  style: text.headlineMedium?.copyWith(
-                                    color: AppColors.accent,
-                                  ),
-                                ),
-                              ],
+                          Text(
+                            h.name,
+                            style: context.text.bodyMedium?.copyWith(
+                              color: p.muted,
                             ),
                           ),
-                          const Icon(Icons.call, color: AppColors.ok, size: 36),
+                          Text(h.number, style: context.text.headlineMedium),
                         ],
                       ),
                     ),
-                  ),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: p.success.withValues(alpha: 0.16),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.call_rounded, color: p.success),
+                    ),
+                  ],
                 ),
               ),
           ],

@@ -47,11 +47,16 @@ class ChatInputBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mic = ref.watch(micControllerProvider(chatMicKey));
-    final text = Theme.of(context).textTheme;
+    final scheme = context.colors;
+    final p = context.palette;
     final listening = mic == MicPhase.listening;
 
-    return Material(
-      color: AppColors.surface,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        border: Border(top: BorderSide(color: scheme.outline)),
+        boxShadow: p.cardShadow,
+      ),
       child: SafeArea(
         top: false,
         minimum: const EdgeInsets.all(12),
@@ -61,14 +66,40 @@ class ChatInputBar extends ConsumerWidget {
             final canSend = !streaming && value.text.trim().isNotEmpty;
             void submit() => canSend ? onSubmit(value.text) : null;
 
+            Widget roundButton({
+              required Key key,
+              required String tooltip,
+              required Color bg,
+              required Color fg,
+              required VoidCallback? onPressed,
+              required Widget icon,
+            }) => SizedBox.square(
+              dimension: 68,
+              child: IconButton.filled(
+                key: key,
+                tooltip: tooltip,
+                style: IconButton.styleFrom(
+                  backgroundColor: bg,
+                  foregroundColor: fg,
+                  disabledBackgroundColor: scheme.surfaceContainer,
+                  disabledForegroundColor: p.muted,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: onPressed,
+                icon: icon,
+              ),
+            );
+
             final stopButton = FilledButton.icon(
               key: const Key('chat-stop'),
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
+                backgroundColor: scheme.inverseSurface,
+                foregroundColor: scheme.onInverseSurface,
               ),
               onPressed: onStop,
-              icon: const Icon(Icons.stop),
+              icon: const Icon(Icons.stop_rounded),
               label: const Text('Itigil'),
             );
 
@@ -79,42 +110,33 @@ class ChatInputBar extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    SizedBox.square(
-                      dimension: 72,
-                      child: IconButton.filled(
-                        key: const Key('chat-mic'),
-                        tooltip: listening ? 'Itigil at isulat' : 'Magsalita',
-                        style: IconButton.styleFrom(
-                          backgroundColor: listening
-                              ? AppColors.accent
-                              : AppColors.primary,
-                          foregroundColor: listening
-                              ? Colors.black
-                              : Colors.white,
-                        ),
-                        onPressed: mic == MicPhase.transcribing
-                            ? null
-                            : () => _toggleMic(context, ref),
-                        icon: mic == MicPhase.transcribing
-                            ? const SizedBox.square(
-                                dimension: 28,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                ),
-                              )
-                            : Icon(
-                                listening ? Icons.stop : Icons.mic,
-                                size: 40,
-                              ),
-                      ),
+                    roundButton(
+                      key: const Key('chat-mic'),
+                      tooltip: listening ? 'Itigil at isulat' : 'Magsalita',
+                      bg: listening ? p.accent : scheme.primary,
+                      fg: listening ? p.onAccent : scheme.onPrimary,
+                      onPressed: mic == MicPhase.transcribing
+                          ? null
+                          : () => _toggleMic(context, ref),
+                      icon: mic == MicPhase.transcribing
+                          ? const SizedBox.square(
+                              dimension: 28,
+                              child: CircularProgressIndicator(strokeWidth: 3),
+                            )
+                          : Icon(
+                              listening
+                                  ? Icons.stop_rounded
+                                  : Icons.mic_rounded,
+                              size: 36,
+                            ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: TextField(
                         key: const Key('chat-input'),
                         controller: controller,
                         focusNode: focusNode,
-                        style: text.titleLarge,
+                        style: context.text.titleMedium,
                         minLines: 1,
                         maxLines: 4,
                         textInputAction: TextInputAction.send,
@@ -125,40 +147,28 @@ class ChatInputBar extends ConsumerWidget {
                             MicPhase.transcribing => 'Isinusulat…',
                             MicPhase.idle => hint,
                           },
-                          hintStyle: text.bodyLarge,
-                          filled: true,
-                          fillColor: AppColors.background,
-                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
                     if (actionLabel == null) ...[
-                      const SizedBox(width: 8),
-                      SizedBox.square(
-                        dimension: 72,
-                        child: streaming
-                            ? IconButton.filled(
-                                key: const Key('chat-stop'),
-                                tooltip: 'Itigil',
-                                style: IconButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.black,
-                                ),
-                                onPressed: onStop,
-                                icon: const Icon(Icons.stop, size: 40),
-                              )
-                            : IconButton.filled(
-                                key: const Key('chat-send'),
-                                tooltip: 'Ipadala',
-                                style: IconButton.styleFrom(
-                                  backgroundColor: AppColors.accent,
-                                  foregroundColor: Colors.black,
-                                  disabledBackgroundColor: Colors.white12,
-                                ),
-                                onPressed: canSend ? submit : null,
-                                icon: const Icon(Icons.send, size: 36),
-                              ),
-                      ),
+                      const SizedBox(width: 10),
+                      streaming
+                          ? roundButton(
+                              key: const Key('chat-stop'),
+                              tooltip: 'Itigil',
+                              bg: scheme.inverseSurface,
+                              fg: scheme.onInverseSurface,
+                              onPressed: onStop,
+                              icon: const Icon(Icons.stop_rounded, size: 36),
+                            )
+                          : roundButton(
+                              key: const Key('chat-send'),
+                              tooltip: 'Ipadala',
+                              bg: p.accent,
+                              fg: p.onAccent,
+                              onPressed: canSend ? submit : null,
+                              icon: const Icon(Icons.send_rounded, size: 32),
+                            ),
                     ],
                   ],
                 ),
@@ -170,8 +180,8 @@ class ChatInputBar extends ConsumerWidget {
                     FilledButton(
                       key: const Key('chat-action'),
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: Colors.black,
+                        backgroundColor: p.accent,
+                        foregroundColor: p.onAccent,
                       ),
                       onPressed: canSend ? submit : null,
                       child: Text(actionLabel!),

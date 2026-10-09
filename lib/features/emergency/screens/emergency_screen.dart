@@ -20,11 +20,15 @@ class EmergencyScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider).valueOrNull;
+    final p = context.palette;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.emergency,
-        foregroundColor: Colors.white,
+        backgroundColor: p.emergency,
+        foregroundColor: p.onEmergency,
+        titleTextStyle: context.text.headlineSmall?.copyWith(
+          color: p.onEmergency,
+        ),
         leading: BackButton(
           onPressed: () =>
               context.canPop() ? context.pop() : context.go(Routes.home),
@@ -46,12 +50,10 @@ class EmergencyScreen extends ConsumerWidget {
               FilledButton.icon(
                 key: const Key('open-qr'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
                   minimumSize: const Size.fromHeight(80),
                 ),
                 onPressed: () => QrExchangeScreen.open(context, profile),
-                icon: const Icon(Icons.qr_code_2, size: 40),
+                icon: const Icon(Icons.qr_code_2_rounded, size: 36),
                 label: const Text('QR Exchange'),
               ),
             ],

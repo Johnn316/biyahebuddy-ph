@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/contracts/contracts.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../shared/widgets/app_card.dart';
 import '../controllers/violation_controller.dart';
 import '../widgets/agency_picker.dart';
 import '../widgets/violation_search_field.dart';
@@ -93,7 +94,7 @@ class _ViolationStep extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(
             query.isEmpty ? 'Karaniwang violation' : 'Resulta',
-            style: text.titleLarge?.copyWith(color: Colors.white70),
+            style: text.titleMedium?.copyWith(color: context.palette.muted),
           ),
           const SizedBox(height: 4),
           Expanded(
@@ -128,10 +129,9 @@ class _ViolationStep extends ConsumerWidget {
           OutlinedButton.icon(
             key: const Key('unknown-violation'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              minimumSize: const Size.fromHeight(AppSizes.minTap),
-              side: const BorderSide(color: AppColors.primary, width: 2),
-              textStyle: text.titleLarge,
+              foregroundColor: context.colors.primary,
+              side: BorderSide(color: context.colors.primary, width: 2),
+              textStyle: text.titleMedium,
             ),
             onPressed: () => context.push(
               Uri(
@@ -139,7 +139,7 @@ class _ViolationStep extends ConsumerWidget {
                 queryParameters: {'q': unknownViolationQuestion(agency)},
               ).toString(),
             ),
-            icon: const Icon(Icons.help_outline),
+            icon: const Icon(Icons.help_outline_rounded),
             label: const Text('Hindi ko alam ang violation'),
           ),
         ],
@@ -156,29 +156,32 @@ class _FineTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return Card(
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        key: Key('fine-$index'),
-        onTap: () => FineResultScreen.open(context, fine),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 72),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Expanded(child: Text(fine.violation, style: text.titleLarge)),
-                const SizedBox(width: 12),
-                Text(
-                  formatPeso(fine.amount),
-                  style: text.headlineMedium?.copyWith(color: AppColors.accent),
-                ),
-              ],
+    final p = context.palette;
+    return AppCard(
+      tapKey: Key('fine-$index'),
+      shadow: false,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      onTap: () => FineResultScreen.open(context, fine),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(fine.violation, style: context.text.titleMedium),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: p.accent,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              formatPeso(fine.amount),
+              style: context.text.titleMedium?.copyWith(color: p.onAccent),
             ),
           ),
-        ),
+          const SizedBox(width: 4),
+          Icon(Icons.chevron_right_rounded, color: p.muted),
+        ],
       ),
     );
   }

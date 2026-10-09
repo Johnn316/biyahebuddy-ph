@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../../core/contracts/contracts.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../shared/widgets/app_card.dart';
+import '../../shared/widgets/pressable.dart';
+import '../../shared/widgets/scale_down_to_fit.dart';
 import '../controllers/violation_controller.dart';
 
 IconData _icon(Agency a) => switch (a) {
-  Agency.lto => Icons.badge,
-  Agency.mmda => Icons.traffic,
-  Agency.city => Icons.location_city,
+  Agency.lto => Icons.badge_rounded,
+  Agency.mmda => Icons.traffic_rounded,
+  Agency.city => Icons.location_city_rounded,
 };
 
-/// Step 1: three huge tiles that fill the screen.
+/// Step 1: three big cards that fill the screen.
 class AgencyPickerLarge extends StatelessWidget {
   const AgencyPickerLarge({super.key, required this.onSelected});
 
@@ -18,48 +21,58 @@ class AgencyPickerLarge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final primary = context.colors.primary;
     return Padding(
       padding: const EdgeInsets.all(AppSizes.gap),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text("Sino ang nag-flag sa'yo?", style: text.headlineMedium),
+          Text("Sino ang nag-flag sa'yo?", style: context.text.headlineLarge),
           for (final a in Agency.values) ...[
             const SizedBox(height: AppSizes.gap),
             Expanded(
-              child: Material(
-                color: AppColors.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSizes.radius),
-                  side: const BorderSide(color: AppColors.accent, width: 3),
+              child: AppCard(
+                tapKey: Key('agency-${a.name}'),
+                onTap: () => onSelected(a),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
                 ),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  key: Key('agency-${a.name}'),
-                  onTap: () => onSelected(a),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        Icon(_icon(a), size: 56, color: AppColors.accent),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(a.label, style: text.displayLarge),
-                                Text(a.description, style: text.bodyLarge),
-                              ],
-                            ),
+                child: ScaleDownToFit(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(
+                            AppSizes.radiusSm,
                           ),
                         ),
-                        const Icon(Icons.chevron_right, size: 40),
-                      ],
-                    ),
+                        child: Icon(_icon(a), size: 44, color: primary),
+                      ),
+                      const SizedBox(width: 18),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(a.label, style: context.text.displaySmall),
+                            Text(
+                              a.description,
+                              style: context.text.bodyMedium?.copyWith(
+                                color: context.palette.muted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 36,
+                        color: context.palette.muted,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -84,7 +97,7 @@ class AgencyPickerCompact extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final scheme = context.colors;
     return Row(
       children: [
         for (final (i, a) in Agency.values.indexed) ...[
@@ -93,29 +106,41 @@ class AgencyPickerCompact extends StatelessWidget {
             child: Semantics(
               selected: a == selected,
               button: true,
-              child: Material(
-                color: a == selected ? AppColors.accent : AppColors.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  side: const BorderSide(color: AppColors.accent, width: 2),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  key: Key('agency-chip-${a.name}'),
-                  onTap: () => onSelected(a),
-                  child: SizedBox(
-                    height: 56,
-                    child: Center(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: Text(
-                            a.label,
-                            style: text.titleLarge?.copyWith(
-                              color: a == selected
-                                  ? Colors.black
-                                  : Colors.white,
+              child: Pressable(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  decoration: BoxDecoration(
+                    color: a == selected ? scheme.primary : scheme.surface,
+                    borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                    border: Border.all(
+                      color: a == selected ? scheme.primary : scheme.outline,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      key: Key('agency-chip-${a.name}'),
+                      onTap: () => onSelected(a),
+                      child: SizedBox(
+                        height: 56,
+                        child: Center(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                              ),
+                              child: Text(
+                                a.label,
+                                style: context.text.titleMedium?.copyWith(
+                                  color: a == selected
+                                      ? scheme.onPrimary
+                                      : scheme.onSurface,
+                                ),
+                              ),
                             ),
                           ),
                         ),

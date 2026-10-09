@@ -53,7 +53,7 @@ class ViolationSearchField extends ConsumerWidget {
                 MicPhase.idle => 'Hanapin ang violation',
               },
               hintStyle: text.bodyLarge,
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: const Icon(Icons.search_rounded),
               suffixIcon: controller.text.isEmpty
                   ? null
                   : IconButton(
@@ -64,8 +64,6 @@ class ViolationSearchField extends ConsumerWidget {
                         ref.read(violationQueryProvider.notifier).state = '';
                       },
                     ),
-              filled: true,
-              border: const OutlineInputBorder(),
               contentPadding: const EdgeInsets.symmetric(vertical: 18),
             ),
           ),
@@ -77,8 +75,12 @@ class ViolationSearchField extends ConsumerWidget {
             key: const Key('mic'),
             tooltip: listening ? 'Itigil at isulat' : 'Magsalita',
             style: IconButton.styleFrom(
-              backgroundColor: listening ? AppColors.accent : AppColors.primary,
-              foregroundColor: listening ? Colors.black : Colors.white,
+              backgroundColor: listening
+                  ? context.palette.accent
+                  : context.colors.primary,
+              foregroundColor: listening
+                  ? context.palette.onAccent
+                  : context.colors.onPrimary,
             ),
             onPressed: mic == MicPhase.transcribing
                 ? null
@@ -88,7 +90,10 @@ class ViolationSearchField extends ConsumerWidget {
                     dimension: 24,
                     child: CircularProgressIndicator(strokeWidth: 3),
                   )
-                : Icon(listening ? Icons.stop : Icons.mic, size: 32),
+                : Icon(
+                    listening ? Icons.stop_rounded : Icons.mic_rounded,
+                    size: 32,
+                  ),
           ),
         ),
       ],

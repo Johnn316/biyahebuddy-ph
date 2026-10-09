@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../shared/widgets/app_card.dart';
 import '../controllers/emergency_controller.dart';
-import 'emergency_common.dart';
 
 /// "Ano ang gagawin ngayon" — tickable steps after a crash.
 class ChecklistSection extends ConsumerWidget {
@@ -12,48 +12,59 @@ class ChecklistSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final done = ref.watch(checklistProvider);
-    final text = Theme.of(context).textTheme;
+    final p = context.palette;
+    final allDone = done.length == emergencyChecklist.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SectionHeader(
+        SectionTitle(
           'Ano ang gagawin ngayon',
-          trailing: Text(
-            '${done.length}/${emergencyChecklist.length}',
-            style: text.titleLarge?.copyWith(
-              color: done.length == emergencyChecklist.length
-                  ? AppColors.ok
-                  : Colors.white70,
+          icon: Icons.checklist_rounded,
+          trailing: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: allDone ? p.success : context.colors.surfaceContainer,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              '${done.length}/${emergencyChecklist.length}',
+              style: context.text.titleMedium?.copyWith(
+                color: allDone ? p.onSuccess : p.muted,
+              ),
             ),
           ),
         ),
-        for (final (i, item) in emergencyChecklist.indexed)
-          Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: CheckboxListTile(
-              key: Key('check-$i'),
-              value: done.contains(i),
-              onChanged: (v) => ref.read(checklistProvider.notifier).state = {
-                ...done.where((d) => d != i),
-                if (v ?? false) i,
-              },
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
-              title: Text(
-                item,
-                style: text.titleLarge?.copyWith(
-                  decoration: done.contains(i)
-                      ? TextDecoration.lineThrough
-                      : null,
-                  color: done.contains(i) ? Colors.white60 : null,
+        AppCard(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            children: [
+              for (final (i, item) in emergencyChecklist.indexed) ...[
+                if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
+                CheckboxListTile(
+                  key: Key('check-$i'),
+                  value: done.contains(i),
+                  onChanged: (v) => ref.read(checklistProvider.notifier).state =
+                      {...done.where((d) => d != i), if (v ?? false) i},
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  title: Text(
+                    item,
+                    style: context.text.titleMedium?.copyWith(
+                      decoration: done.contains(i)
+                          ? TextDecoration.lineThrough
+                          : null,
+                      color: done.contains(i) ? p.muted : null,
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              ],
+            ],
           ),
+        ),
       ],
     );
   }

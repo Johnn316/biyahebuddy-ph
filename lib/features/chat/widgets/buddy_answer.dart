@@ -6,21 +6,60 @@ import '../controllers/chat_controller.dart';
 
 const answerDisclaimer = 'Gabay batay sa batas, hindi legal na hatol.';
 
-({IconData icon, Color color}) _style(AnswerSectionKind k) => switch (k) {
+({IconData icon, Color color}) _style(
+  BuildContext context,
+  AnswerSectionKind k,
+) => switch (k) {
   AnswerSectionKind.kalma => (
-    icon: Icons.self_improvement,
-    color: AppColors.ok,
+    icon: Icons.self_improvement_rounded,
+    color: context.palette.success,
   ),
-  AnswerSectionKind.batas => (icon: Icons.gavel, color: AppColors.accent),
+  AnswerSectionKind.batas => (
+    icon: Icons.gavel_rounded,
+    color: context.palette.accent,
+  ),
   AnswerSectionKind.pagsusuri => (
-    icon: Icons.search,
-    color: Colors.lightBlueAccent,
+    icon: Icons.manage_search_rounded,
+    color: context.colors.primary,
   ),
-  AnswerSectionKind.gagawin => (icon: Icons.checklist, color: Colors.white),
+  AnswerSectionKind.gagawin => (
+    icon: Icons.checklist_rounded,
+    color: context.colors.onSurface,
+  ),
 };
 
-/// Buddy's answer: 4 labeled sections when present, else plain text.
-/// Citations are shown as amber chips. Disclaimer always underneath.
+/// Buddy avatar: round, primary, with a soft ring.
+class BuddyAvatar extends StatelessWidget {
+  const BuddyAvatar({super.key, this.size = 36});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: scheme.primary,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: scheme.primary.withValues(alpha: 0.25),
+          width: 3,
+          strokeAlign: BorderSide.strokeAlignOutside,
+        ),
+      ),
+      child: Icon(
+        Icons.support_agent_rounded,
+        size: size * 0.6,
+        color: scheme.onPrimary,
+      ),
+    );
+  }
+}
+
+/// Buddy's answer: 4 labeled section cards when present, else plain text.
+/// Citations are amber chips. Disclaimer always underneath.
 class BuddyAnswer extends StatelessWidget {
   const BuddyAnswer({super.key, required this.message});
 
@@ -28,9 +67,9 @@ class BuddyAnswer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
     final parsed = parseAnswer(message.text);
     final waiting = message.streaming && message.text.trim().isEmpty;
+    final p = context.palette;
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -42,16 +81,12 @@ class BuddyAnswer extends StatelessWidget {
           children: [
             Row(
               children: [
-                const CircleAvatar(
-                  radius: 16,
-                  backgroundColor: AppColors.primary,
-                  child: Icon(Icons.support_agent, size: 20),
-                ),
-                const SizedBox(width: 8),
-                Text('Buddy', style: text.titleLarge),
+                const BuddyAvatar(),
+                const SizedBox(width: 10),
+                Text('Buddy', style: context.text.titleLarge),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             if (waiting)
               const _Thinking()
             else ...[
@@ -65,8 +100,8 @@ class BuddyAnswer extends StatelessWidget {
                 _SectionCard(
                   key: Key('section-${s.kind.name}'),
                   label: s.kind.label,
-                  icon: _style(s.kind).icon,
-                  color: _style(s.kind).color,
+                  icon: _style(context, s.kind).icon,
+                  color: _style(context, s.kind).color,
                   child: CitationText(
                     s.body + (i == parsed.sections.length - 1 ? _cursor : ''),
                   ),
@@ -77,18 +112,24 @@ class BuddyAnswer extends StatelessWidget {
             if (message.failed)
               _Note(
                 'Hindi nakasagot si Buddy. Subukan ulit.',
-                icon: Icons.error_outline,
-                color: AppColors.warning,
+                icon: Icons.error_outline_rounded,
+                color: p.accent,
               ),
             Padding(
-              padding: const EdgeInsets.only(top: 4, left: 4),
-              child: Text(
-                answerDisclaimer,
-                style: text.bodyMedium?.copyWith(
-                  color: Colors.white60,
-                  fontSize: 15,
-                  fontStyle: FontStyle.italic,
-                ),
+              padding: const EdgeInsets.only(top: 2, left: 4),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 16, color: p.muted),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      answerDisclaimer,
+                      style: context.text.bodySmall?.copyWith(
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -106,46 +147,67 @@ class _SectionCard extends StatelessWidget {
     required this.child,
     this.label,
     this.icon,
-    this.color = Colors.white24,
+    this.color,
   });
 
   final Widget child;
   final String? label;
   final IconData? icon;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final scheme = context.colors;
+    final c = color ?? scheme.outline;
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border(left: BorderSide(color: color, width: 6)),
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: scheme.outline),
+        boxShadow: context.palette.cardShadow,
       ),
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (label != null) ...[
-            Row(
-              children: [
-                Icon(icon, color: color, size: 24),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label!,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleLarge?.copyWith(color: color),
-                  ),
+      clipBehavior: Clip.antiAlias,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(width: 5, color: c),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (label != null) ...[
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: c.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(icon, color: c, size: 20),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              label!,
+                              style: context.text.titleMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    child,
+                  ],
                 ),
-              ],
+              ),
             ),
-            const SizedBox(height: 6),
           ],
-          child,
-        ],
+        ),
       ),
     );
   }
@@ -159,7 +221,8 @@ class CitationText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.bodyLarge;
+    final style = context.text.bodyLarge;
+    final p = context.palette;
     final spans = <InlineSpan>[];
     var last = 0;
     for (final m in citationPattern.allMatches(data)) {
@@ -173,22 +236,23 @@ class CitationText extends StatelessWidget {
           child: Container(
             key: ValueKey('citation-$cite'),
             margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             decoration: BoxDecoration(
-              color: AppColors.accent,
-              borderRadius: BorderRadius.circular(8),
+              color: p.accent,
+              borderRadius: BorderRadius.circular(999),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.menu_book, size: 16, color: Colors.black),
-                const SizedBox(width: 4),
+                Icon(Icons.menu_book_rounded, size: 16, color: p.onAccent),
+                const SizedBox(width: 5),
                 Flexible(
                   child: Text(
                     cite,
                     style: style?.copyWith(
-                      color: Colors.black,
+                      color: p.onAccent,
                       fontWeight: FontWeight.w800,
+                      fontSize: (style.fontSize ?? 18) - 2,
                     ),
                   ),
                 ),
@@ -209,16 +273,16 @@ class _Thinking extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _SectionCard(
+    return _SectionCard(
       child: Row(
         children: [
-          SizedBox.square(
+          const SizedBox.square(
             dimension: 22,
             child: CircularProgressIndicator(strokeWidth: 3),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Flexible(
-            child: Text('Nag-iisip si Buddy…', style: TextStyle(fontSize: 20)),
+            child: Text('Nag-iisip si Buddy…', style: context.text.bodyLarge),
           ),
         ],
       ),
@@ -227,26 +291,25 @@ class _Thinking extends StatelessWidget {
 }
 
 class _Note extends StatelessWidget {
-  const _Note(this.text, {required this.icon, this.color = Colors.white70});
+  const _Note(this.text, {required this.icon, this.color});
 
   final String text;
   final IconData icon;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final c = color ?? context.palette.muted;
     return Padding(
       padding: const EdgeInsets.only(bottom: 4, left: 4),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 20),
+          Icon(icon, color: c, size: 20),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
               text,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: color),
+              style: context.text.bodyMedium?.copyWith(color: c),
             ),
           ),
         ],

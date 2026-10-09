@@ -107,28 +107,41 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           onPressed: () =>
               context.canPop() ? context.pop() : context.go(Routes.home),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        titleSpacing: 0,
+        title: Row(
           children: [
-            const Text('Buddy'),
-            Row(
-              children: [
-                const Icon(Icons.wifi_off, size: 16, color: AppColors.ok),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Gumagana kahit walang signal',
-                      style: text.bodyMedium?.copyWith(
-                        color: AppColors.ok,
-                        fontSize: 15,
+            const BuddyAvatar(size: 40),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Buddy'),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.wifi_off_rounded,
+                        size: 16,
+                        color: context.palette.success,
                       ),
-                    ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Gumagana kahit walang signal',
+                            style: text.bodyMedium?.copyWith(
+                              color: context.palette.success,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -144,18 +157,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               style: SegmentedButton.styleFrom(
                 minimumSize: const Size.fromHeight(56),
                 textStyle: text.titleLarge,
-                selectedBackgroundColor: AppColors.accent,
-                selectedForegroundColor: Colors.black,
               ),
               segments: const [
                 ButtonSegment(
                   value: ChatMode.ask,
-                  icon: Icon(Icons.chat),
+                  icon: Icon(Icons.forum_rounded),
                   label: Text('Tanong'),
                 ),
                 ButtonSegment(
                   value: ChatMode.twoSides,
-                  icon: Icon(Icons.balance),
+                  icon: Icon(Icons.balance_rounded),
                   label: Text('Dalawang panig'),
                 ),
               ],
@@ -178,14 +189,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: FilledButton.icon(
                 key: const Key('new-case'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.accent,
-                  foregroundColor: Colors.black,
+                  backgroundColor: context.palette.accent,
+                  foregroundColor: context.palette.onAccent,
                 ),
                 onPressed: () {
                   _input.clear();
                   _chat.newCase();
                 },
-                icon: const Icon(Icons.restart_alt),
+                icon: const Icon(Icons.restart_alt_rounded),
                 label: const Text('Bagong kaso'),
               ),
             )
@@ -234,10 +245,9 @@ class _EmptyAsk extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (box.maxHeight > 260)
-                const Icon(
-                  Icons.support_agent,
-                  size: 110,
-                  color: AppColors.primary,
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 20),
+                  child: BuddyAvatar(size: 96),
                 ),
               Text(
                 'Ano ang gusto mong itanong kay Buddy?',
@@ -248,7 +258,7 @@ class _EmptyAsk extends StatelessWidget {
               Text(
                 'Batas trapiko, multa, aksidente — magsalita o mag-type.',
                 textAlign: TextAlign.center,
-                style: text.bodyLarge?.copyWith(color: Colors.white70),
+                style: text.bodyLarge?.copyWith(color: context.palette.muted),
               ),
             ],
           ),
@@ -284,7 +294,7 @@ class _QuickChips extends StatelessWidget {
                   horizontal: 6,
                   vertical: 10,
                 ),
-                side: const BorderSide(color: AppColors.accent, width: 2),
+                side: BorderSide(color: context.palette.accent, width: 2),
                 onPressed: () => onTap(q),
               ),
             ),
@@ -317,7 +327,7 @@ class _TwoSidesPrompt extends StatelessWidget {
         children: [
           Text(
             isA ? 'Hakbang 1 ng 2' : 'Hakbang 2 ng 2',
-            style: text.titleLarge?.copyWith(color: AppColors.accent),
+            style: text.titleMedium?.copyWith(color: context.colors.primary),
           ),
           const SizedBox(height: 8),
           Text(
@@ -334,28 +344,25 @@ class _TwoSidesPrompt extends StatelessWidget {
                       'lumiko pakaliwa."'
                 : 'Ilagay ang kuwento niya kahit hindi ka sang-ayon. Si Buddy '
                       'ang titingin sa dalawang panig.',
-            style: text.bodyLarge?.copyWith(color: Colors.white70),
+            style: text.bodyLarge?.copyWith(color: context.palette.muted),
           ),
           if (!isA) ...[
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.colors.surfaceContainer,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Panig mo',
-                    style: text.bodyMedium?.copyWith(color: Colors.white70),
-                  ),
+                  Text('Panig mo', style: text.bodySmall),
                   Text(sideA, style: text.bodyLarge),
                   TextButton.icon(
                     key: const Key('edit-side-a'),
                     onPressed: onEditSideA,
-                    icon: const Icon(Icons.edit),
+                    icon: const Icon(Icons.edit_rounded),
                     label: const Text('Baguhin'),
                   ),
                 ],

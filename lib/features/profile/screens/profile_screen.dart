@@ -7,6 +7,7 @@ import '../../../core/di/providers.dart';
 import '../../../core/router/app_router.dart';
 import '../controllers/profile_controller.dart';
 import '../widgets/profile_form.dart';
+import '../widgets/theme_mode_picker.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -49,6 +50,7 @@ class ProfileScreen extends ConsumerWidget {
           initial: value,
           submitLabel: 'I-save',
           saving: saving,
+          header: const ThemeModePicker(),
           onSubmit: (p) => _save(context, ref, p),
         ),
         error: (_, _) =>

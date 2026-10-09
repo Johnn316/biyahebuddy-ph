@@ -25,12 +25,16 @@ class ProfileForm extends StatefulWidget {
     required this.onSubmit,
     this.initial,
     this.saving = false,
+    this.header,
   });
 
   final Profile? initial;
   final String submitLabel;
   final bool saving;
   final ValueChanged<Profile> onSubmit;
+
+  /// Optional widget shown above the fields (e.g. theme switcher).
+  final Widget? header;
 
   @override
   State<ProfileForm> createState() => _ProfileFormState();
@@ -159,7 +163,8 @@ class _ProfileFormState extends State<ProfileForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const FormSectionTitle('Ikaw'),
+                  ?widget.header,
+                  const FormSectionTitle('Ikaw', icon: Icons.person_rounded),
                   BigTextField(
                     key: const Key('field-name'),
                     controller: _name,
@@ -182,7 +187,10 @@ class _ProfileFormState extends State<ProfileForm> {
                           : null;
                     },
                   ),
-                  const FormSectionTitle('Lisensya at sasakyan'),
+                  const FormSectionTitle(
+                    'Lisensya at sasakyan',
+                    icon: Icons.badge_rounded,
+                  ),
                   BigTextField(
                     key: const Key('field-license'),
                     controller: _license,
@@ -221,7 +229,10 @@ class _ProfileFormState extends State<ProfileForm> {
                     required: true,
                     onChanged: (v) => setState(() => _vehicleType = v),
                   ),
-                  const FormSectionTitle('Kalusugan at insurance'),
+                  const FormSectionTitle(
+                    'Kalusugan at insurance',
+                    icon: Icons.health_and_safety_rounded,
+                  ),
                   BigDropdownField(
                     key: const Key('field-blood'),
                     label: 'Blood type',
@@ -243,7 +254,10 @@ class _ProfileFormState extends State<ProfileForm> {
                     label: 'Policy no.',
                     textCapitalization: TextCapitalization.characters,
                   ),
-                  const FormSectionTitle('Emergency contacts'),
+                  const FormSectionTitle(
+                    'Emergency contacts',
+                    icon: Icons.contact_phone_rounded,
+                  ),
                   Text(
                     'Sila ang ite-text kapag pinindot mo ang EMERGENCY. '
                     'Kailangan ng kahit isa.',
@@ -269,25 +283,33 @@ class _ProfileFormState extends State<ProfileForm> {
                     ),
                     onPressed: () =>
                         setState(() => _contacts.add(_ContactControllers())),
-                    icon: const Icon(Icons.person_add),
+                    icon: const Icon(Icons.person_add_rounded),
                     label: const Text('Magdagdag ng contact'),
                   ),
                 ],
               ),
             ),
           ),
-          SafeArea(
-            top: false,
-            minimum: const EdgeInsets.all(AppSizes.gap),
-            child: FilledButton(
-              key: const Key('profile-submit'),
-              onPressed: widget.saving ? null : _submit,
-              child: widget.saving
-                  ? const SizedBox.square(
-                      dimension: 28,
-                      child: CircularProgressIndicator(strokeWidth: 3),
-                    )
-                  : Text(widget.submitLabel),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              border: Border(
+                top: BorderSide(color: Theme.of(context).colorScheme.outline),
+              ),
+            ),
+            child: SafeArea(
+              top: false,
+              minimum: const EdgeInsets.all(AppSizes.gap),
+              child: FilledButton(
+                key: const Key('profile-submit'),
+                onPressed: widget.saving ? null : _submit,
+                child: widget.saving
+                    ? const SizedBox.square(
+                        dimension: 28,
+                        child: CircularProgressIndicator(strokeWidth: 3),
+                      )
+                    : Text(widget.submitLabel),
+              ),
             ),
           ),
         ],
@@ -331,7 +353,7 @@ class _ContactCard extends StatelessWidget {
                   IconButton(
                     key: Key('remove-contact-$index'),
                     tooltip: 'Tanggalin',
-                    icon: const Icon(Icons.delete_outline),
+                    icon: const Icon(Icons.delete_outline_rounded),
                     onPressed: onRemove,
                   ),
               ],

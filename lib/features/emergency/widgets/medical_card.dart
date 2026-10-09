@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/contracts/contracts.dart';
 import '../../../core/theme/app_theme.dart';
-import 'emergency_common.dart';
+import '../../shared/widgets/app_card.dart';
 
 /// Info for responders: name, age, blood type, insurance.
 class MedicalCard extends StatelessWidget {
@@ -12,48 +12,70 @@ class MedicalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final p = context.palette;
     const none = 'Hindi nakalagay';
     final insurance = [
       profile.insurer,
       if (profile.policyNo != null) 'Policy ${profile.policyNo}',
     ].nonNulls.join(' · ');
 
-    Widget row(String label, String value, {bool big = false}) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: text.bodyMedium?.copyWith(color: Colors.white70)),
-          Text(value, style: big ? text.displayLarge : text.titleLarge),
-        ],
-      ),
+    Widget field(String label, String value, {TextStyle? style}) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: context.text.bodySmall),
+        Text(value, style: style ?? context.text.titleLarge),
+      ],
     );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SectionHeader('Medical info'),
-        Container(
+        const SectionTitle(
+          'Medical info',
+          icon: Icons.medical_information_rounded,
+        ),
+        AppCard(
           key: const Key('medical-card'),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppSizes.radius),
-            border: Border.all(color: Colors.white, width: 2),
-          ),
+          padding: const EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: row('Pangalan', profile.name)),
-                  row('Edad', '${profile.age}'),
+                  Expanded(child: field('Pangalan', profile.name)),
+                  const SizedBox(width: 12),
+                  field('Edad', '${profile.age}'),
                 ],
               ),
-              row('Blood type', profile.bloodType ?? none, big: true),
-              row('Insurance', insurance.isEmpty ? none : insurance),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: context.colors.surfaceContainer,
+                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.bloodtype_rounded, size: 36, color: p.muted),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: field(
+                        'Blood type',
+                        profile.bloodType ?? none,
+                        style: profile.bloodType == null
+                            ? context.text.titleLarge
+                            : context.text.displayMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              field('Insurance', insurance.isEmpty ? none : insurance),
             ],
           ),
         ),

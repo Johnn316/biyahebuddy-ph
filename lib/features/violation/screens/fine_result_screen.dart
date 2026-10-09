@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/contracts/contracts.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../shared/widgets/app_card.dart';
 import '../controllers/violation_controller.dart';
 import 'officer_message_screen.dart';
 
@@ -17,11 +18,12 @@ class FineResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final p = context.palette;
+    final scheme = context.colors;
 
     Widget label(String s) => Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: Text(s, style: text.bodyMedium?.copyWith(color: Colors.white70)),
+      padding: const EdgeInsets.only(top: 18, bottom: 2),
+      child: Text(s, style: context.text.bodySmall),
     );
 
     return Scaffold(
@@ -34,18 +36,17 @@ class FineResultScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(AppSizes.radius),
-                    border: Border.all(color: AppColors.accent, width: 3),
-                  ),
+                child: AppCard(
+                  padding: EdgeInsets.zero,
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(fine.violation, style: text.headlineMedium),
+                        Text(
+                          fine.violation,
+                          style: context.text.headlineMedium,
+                        ),
                         label('Multa'),
                         FittedBox(
                           fit: BoxFit.scaleDown,
@@ -53,40 +54,44 @@ class FineResultScreen extends StatelessWidget {
                           child: Text(
                             formatPeso(fine.amount),
                             key: const Key('fine-amount'),
-                            style: text.displayLarge?.copyWith(
-                              fontSize: 64,
-                              color: AppColors.accent,
+                            style: context.text.displayLarge?.copyWith(
+                              fontSize: 60,
+                              color: scheme.primary,
                             ),
                           ),
                         ),
                         label('Ahensya'),
                         Text(
                           '${fine.agency.label} — ${fine.agency.description}',
-                          style: text.titleLarge,
+                          style: context.text.titleLarge,
                         ),
                         label('Legal basis'),
-                        Text(fine.legalBasis, style: text.titleLarge),
+                        Text(fine.legalBasis, style: context.text.titleLarge),
                         const SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: AppColors.warning.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.warning),
+                            color: scheme.tertiaryContainer,
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radiusSm,
+                            ),
+                            border: Border.all(color: p.accent, width: 1.5),
                           ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(
-                                Icons.receipt_long,
-                                color: AppColors.warning,
+                              Icon(
+                                Icons.receipt_long_rounded,
+                                color: scheme.onTertiaryContainer,
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   'Humingi ng official ticket. Huwag magbayad '
                                   'on the spot nang walang resibo.',
-                                  style: text.titleLarge,
+                                  style: context.text.titleMedium?.copyWith(
+                                    color: scheme.onTertiaryContainer,
+                                  ),
                                 ),
                               ),
                             ],
@@ -101,13 +106,11 @@ class FineResultScreen extends StatelessWidget {
               FilledButton.icon(
                 key: const Key('ipakita'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  minimumSize: const Size.fromHeight(88),
-                  textStyle: text.displayLarge?.copyWith(fontSize: 32),
+                  minimumSize: const Size.fromHeight(84),
+                  textStyle: context.text.headlineMedium,
                 ),
                 onPressed: () => OfficerMessageScreen.open(context, fine),
-                icon: const Icon(Icons.fullscreen, size: 40),
+                icon: const Icon(Icons.fullscreen_rounded, size: 36),
                 label: const Text('IPAKITA'),
               ),
             ],

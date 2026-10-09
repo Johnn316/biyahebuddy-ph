@@ -32,30 +32,33 @@ void main() {
 
     expect(find.text('EMERGENCY'), findsOneWidget);
     expect(find.text('Naaksidente ako'), findsOneWidget);
-    expect(find.text('Tanong kay\nBuddy'), findsOneWidget);
-    expect(find.text('Na-flag\nako'), findsOneWidget);
+    expect(find.text('Tanong kay Buddy'), findsOneWidget);
+    expect(find.text('Na-flag ako'), findsOneWidget);
     expect(find.text('MMDA coding'), findsOneWidget);
     expect(find.text('NAB 1234'), findsOneWidget);
     expect(find.text('Hindi ka coding'), findsOneWidget);
     expect(tester.takeException(), isNull); // no overflow
   });
 
-  testWidgets('coding day shows AMBER (never red) "Coding ka ngayon"', (
-    tester,
-  ) async {
-    await pumpHome(tester, isCoding: true);
-    expect(find.text('Coding ka ngayon'), findsOneWidget);
-    final badge = tester.widget<Container>(
-      find
-          .ancestor(
-            of: find.text('Coding ka ngayon'),
-            matching: find.byType(Container),
-          )
-          .first,
-    );
-    expect(badge.color, AppColors.warning);
-    expect(badge.color, isNot(AppColors.emergency));
-  });
+  for (final brightness in Brightness.values) {
+    testWidgets('coding day badge is AMBER, never red ($brightness)', (
+      tester,
+    ) async {
+      tester.platformDispatcher.platformBrightnessTestValue = brightness;
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+      await pumpHome(tester, isCoding: true);
+      expect(find.text('Coding ka ngayon'), findsOneWidget);
+      final palette = brightness == Brightness.dark
+          ? AppPalette.dark
+          : AppPalette.light;
+      final badge = tester.widget<Container>(
+        find.byKey(const Key('coding-badge')),
+      );
+      final color = (badge.decoration! as BoxDecoration).color;
+      expect(color, palette.accent);
+      expect(color, isNot(palette.emergency));
+    });
+  }
 
   testWidgets('emergency is the largest button', (tester) async {
     await pumpHome(tester, isCoding: false);

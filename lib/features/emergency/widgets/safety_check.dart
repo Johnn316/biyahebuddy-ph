@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../shared/widgets/app_card.dart';
+import '../../shared/widgets/pressable.dart';
 import '../controllers/emergency_controller.dart';
 import 'emergency_common.dart';
 
@@ -12,7 +14,7 @@ class SafetyCheck extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final injured = ref.watch(injuredProvider);
-    final text = Theme.of(context).textTheme;
+    final p = context.palette;
 
     Widget choice({
       required Key key,
@@ -26,35 +28,56 @@ class SafetyCheck extends ConsumerWidget {
       return Expanded(
         child: Semantics(
           selected: selected,
-          child: selected
-              ? FilledButton.icon(
+          child: Pressable(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              decoration: BoxDecoration(
+                color: selected ? color : context.colors.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: selected ? color : context.colors.outline,
+                  width: 2,
+                ),
+                boxShadow: selected ? p.cardShadow : null,
+              ),
+              child: Material(
+                type: MaterialType.transparency,
+                borderRadius: BorderRadius.circular(18),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
                   key: key,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: color,
-                    foregroundColor: onColor,
-                    minimumSize: const Size.fromHeight(72),
-                  ),
-                  onPressed: () =>
-                      ref.read(injuredProvider.notifier).state = value,
-                  icon: Icon(icon),
-                  label: FittedBox(child: Text(label)),
-                )
-              : OutlinedButton.icon(
-                  key: key,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: BorderSide(color: color, width: 3),
-                    minimumSize: const Size.fromHeight(72),
-                    textStyle: text.labelLarge,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSizes.radius),
+                  onTap: () => ref.read(injuredProvider.notifier).state = value,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 76),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(icon, color: selected ? onColor : color),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              label,
+                              textAlign: TextAlign.center,
+                              style: context.text.titleMedium?.copyWith(
+                                color: selected
+                                    ? onColor
+                                    : context.colors.onSurface,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  onPressed: () =>
-                      ref.read(injuredProvider.notifier).state = value,
-                  icon: Icon(icon),
-                  label: FittedBox(child: Text(label)),
                 ),
+              ),
+            ),
+          ),
         ),
       );
     }
@@ -62,45 +85,66 @@ class SafetyCheck extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Ligtas ka ba?', style: text.displayLarge?.copyWith(fontSize: 36)),
+        Text('Ligtas ka ba?', style: context.text.displaySmall),
         const SizedBox(height: 12),
         Row(
           children: [
             choice(
               key: const Key('injured-yes'),
               label: 'May sugatan',
-              icon: Icons.personal_injury,
+              icon: Icons.personal_injury_rounded,
               value: true,
-              color: AppColors.emergency,
-              onColor: Colors.white,
+              color: p.emergency,
+              onColor: p.onEmergency,
             ),
             const SizedBox(width: 12),
             choice(
               key: const Key('injured-no'),
               label: 'Walang sugatan',
-              icon: Icons.health_and_safety,
+              icon: Icons.health_and_safety_rounded,
               value: false,
-              color: AppColors.ok,
-              onColor: Colors.black,
+              color: p.success,
+              onColor: p.onSuccess,
             ),
           ],
         ),
-        if (injured == true) ...[
-          const SizedBox(height: 12),
-          FilledButton.icon(
-            key: const Key('call-911'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.emergency,
-              foregroundColor: Colors.white,
-              minimumSize: const Size.fromHeight(96),
-              textStyle: text.displayLarge?.copyWith(fontSize: 32),
-              side: const BorderSide(color: Colors.white, width: 3),
-            ),
-            onPressed: () => dialNumber(context, ref, '911'),
-            icon: const Icon(Icons.call, size: 40),
-            label: const Text('Tumawag sa 911'),
-          ),
-        ],
+        AnimatedSize(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+          child: injured == true
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: AppCard(
+                    tapKey: const Key('call-911'),
+                    gradient: p.emergencyGradient,
+                    onTap: () => dialNumber(context, ref, '911'),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.call_rounded,
+                          size: 40,
+                          color: p.onEmergency,
+                        ),
+                        const SizedBox(width: 12),
+                        Flexible(
+                          child: Text(
+                            'Tumawag sa 911',
+                            style: context.text.headlineLarge?.copyWith(
+                              color: p.onEmergency,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
       ],
     );
   }
