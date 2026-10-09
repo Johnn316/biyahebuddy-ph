@@ -7,6 +7,16 @@ import 'vector_index.dart';
 /// Laws and fines an answer cites.
 typedef Retrieved = ({List<LawChunk> laws, List<Fine> fines});
 
+/// Why retrieval chose what it did (debug/eval only, see [HybridRetriever.onTrace]).
+typedef RetrievalTrace = ({
+  Set<Intent> intents,
+  bool asksFine,
+  bool enforcerOnly,
+  List<({String id, double score})> laws,
+  List<({String violation, double score})> fines,
+  List<({String text, double score, List<String> sections})> faq,
+});
+
 /// Hybrid retrieval: FTS5 keywords + semantic vectors (multilingual
 /// embeddings), fused with reciprocal rank fusion, steered by intent and
 /// boosted by strong FAQ matches. Falls back to keywords alone if the
@@ -39,6 +49,14 @@ class HybridRetriever {
   /// Score multiplier for laws that fit the question's intent.
   static const _intentBoost = 1.25;
 
+  /// Debug/eval hook (tools/eval/ask.dart): called after each retrieval with
+  /// the fused scores. Null in the app; never changes the result.
+  void Function(RetrievalTrace trace)? onTrace;
+  List<({String id, double score})> _traceLaws = const [];
+  List<({String violation, double score})> _traceFines = const [];
+  List<({String text, double score, List<String> sections})> _traceFaq =
+      const [];
+
   Future<Retrieved> retrieve(String question, {required bool aboutFine}) async {
     final intents = classifyIntent(question);
     final asksFine = aboutFine || intents.contains(Intent.fine);
@@ -65,7 +83,24 @@ class HybridRetriever {
         ],
       ],
     );
+    _emitTrace(intents, asksFine: asksFine, enforcerOnly: enforcerOnly);
     return (laws: laws, fines: [for (final (_, f) in fines) f]);
+  }
+
+  void _emitTrace(
+    Set<Intent> intents, {
+    required bool asksFine,
+    required bool enforcerOnly,
+  }) {
+    onTrace?.call((
+      intents: intents,
+      asksFine: asksFine,
+      enforcerOnly: enforcerOnly,
+      laws: _traceLaws,
+      fines: _traceFines,
+      faq: _traceFaq,
+    ));
+    _traceFines = const [];
   }
 
   Future<Retrieved> retrieveTwoSides(String driverA, String driverB) async {
@@ -74,10 +109,9 @@ class HybridRetriever {
       ..remove(Intent.general)
       ..add(Intent.accident);
     final vectors = await _embedAll([driverA, driverB, both]);
-    return (
-      laws: _laws(both, vectors, intents, citedByFines: const []),
-      fines: const <Fine>[],
-    );
+    final laws = _laws(both, vectors, intents, citedByFines: const []);
+    _emitTrace(intents, asksFine: false, enforcerOnly: false);
+    return (laws: laws, fines: const <Fine>[]);
   }
 
   Future<List<List<double>>> _embedAll(List<String> texts) async {
@@ -110,10 +144,12 @@ class HybridRetriever {
     addRanked(keyword.laws(question, k: _depth).map((c) => c.id));
     // The canonical section for the situation is always a candidate.
     addRanked([for (final i in intents) ...?intentAnchors[i]]);
+    final faqSeen = <({String text, double score, List<String> sections})>[];
     for (final v in vectors) {
       addRanked(index.topLaws(v, _depth).map((e) => e.id));
-      final faq = index
-          .topFaq(v, 3)
+      final top = index.topFaq(v, 3);
+      if (onTrace != null) faqSeen.addAll(top);
+      final faq = top
           .where((f) => f.score >= faqThreshold)
           .expand((f) => f.sections);
       addRanked(faq, weight: 2);
@@ -131,6 +167,12 @@ class HybridRetriever {
 
     final ranked = scores.keys.toList()
       ..sort((a, b) => scores[b]!.compareTo(scores[a]!));
+    if (onTrace != null) {
+      _traceLaws = [
+        for (final id in ranked.take(8)) (id: id, score: scores[id]!),
+      ];
+      _traceFaq = faqSeen;
+    }
     final chunks = keyword.lawsByIds(ranked.take(lawsK * 3).toList());
     final seenSections = <String>{};
     return chunks
@@ -183,6 +225,11 @@ class HybridRetriever {
     }
     var ranked = scores.keys.toList()
       ..sort((a, b) => scores[b]!.compareTo(scores[a]!));
+    if (onTrace != null) {
+      _traceFines = [
+        for (final f in ranked.take(5)) (violation: f, score: scores[f]!),
+      ];
+    }
     if (consensusOnly) {
       final ftsTop = ftsFams.take(5).toSet();
       // Keyword evidence that names exactly one violation type in its top 5

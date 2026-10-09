@@ -55,3 +55,26 @@ Answer times are **PC CPU** times; a phone is several times slower.
 ```bash
 dart run tools/build_embeddings.dart --model models/embeddinggemma-300M-Q8_0.gguf
 ```
+
+## Ask Buddy yourself (interactive, offline)
+
+```bash
+dart run tools/eval/ask.dart            # Gemma 3 1B + EmbeddingGemma from models/
+dart run tools/eval/ask.dart --llm models/gemma-3-4b-it-Q4_K_M.gguf
+```
+
+Same pipeline as the app (`LocalAiAssistant` → intent routing, hybrid
+retrieval + FAQ boost, same prompts, citation guard, 4-section answer).
+For each question it prints the detected intent, the top law candidates and
+fine types with their fused scores (first 3 non-boilerplate laws / first 2
+fine types are cited), FAQ matches, then streams the answer exactly as the
+app shows it, with retrieval / first-text / total times.
+
+| Command | |
+|---|---|
+| *any text* | ask (Taglish / Tagalog / English) |
+| `/two` | Dalawang panig: asks Driver A, then Driver B |
+| `/bad <note>` | appends the last question, what was retrieved, the answer and your note to `tools/eval/feedback.json` — fix it, then add a similar question to `questions.json` (never `holdout.json`) |
+| `/quit` | exit |
+
+Fully offline: it only reads `assets/data/` and `models/`.
