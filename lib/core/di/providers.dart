@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/local/local_data.dart';
 import '../contracts/contracts.dart';
 import '../fakes/fakes.dart';
 
 /// Single switch: true = fakes (frontend dev), false = real backend impls.
 /// Backend flips this (or swaps individual providers) once lib/data/ is merged.
+/// When false, main() must `await LocalData.init()` before runApp.
 const bool useFakes = true;
 
 T _real<T>(String name) => throw UnimplementedError(
@@ -13,19 +15,19 @@ T _real<T>(String name) => throw UnimplementedError(
 );
 
 final profileRepositoryProvider = Provider<ProfileRepository>(
-  (ref) => useFakes ? FakeProfileRepository() : _real('ProfileRepository'),
+  (ref) => useFakes ? FakeProfileRepository() : LocalData.instance.profiles,
 );
 
 final codingServiceProvider = Provider<CodingService>(
-  (ref) => useFakes ? FakeCodingService() : _real('CodingService'),
+  (ref) => useFakes ? FakeCodingService() : LocalData.instance.coding,
 );
 
 final finesRepositoryProvider = Provider<FinesRepository>(
-  (ref) => useFakes ? FakeFinesRepository() : _real('FinesRepository'),
+  (ref) => useFakes ? FakeFinesRepository() : LocalData.instance.fines,
 );
 
 final hotlineRepositoryProvider = Provider<HotlineRepository>(
-  (ref) => useFakes ? FakeHotlineRepository() : _real('HotlineRepository'),
+  (ref) => useFakes ? FakeHotlineRepository() : LocalData.instance.hotlines,
 );
 
 final aiAssistantProvider = Provider<AiAssistant>(
