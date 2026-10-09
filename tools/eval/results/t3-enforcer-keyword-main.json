@@ -1,0 +1,543 @@
+{
+  "summary": {
+    "label": "t3-enforcer-keyword-main",
+    "retriever": "Hybrid FTS5 + embeddinggemma-300m-q8 (RRF, intent, FAQ: 0 phrasings)",
+    "llm": null,
+    "accuracy": 0.9666666666666667,
+    "lawHitRate": 0.9642857142857143,
+    "fineHitRate": 1.0,
+    "retrievalMsMedian": 71,
+    "answerMsMedian": null,
+    "answerMsMean": null,
+    "inventedCitationRate": null,
+    "answerQualityRate": null,
+    "badFormat": 0,
+    "blame": 0,
+    "shownWrong": 0,
+    "badAmount": 0,
+    "onTargetCitationRate": null,
+    "answerMsMax": null
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra4136-s42",
+        "ra4136-s44"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q02",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra10054-s3",
+        "ra10054-s5",
+        "ra10054-s7"
+      ],
+      "fines": [
+        "No / non-standard motorcycle helmet — 1st offense",
+        "Motorcycle dress code violation (slippers, sando/shorts) — 1st offense"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q03",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra10913-s4",
+        "ra10913-s10",
+        "ra10913-s8"
+      ],
+      "fines": [
+        "Distracted driving (mobile phone / gadget use) — 1st offense",
+        "Distracted driving by a public utility, school service, or hazardous-cargo vehicle driver, or within 50 m of a school"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q04",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s53",
+        "ra10586-s12",
+        "ra10586-s7"
+      ],
+      "fines": [
+        "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)",
+        "Number coding (UVVRP) violation"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q05",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra8750-s5",
+        "ra11229-s5",
+        "ra11229-s3"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q06",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s49",
+        "ra4136-s43"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q07",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s49",
+        "ra4136-s43"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q08",
+      "intent": "right_of_way",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s39",
+        "ra4136-s40",
+        "ra4136-s41"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q09",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra10586-s7",
+        "ra4136-s56-p3"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q10",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s55",
+        "ra4136-s35",
+        "ra10586-s7"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q11",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s36",
+        "ra4136-s35",
+        "ra4136-s40"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q12",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s36",
+        "ra4136-s35",
+        "ra10586-s12"
+      ],
+      "fines": [
+        "Overspeeding",
+        "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q13",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s46",
+        "ra4136-s52",
+        "ra4136-s49"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q14",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s52",
+        "ra4136-s46",
+        "ra4136-s56-p3"
+      ],
+      "fines": [
+        "Illegal parking, unattended (+ impoundment)",
+        "Illegal parking, attended by the driver"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q15",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s24",
+        "ra4136-s31",
+        "ra4136-s19"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q16",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s29",
+        "ra4136-s19",
+        "ra10586-s4"
+      ],
+      "fines": [
+        "Arrogance / discourteous conduct by driver (+ driver's seminar)",
+        "Driving without a valid driver's license or conductor's permit"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q17",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra8750-s5",
+        "ra11229-s4"
+      ],
+      "fines": [
+        "No seatbelt (driver/front passenger) — 1st offense",
+        "No child restraint system / child under 12 in front seat — 1st offense"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q18",
+      "intent": "fine",
+      "pass": false,
+      "lawHit": false,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s54",
+        "ra4136-s41",
+        "ra4136-s48"
+      ],
+      "fines": [
+        "Illegal counterflow",
+        "Illegal counterflow causing physical injury or property damage"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q19",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s48",
+        "ra10586-s6",
+        "ra4136-s49"
+      ],
+      "fines": [
+        "Reckless driving — 1st offense"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q20",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s50",
+        "ra4136-s51",
+        "ra4136-s39"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q21",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s49",
+        "ra10913-s6"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q22",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s54",
+        "ra4136-s32",
+        "ra4136-s46"
+      ],
+      "fines": [
+        "Loading/unloading in a prohibited zone",
+        "Overloading (passengers or cargo)"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q23",
+      "intent": "accident",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s7",
+        "ra4136-s53",
+        "ra10586-s6"
+      ],
+      "fines": [
+        "Driving under the influence of alcohol/drugs, no injury (minimum fine; up to ₱80,000 + 3 months jail)"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q24",
+      "intent": "enforcer",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra10586-s6",
+        "ra10586-s7",
+        "ra10586-s8"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q25",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s57",
+        "ra4136-s50",
+        "ra10054-s3"
+      ],
+      "fines": [
+        "Number coding (UVVRP) violation",
+        "Motorcycle dress code violation (slippers, sando/shorts) — 1st offense"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q26",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": true,
+      "laws": [
+        "ra4136-s34-p3",
+        "ra4136-s37",
+        "ra4136-s49"
+      ],
+      "fines": [
+        "Disregarding traffic signs (incl. beating the red light)",
+        "Defective motor vehicle accessories (lights, mirrors, horn)"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q27",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra4136-s54",
+        "ra4136-s32"
+      ],
+      "fines": [
+        "No seatbelt (driver/front passenger) — 1st offense",
+        "Overloading (passengers or cargo)"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q28",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s18",
+        "ra4136-s34-p2",
+        "ra4136-s7-p3"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q29",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s42",
+        "ra4136-s45",
+        "ra4136-s55"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "q30",
+      "intent": "two_sides",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "laws": [
+        "ra4136-s39",
+        "ra4136-s40",
+        "ra4136-s42"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    }
+  ]
+}

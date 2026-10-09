@@ -231,3 +231,4 @@ analysis appears in the shown law/fines.
 | Baseline on `main` (reproduced) | 86.7% (26/30) | 80.0% (8/10) | 4/4 retrieval, 4/4 quality, every run |
 | 1. Enforcer-only fines no longer push their laws (q23 fixed) | 90.0% (27/30) | 80.0% (8/10) | 4/4 retrieval |
 | 2. Fine→law links: tag/title evidence re-ranks each fine's top-6 nearest sections (embeddings rebuilt; q12 fixed) | 93.3% (28/30) | 80.0% (8/10) | 4/4 retrieval |
+| 3. Enforcer questions: unanimous keyword fine accepted; fine's topic links kept, penalty provision dropped; generic "to drive" verbs are stopwords (q19 fixed) | 96.7% (29/30) | 80.0% (8/10) | 4/4 retrieval |
