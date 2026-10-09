@@ -104,11 +104,7 @@ void main() {
   });
 
   Matcher unavailable(String messagePart) => throwsA(
-    isA<SosUnavailable>().having(
-      (e) => e.message,
-      'message',
-      contains(messagePart),
-    ),
+    isA<SosUnavailable>().having((e) => e.message, 'message', contains(messagePart)),
   );
 
   group('Wi-Fi tablet, no SIM', () {
@@ -124,10 +120,7 @@ void main() {
     });
 
     test('SMS throws a clear no-SIM message and sends nothing', () async {
-      await expectLater(
-        sos.smsContacts([_maria], 'SOS'),
-        unavailable('Walang SIM'),
-      );
+      await expectLater(sos.smsContacts([_maria], 'SOS'), unavailable('Walang SIM'));
       expect(device.sentTo, isNull);
     });
 
@@ -191,17 +184,11 @@ void main() {
 
     test('SMS permission denied → clear message', () async {
       device.smsPermission = false;
-      await expectLater(
-        sos.smsContacts([_maria], 'SOS'),
-        unavailable('pahintulot sa SMS'),
-      );
+      await expectLater(sos.smsContacts([_maria], 'SOS'), unavailable('pahintulot sa SMS'));
     });
 
     test('no contacts → tells user to add one', () async {
-      await expectLater(
-        sos.smsContacts([], 'SOS'),
-        unavailable('emergency contact'),
-      );
+      await expectLater(sos.smsContacts([], 'SOS'), unavailable('emergency contact'));
     });
   });
 
@@ -209,10 +196,7 @@ void main() {
     device.throwEverywhere = true;
     expect(await sos.canSendSms(), isFalse);
     expect(await sos.currentLocation(), isNull);
-    await expectLater(
-      sos.smsContacts([_maria], 'SOS'),
-      unavailable('Walang SIM'),
-    );
+    await expectLater(sos.smsContacts([_maria], 'SOS'), unavailable('Walang SIM'));
     await sos.enableVolumeTrigger(); // permission request failure ignored
     expect(device.enabledWith, [_maria]);
   });

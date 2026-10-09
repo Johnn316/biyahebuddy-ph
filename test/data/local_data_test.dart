@@ -61,18 +61,15 @@ void main() {
     db.close();
   });
 
-  test(
-    'hotlines: zone first, then nationwide; zone is case-insensitive',
-    () async {
-      final repo = AssetHotlineRepository.fromJson('''[
+  test('hotlines: zone first, then nationwide; zone is case-insensitive', () async {
+    final repo = AssetHotlineRepository.fromJson('''[
       {"name": "911", "number": "911", "zone": null},
       {"name": "MMDA", "number": "136", "zone": "NCR"},
       {"name": "NLEX", "number": "1-35000", "zone": "NLEX"}
     ]''');
-      expect((await repo.forZone('ncr')).map((h) => h.name), ['MMDA', '911']);
-      expect((await repo.forZone(null)).map((h) => h.name), ['911']);
-    },
-  );
+    expect((await repo.forZone('ncr')).map((h) => h.name), ['MMDA', '911']);
+    expect((await repo.forZone(null)).map((h) => h.name), ['911']);
+  });
 
   test('profile round-trips through shared_preferences', () async {
     SharedPreferences.setMockInitialValues({});
