@@ -78,17 +78,26 @@ void main() {
     await tester.ensureVisible(find.byKey(const Key('add-contact')));
     await tester.tap(find.byKey(const Key('add-contact')));
     await tester.pumpAndSettle();
-    expect(find.text('Contact 2'), findsOneWidget);
+    expect(find.text('CONTACT 2'), findsOneWidget);
+    // Removing asks first (Cupertino action sheet).
     await tester.ensureVisible(find.byKey(const Key('remove-contact-1')));
     await tester.tap(find.byKey(const Key('remove-contact-1')));
     await tester.pumpAndSettle();
-    expect(find.text('Contact 2'), findsNothing);
+    await tester.tap(find.byKey(const Key('sheet-cancel')));
+    await tester.pumpAndSettle();
+    expect(find.text('CONTACT 2'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('remove-contact-1')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('sheet-confirm')));
+    await tester.pumpAndSettle();
+    expect(find.text('CONTACT 2'), findsNothing);
 
     await submit(tester);
 
     // Home with the new plate.
-    expect(find.text('EMERGENCY'), findsOneWidget);
-    expect(find.text('ABC 1235'), findsOneWidget);
+    expect(find.text('SOS'), findsOneWidget);
+    expect(find.text('ABC 1235 · Motorsiklo'), findsOneWidget);
+    expect(find.textContaining(', Ana'), findsOneWidget); // greeting
 
     final prefs = await SharedPreferences.getInstance();
     final saved =
@@ -113,7 +122,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: App()));
     await tester.pumpAndSettle();
 
-    expect(find.text('EMERGENCY'), findsOneWidget);
+    expect(find.text('SOS'), findsOneWidget);
     expect(find.textContaining('Isang beses lang'), findsNothing);
   });
 }

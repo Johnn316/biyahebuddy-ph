@@ -1,5 +1,6 @@
 // Visits every screen in light + dark, at normal and largest (2.0x) font,
-// on a small and a regular phone, and fails on any overflow/exception.
+// on small/large phones and tablets (portrait + landscape), and fails on any
+// overflow/exception.
 import 'dart:async';
 
 import 'package:biyahebuddy_ph/app.dart';
@@ -28,7 +29,12 @@ typedef _Combo = ({Brightness brightness, double scale, Size size});
 final _combos = <_Combo>[
   for (final b in Brightness.values)
     for (final scale in [1.0, 2.0])
-      for (final size in const [Size(360, 640), Size(412, 915)])
+      for (final size in const [
+        Size(360, 640), // small phone
+        Size(412, 915), // large phone
+        Size(800, 1280), // tablet portrait
+        Size(1280, 800), // tablet landscape
+      ])
         (brightness: b, scale: scale, size: size),
 ];
 
@@ -87,8 +93,14 @@ class GoRouterHelper {
   final WidgetTester tester;
   final ProviderContainer container;
 
+  /// Tabs are switched with go(); full-screen routes are pushed.
   Future<void> push(String location) async {
-    unawaited(container.read(routerProvider).push(location));
+    final router = container.read(routerProvider);
+    if (location.startsWith(Routes.emergency)) {
+      unawaited(router.push(location));
+    } else {
+      router.go(location);
+    }
     await settle();
   }
 
@@ -122,7 +134,7 @@ void main() {
     group(_name(c), () {
       testWidgets('Home + Profile', (tester) async {
         final app = await _pump(tester, c);
-        expect(find.text('EMERGENCY'), findsOneWidget);
+        expect(find.text('SOS'), findsOneWidget);
         await app.push(Routes.profile);
         await app.scrollThrough();
       });

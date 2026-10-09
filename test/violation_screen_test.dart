@@ -49,7 +49,7 @@ Future<void> openViolation(
     ),
   );
   await tester.pumpAndSettle();
-  await tester.tap(find.byKey(const Key('home-violation')));
+  await tester.tap(find.byKey(const Key('tab-violation')));
   await tester.pumpAndSettle();
 }
 
@@ -68,7 +68,7 @@ void main() {
     expect(find.byKey(const Key('violation-search')), findsNothing);
 
     await tapKey(tester, 'agency-lto'); // tap 1
-    expect(find.text('Karaniwang violation'), findsOneWidget);
+    expect(find.text('KARANIWANG VIOLATION'), findsOneWidget);
     expect(find.text('Driving without a valid license'), findsOneWidget);
     // Only LTO violations.
     expect(find.text('Number coding (UVVRP) violation'), findsNothing);
@@ -96,7 +96,7 @@ void main() {
 
     await tester.enterText(find.byKey(const Key('violation-search')), 'cell');
     await tester.pumpAndSettle();
-    expect(find.text('Resulta'), findsOneWidget);
+    expect(find.text('RESULTA'), findsOneWidget);
     expect(find.text('Using mobile phone while driving'), findsOneWidget);
     expect(find.text('Driving without a valid license'), findsNothing);
 
@@ -191,13 +191,14 @@ void main() {
     );
     expect(cityChip.properties.selected, isTrue);
 
-    // Back again → step 1, then → Home.
+    // Back again → step 1 (agency picker); then the Home tab.
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text("Sino ang nag-flag sa'yo?"), findsOneWidget);
-    await tester.tap(find.byType(BackButton));
+    expect(find.byType(BackButton), findsNothing); // tab root
+    await tester.tap(find.byKey(const Key('tab-home')));
     await tester.pumpAndSettle();
-    expect(find.text('EMERGENCY'), findsOneWidget);
+    expect(find.text('SOS'), findsOneWidget);
   });
 
   testWidgets('"Hindi ko alam" opens Buddy with the question prefilled', (

@@ -85,7 +85,7 @@ Future<void> pumpChat(
   await tester.pumpAndSettle();
   // Open from Home with push so Back returns to Home.
   final router = container.read(routerProvider);
-  unawaited(router.push(location));
+  router.go(location); // Buddy is a tab
   await tester.pumpAndSettle();
 }
 
@@ -112,7 +112,7 @@ void main() {
       location: '/chat?q=${Uri.encodeQueryComponent('Na-flag ako ng LTO')}',
     );
 
-    expect(find.text('Buddy'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
     expect(find.text('Gumagana kahit walang signal'), findsOneWidget);
     expect(find.text('Magkano multa sa…'), findsOneWidget);
     expect(
@@ -163,7 +163,11 @@ void main() {
     expect(find.text(answerDisclaimer), findsOneWidget);
     expect(find.byKey(const Key('chat-stop')), findsNothing);
     expect(find.byKey(const Key('chat-send')), findsOneWidget);
-    expect(tester.getCenter(find.text('Buddy').last).dx, lessThan(412 / 2));
+    final buddyLabel = find.descendant(
+      of: find.byType(BuddyAnswer),
+      matching: find.text('Buddy'),
+    );
+    expect(tester.getTopLeft(buddyLabel).dx, lessThan(412 / 4));
   });
 
   testWidgets('stop mid-stream keeps partial answer and re-enables send', (
@@ -269,7 +273,17 @@ void main() {
     expect(find.text('Ano ang sinasabi ng batas'), findsOneWidget);
     expect(find.text(answerDisclaimer), findsOneWidget);
 
+    // Cupertino action sheet: cancel keeps the result, confirm resets.
     await tester.tap(find.byKey(const Key('new-case')));
+    await tester.pumpAndSettle();
+    expect(find.text('Bagong kaso?'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('sheet-cancel')));
+    await tester.pumpAndSettle();
+    expect(find.text('Ano ang sinasabi ng batas'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('new-case')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('sheet-confirm')));
     await tester.pumpAndSettle();
     expect(find.text('Ano ang nangyari sa panig mo?'), findsOneWidget);
     expect(find.text('Nauna ako'), findsNothing);
@@ -300,23 +314,36 @@ void main() {
     await ai.finish();
   });
 
-  testWidgets('history clears when leaving the screen', (tester) async {
+  testWidgets('history stays while switching tabs', (tester) async {
     final ai = ControlledAi();
     await pumpChat(tester, ai: ai);
     await typeAndSend(tester, 'Unang tanong');
     ai.emit('Sagot.');
     await ai.finish();
     await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('tab-home')));
+    await tester.pumpAndSettle();
+    expect(find.text('SOS'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('tab-chat')));
+    await tester.pumpAndSettle();
     expect(find.text('Unang tanong'), findsOneWidget);
+  });
 
-    await tester.tap(find.byType(BackButton));
+  testWidgets('a new ?q= fills the box even when the tab already exists', (
+    tester,
+  ) async {
+    final ai = ControlledAi();
+    await pumpChat(tester, ai: ai);
+    await tester.tap(find.byKey(const Key('tab-home')));
     await tester.pumpAndSettle();
-    expect(find.text('EMERGENCY'), findsOneWidget);
 
-    GoRouter.of(tester.element(find.text('EMERGENCY'))).push('/chat');
+    GoRouter.of(
+      tester.element(find.text('SOS')),
+    ).go('/chat?q=${Uri.encodeQueryComponent('Na-flag ako ng MMDA')}');
     await tester.pumpAndSettle();
-    expect(find.text('Unang tanong'), findsNothing);
-    expect(find.text('Magkano multa sa…'), findsOneWidget);
+    expect(inputText(tester), 'Na-flag ako ng MMDA');
+    expect(ai.asked, isEmpty);
   });
 
   testWidgets('real fake AI renders all 4 sections + citation', (tester) async {

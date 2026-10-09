@@ -95,23 +95,31 @@ anyone is hurt. `analyzeTwoSides` stays neutral between Driver A and Driver B.
 
 ## UI rules
 
-- High contrast, large text, min 64dp tap targets, one-thumb use. Layouts fill
-  their space (no big empty areas) and must not overflow at the largest
-  system font — `test/screens_matrix_test.dart` checks every screen in light +
-  dark at 1.0x and 2.0x text on 360x640 and 412x915.
-- Theme lives in `lib/core/theme/` (frontend-owned): Material 3 light + dark,
-  bundled Plus Jakarta Sans (`assets/fonts/`, never runtime-fetched). ThemeMode
-  follows System by default; Light/Dark/System switch in Profile
-  (`themeModeProvider`, saved in shared_preferences).
-- **Never hardcode colors in features/.** Use `context.colors` (ColorScheme)
-  and `context.palette` (`AppPalette`: emergency, accent, success, muted,
-  cardShadow). Only exception: the QR code is always black on white.
-- Red (`palette.emergency`) is ONLY for emergency actions. Warnings (e.g.
-  "Coding ka ngayon") use amber `palette.accent`; safe/OK states use green
-  `palette.success`.
-- Shared UI building blocks: `lib/features/shared/widgets/` (`AppCard`,
-  `SectionTitle`, `Pressable`, `ScaleDownToFit`).
-- Home: status strip → red gradient EMERGENCY hero → two equal action cards.
+- iOS-inspired design (not a copy of any app): iOS system colors, inset
+  grouped lists (`GroupedSection` / `GroupedTile`), large titles, Cupertino
+  icons/transitions/segmented controls/action sheets, haptics on primary taps,
+  very soft shadows (none in dark). `ThemeData.platform = iOS` on purpose.
+- Navigation: floating frosted tab bar (Home · Buddy · Na-flag · Profile) via
+  `StatefulShellRoute` in `core/router` (`features/shell/main_shell.dart`).
+  Emergency, QR, IPAKITA and onboarding are full-screen above the tab bar
+  (push on the root navigator). Tab screens must pad their bottom by
+  `MediaQuery.paddingOf(context).bottom` (body extends behind the bar).
+- Large, high contrast, one-thumb use. Layouts fill their space and must not
+  overflow at the largest system font. Tests: `test/screens_matrix_test.dart`
+  (every screen × light/dark × 1.0x/2.0x × phones + tablets) and
+  `test/home_fit_test.dart` (Home fully visible above the tab bar).
+- Tablets: content is centered at max 640dp (`ContentWidth`).
+- Theme lives in `lib/core/theme/` (frontend-owned). Bundled Plus Jakarta Sans
+  (never runtime-fetched). ThemeMode follows System by default; Profile has
+  "Sundin ang system" switch + Light/Dark (`themeModeProvider`, persisted).
+- **Never hardcode colors in features/.** Use `context.colors` and
+  `context.palette` (`AppPalette`). Exceptions: QR always black on white;
+  IPAKITA always uses the dark theme.
+- Red (`palette.emergency`, #FF3B30) is ONLY for SOS/emergency — not even
+  for validation errors (those are amber). Coding badge + citations = amber
+  `palette.accent`; safe/OK = green `palette.success`; links = #0A84FF.
+- Reduce motion: the SOS rings stop pulsing; widget tests run with reduce
+  motion on (`test/flutter_test_config.dart`).
 
 ## Workflow rule
 
@@ -133,6 +141,7 @@ _Last updated: 2026-10-09_
 | Na-flag ako (agency → violation → result, mic search, IPAKITA officer screen) | John | ✅ On fakes — branch `frontend/violation` |
 | Tanong kay Buddy (chat + Dalawang panig, streaming, 4-section answers, mic) | John | ✅ On fakes — branch `frontend/chat` |
 | UI refresh (light/dark theme, bundled font, modern cards, theme switch) | John | ✅ branch `frontend/ui-refresh` |
+| iOS-style redesign (tab bar, SOS hero, grouped lists, iMessage chat) | John | ✅ branch `frontend/ios-redesign` — touches `core/router` (tabs) |
 | Local DB + JSON loaders | Backend | ⬜ Not started |
 | CodingService (real) | Backend | ⬜ Not started |
 | AI / RAG (LLM package TBD after spike) | Backend | ⬜ Not started |

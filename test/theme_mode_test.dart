@@ -40,9 +40,15 @@ void main() {
     await pumpApp(tester);
     expect(appBrightness(tester), Brightness.light); // follows system
 
-    await tester.tap(find.byKey(const Key('home-profile')));
+    await tester.tap(find.byKey(const Key('tab-profile')));
     await tester.pumpAndSettle();
-    expect(find.text('Itsura ng app'), findsOneWidget);
+    expect(find.text('ITSURA'), findsOneWidget);
+    expect(find.text('Light'), findsNothing); // hidden while following system
+
+    // Turn off "Sundin ang system" → Light/Dark control appears.
+    await tester.tap(find.byKey(const Key('theme-follow-system')));
+    await tester.pumpAndSettle();
+    expect(find.text('Light'), findsOneWidget);
 
     await tester.tap(find.text('Dark'));
     await tester.pumpAndSettle();
@@ -50,9 +56,11 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getString(ThemeModeController.prefsKey), 'dark');
 
-    await tester.tap(find.text('System'));
+    // Back to System.
+    await tester.tap(find.byKey(const Key('theme-follow-system')));
     await tester.pumpAndSettle();
     expect(appBrightness(tester), Brightness.light);
+    expect(prefs.getString(ThemeModeController.prefsKey), 'system');
   });
 
   testWidgets('saved choice is restored on launch', (tester) async {
