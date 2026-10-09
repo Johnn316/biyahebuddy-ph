@@ -1,0 +1,97 @@
+{
+  "ra4136": {
+    "name": "RA 4136 (Land Transportation and Traffic Code)",
+    "file": "ra_4136_1964.html",
+    "attempts": [
+      {
+        "url": "https://lawphil.net/statutes/repacts/ra1964/ra_4136_1964.html",
+        "status": 200,
+        "blocked": false
+      }
+    ],
+    "url": "https://lawphil.net/statutes/repacts/ra1964/ra_4136_1964.html",
+    "retrieved": "2026-10-09",
+    "sha256": "b075cde45fae2189e3ee46af4c4df4308713ad735e2adbdeaadf6130e55df6ac"
+  },
+  "ra10913": {
+    "name": "RA 10913 (Anti-Distracted Driving Act)",
+    "file": "ra_10913_2016.html",
+    "attempts": [
+      {
+        "url": "https://lawphil.net/statutes/repacts/ra2016/ra_10913_2016.html",
+        "status": 200,
+        "blocked": false
+      }
+    ],
+    "url": "https://lawphil.net/statutes/repacts/ra2016/ra_10913_2016.html",
+    "retrieved": "2026-10-09",
+    "sha256": "af474ed2be8aa8ba98ac7013380195f018f346986a443224b79d2994a09d344d"
+  },
+  "ra10586": {
+    "name": "RA 10586 (Anti-Drunk and Drugged Driving Act of 2013)",
+    "file": "ra_10586_2013.html",
+    "attempts": [
+      {
+        "url": "https://lawphil.net/statutes/repacts/ra2013/ra_10586_2013.html",
+        "status": 200,
+        "blocked": false
+      }
+    ],
+    "url": "https://lawphil.net/statutes/repacts/ra2013/ra_10586_2013.html",
+    "retrieved": "2026-10-09",
+    "sha256": "8aaa7db392324bcb1b09ed8900b371f7670d6e83d00553f71eafe565c1fdcb6c"
+  },
+  "ra10054": {
+    "name": "RA 10054 (Motorcycle Helmet Act of 2009)",
+    "file": "ra_10054_2010.html",
+    "attempts": [
+      {
+        "url": "https://lawphil.net/statutes/repacts/ra2010/ra_10054_2010.html",
+        "status": 200,
+        "blocked": false
+      }
+    ],
+    "url": "https://lawphil.net/statutes/repacts/ra2010/ra_10054_2010.html",
+    "retrieved": "2026-10-09",
+    "sha256": "e16fd37867e46dcddbdccb4924275ea8b597cfb2ad49cbf5418e2d0f3404301b"
+  },
+  "ra8750": {
+    "name": "RA 8750 (Seat Belts Use Act of 1999)",
+    "file": "ra_8750_1999.html",
+    "attempts": [
+      {
+        "url": "https://lawphil.net/statutes/repacts/ra1999/ra_8750_1999.html",
+        "status": 200,
+        "blocked": false
+      }
+    ],
+    "url": "https://lawphil.net/statutes/repacts/ra1999/ra_8750_1999.html",
+    "retrieved": "2026-10-09",
+    "sha256": "92c84de540e1a5b60e7ecf07ad618ef9c705502b749526abc779856da3f712ba"
+  },
+  "ra11229": {
+    "name": "RA 11229 (Child Safety in Motor Vehicles Act)",
+    "file": "ra_11229_2019.html",
+    "attempts": [
+      {
+        "url": "https://lawphil.net/statutes/repacts/ra2019/ra_11229_2019.html",
+        "status": 200,
+        "blocked": false
+      }
+    ],
+    "url": "https://lawphil.net/statutes/repacts/ra2019/ra_11229_2019.html",
+    "retrieved": "2026-10-09",
+    "sha256": "8e3b47e603e9316adc7ab7afd0ac5cc4a5d89bac14872a37b5ade1baa5307e60"
+  },
+  "lto-manual": {
+    "name": "LTO Driver's Manual",
+    "file": "lto_drivers_manual.pdf",
+    "attempts": [
+      {
+        "url": "https://lto.gov.ph/",
+        "status": 403,
+        "blocked": true
+      }
+    ]
+  }
+}

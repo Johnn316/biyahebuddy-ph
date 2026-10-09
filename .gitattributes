@@ -3,3 +3,5 @@
 *.jpg binary
 *.jar binary
 *.bat text eol=crlf
+# Keep downloaded sources byte-identical to manifest.json sha256
+data_sources/raw/** -text

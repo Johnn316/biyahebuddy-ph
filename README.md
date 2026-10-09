@@ -29,6 +29,23 @@ flutter build apk --debug
 The app runs entirely on **fakes** by default (`useFakes = true` in
 `lib/core/di/providers.dart`).
 
+## How to rebuild data
+
+`assets/data/laws.json` is generated from official law texts — don't edit it
+by hand.
+
+```bash
+pip install -r tools/requirements.txt
+python3 tools/build_data.py --download   # re-fetch sources into data_sources/raw/, then build
+python3 tools/build_data.py              # rebuild from the files already in data_sources/raw/
+```
+
+The script splits each law by Section, strips site headers/footers and
+signature blocks, adds Taglish `tags`, notes amended sections, validates the
+output (valid JSON, no empty chunks, every chunk has a `url`) and prints chunk
+counts. Sources and blocked sites are listed in [docs/SOURCES.md](docs/SOURCES.md).
+The build needs internet only with `--download`; the app itself stays offline.
+
 ## Team
 
 | Who | Role | Owns |
