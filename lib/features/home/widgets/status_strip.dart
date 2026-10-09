@@ -37,64 +37,75 @@ class StatusStrip extends ConsumerWidget {
         ? Colors.black
         : Colors.white;
 
-    return Semantics(
-      container: true,
-      label: 'MMDA coding. Plate $plate. $badge.',
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppSizes.radius),
-          border: Border.all(color: color, width: 3),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'MMDA coding',
-                        style: text.bodyMedium?.copyWith(color: Colors.white70),
-                      ),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          plate,
-                          style: text.headlineMedium?.copyWith(
-                            letterSpacing: 1.5,
+    // Strip text is already large; cap system font scaling so it can't grow
+    // taller than the screen on small phones with the largest font setting.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.25,
+      child: Semantics(
+        container: true,
+        label: 'MMDA coding. Plate $plate. $badge.',
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSizes.radius),
+            border: Border.all(color: color, width: 3),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'MMDA coding',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: text.bodyMedium?.copyWith(
+                            color: Colors.white70,
                           ),
                         ),
-                      ),
-                      if (detail != null)
-                        Text(
-                          detail,
-                          style: text.bodyMedium,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            plate,
+                            style: text.headlineMedium?.copyWith(
+                              letterSpacing: 1.5,
+                            ),
+                          ),
                         ),
-                    ],
+                        if (detail != null)
+                          Text(
+                            detail,
+                            style: text.bodyMedium,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                width: 140,
-                color: color,
-                padding: const EdgeInsets.all(8),
-                alignment: Alignment.center,
-                child: Text(
-                  badge,
-                  textAlign: TextAlign.center,
-                  style: text.titleLarge?.copyWith(color: onColor),
+                Container(
+                  width: 140,
+                  color: color,
+                  padding: const EdgeInsets.all(8),
+                  alignment: Alignment.center,
+                  child: Text(
+                    badge,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: text.titleLarge?.copyWith(color: onColor),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
