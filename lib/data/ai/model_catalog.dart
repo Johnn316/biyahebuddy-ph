@@ -1,3 +1,5 @@
+import '../../core/config/features.dart';
+
 /// On-device model files. Downloaded ONCE by [LocalModelManager]; never
 /// committed to git (see .gitignore). All sources are public and ungated,
 /// so no Hugging Face token is needed.
@@ -51,4 +53,12 @@ abstract final class ModelCatalog {
   );
 
   static const all = [llm, whisper, embedder];
+
+  /// What this build downloads: no Whisper while voice input is disabled
+  /// (LLM + embedder ≈ 1.14 GB).
+  static List<ModelSpec> get enabled => [
+    llm,
+    embedder,
+    if (kVoiceInputEnabled) whisper,
+  ];
 }

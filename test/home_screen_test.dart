@@ -3,7 +3,6 @@ import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
 import 'package:biyahebuddy_ph/core/theme/app_theme.dart';
 import 'package:biyahebuddy_ph/features/home/controllers/home_controller.dart';
-import 'package:biyahebuddy_ph/features/home/widgets/sos_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,109 +33,177 @@ Future<void> tapKey(WidgetTester tester, String key) async {
   await tester.pumpAndSettle();
 }
 
+String chatInput(WidgetTester tester) => tester
+    .widget<TextField>(find.byKey(const Key('chat-input')))
+    .controller!
+    .text;
+
 void main() {
-  testWidgets('Home: greeting, plate, coding pill, SOS, pills, shortcuts', (
+  testWidgets('Home dashboard: top bar, vehicle, Ask hero, cards, SOS bar', (
     tester,
   ) async {
     await pumpHome(tester, isCoding: false);
 
-    expect(
-      find.textContaining(RegExp(r'^Magandang .+, Juan$')),
-      findsOneWidget,
-    );
-    expect(find.text('NAB 1234 · Kotse'), findsOneWidget);
-    expect(find.text('MMDA coding'), findsOneWidget);
-    expect(find.text('Hindi ka coding'), findsOneWidget);
-    expect(find.text('SOS'), findsOneWidget);
-    expect(find.text('Pindutin kapag naaksidente'), findsOneWidget);
-    expect(find.text('Ibahagi lokasyon'), findsOneWidget);
-    expect(find.text('QR Exchange'), findsOneWidget);
+    // Top bar: app mark + initials avatar.
+    expect(find.text('BiyaheBuddy PH'), findsOneWidget);
+    expect(find.text('JD'), findsOneWidget);
+    // Sasakyan mo: plate, vehicle, one status line.
+    expect(find.text('SASAKYAN MO'), findsOneWidget);
+    expect(find.text('NAB 1234'), findsOneWidget);
+    expect(find.text('Kotse'), findsOneWidget);
+    expect(find.text('Hindi coding'), findsOneWidget);
+    expect(find.text('I-download si Buddy'), findsOneWidget); // fakes
+    // Hero.
     expect(find.text('Tanong kay Buddy'), findsOneWidget);
+    expect(find.text("Ano'ng tanong mo sa batas trapiko?"), findsOneWidget);
+    for (final t in ['Multa', 'Helmet', 'Overtaking']) {
+      expect(find.text(t), findsOneWidget);
+    }
+    // Two cards.
     expect(find.text('Na-flag ako'), findsOneWidget);
-    // Floating tab bar.
-    for (final t in ['Home', 'Buddy', 'Na-flag', 'Profile']) {
+    expect(find.text('Alamin ang tamang multa'), findsOneWidget);
+    expect(find.text('TIP NG ARAW'), findsOneWidget);
+    // SOS bar; no QR / Lokasyon tiles, no big profile card.
+    expect(find.text('SOS'), findsOneWidget);
+    expect(find.text('Naaksidente ako'), findsOneWidget);
+    expect(find.byKey(const Key('home-qr')), findsNothing);
+    expect(find.byKey(const Key('home-share-location')), findsNothing);
+    expect(find.byKey(const Key('home-profile-card')), findsNothing);
+    for (final t in ['Home', 'Na-flag', 'Profile']) {
       expect(find.text(t), findsOneWidget);
     }
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('SOS bar: full width, compact, just above the tab bar', (
+    tester,
+  ) async {
+    await pumpHome(tester, isCoding: false);
+    final sos = tester.getRect(find.byKey(const Key('home-emergency')));
+    expect(sos.width, greaterThan(412 - 2 * 16 - 1));
+    expect(sos.height, greaterThanOrEqualTo(64)); // real-font height: fit test
+    final tabTop = tester.getRect(find.byKey(const Key('tab-home'))).top;
+    expect(sos.bottom, lessThan(tabTop));
+    expect(find.byKey(const Key('sos-pulse')), findsOneWidget);
+  });
+
+  testWidgets('cards fill the screen: no dead space above the SOS bar', (
+    tester,
+  ) async {
+    await pumpHome(tester, isCoding: false);
+    final cards = tester.getRect(find.byKey(const Key('home-violation')));
+    final sos = tester.getRect(find.byKey(const Key('home-emergency')));
+    expect(sos.top - cards.bottom, lessThan(40));
+    final tip = tester.getRect(find.byKey(const Key('home-tip')));
+    expect(tip.height, cards.height); // two equal cards
+    expect(tip.top, cards.top);
+  });
+
   test('greeting by time of day', () {
-    expect(greetingFor(DateTime(2026, 1, 1, 7)), 'Magandang umaga');
-    expect(greetingFor(DateTime(2026, 1, 1, 13)), 'Magandang hapon');
-    expect(greetingFor(DateTime(2026, 1, 1, 20)), 'Magandang gabi');
+    String at(int h, [int m = 0]) => greetingFor(DateTime(2026, 1, 1, h, m));
+    expect(at(0), 'Magandang gabi');
+    expect(at(3, 59), 'Magandang gabi');
+    expect(at(4), 'Magandang umaga');
+    expect(at(11, 59), 'Magandang umaga');
+    expect(at(12), 'Magandang hapon');
+    expect(at(17, 59), 'Magandang hapon');
+    expect(at(18), 'Magandang gabi');
+    expect(at(23, 59), 'Magandang gabi');
   });
 
   for (final brightness in Brightness.values) {
-    testWidgets('coding pill is AMBER, never red ($brightness)', (
+    testWidgets('coding status is AMBER, never red ($brightness)', (
       tester,
     ) async {
       tester.platformDispatcher.platformBrightnessTestValue = brightness;
       addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
       await pumpHome(tester, isCoding: true);
-      expect(find.text('Coding ka ngayon'), findsOneWidget);
+      expect(find.text('Coding ngayon'), findsOneWidget);
       final palette = brightness == Brightness.dark
           ? AppPalette.dark
           : AppPalette.light;
-      final badge = tester.widget<Container>(
-        find.byKey(const Key('coding-badge')),
+      final chip = find.byKey(const Key('coding-badge'));
+      final icon = tester.widget<Icon>(
+        find.descendant(of: chip, matching: find.byType(Icon)),
       );
-      final color = (badge.decoration! as BoxDecoration).color;
-      expect(color, palette.accent);
-      expect(color, isNot(palette.emergency));
+      final text = tester.widget<Text>(
+        find.descendant(of: chip, matching: find.byType(Text)),
+      );
+      expect(icon.color, palette.cautionText);
+      expect(text.style!.color, palette.cautionText);
+      expect(icon.color, isNot(palette.emergency));
     });
   }
 
-  testWidgets('SOS is a big circle (~60% of the content width)', (
+  testWidgets('SOS pulse dot is static under reduce motion', (tester) async {
+    await pumpHome(tester, isCoding: false); // reduce motion on (test config)
+    final dot = tester.widget<FadeTransition>(
+      find.byKey(const Key('sos-pulse')),
+    );
+    final v = dot.opacity.value;
+    await tester.pump(const Duration(milliseconds: 800));
+    expect(dot.opacity.value, v);
+  });
+
+  test('tip of the day skips boilerplate and is stable within a day', () {
+    final laws = [
+      {
+        'id': 'x-s1',
+        'source': 'RA 1 (X)',
+        'section': 'Sec. 1',
+        'title': 'Short Title',
+        'text': 'a' * 200,
+      },
+      {
+        'id': 'x-s2',
+        'source': 'RA 1 (X)',
+        'section': 'Sec. 2',
+        'title': 'Right of way',
+        'text': 'b' * 200,
+      },
+      {
+        'id': 'x-s3-p1',
+        'source': 'RA 1 (X)',
+        'section': 'Sec. 3',
+        'title': 'Speed',
+        'text': 'c' * 200,
+      },
+    ];
+    final tip = pickTip(laws, DateTime(2026, 10, 10, 8))!;
+    expect(tip.title, 'Right of way');
+    expect(tip.citation, 'RA 1 Sec. 2');
+    expect(pickTip(laws, DateTime(2026, 10, 10, 23))!.title, tip.title);
+  });
+
+  testWidgets('Ask field opens Buddy with the keyboard; chips prefill', (
     tester,
   ) async {
     await pumpHome(tester, isCoding: false);
-    final sos = tester.getSize(find.byKey(const Key('home-emergency')));
-    expect(sos.width, sos.height); // circle
-    expect(sos.width, greaterThan(412 * 0.5));
+    await tapKey(tester, 'home-chat');
+    expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
+    final field = tester.widget<TextField>(find.byKey(const Key('chat-input')));
+    expect(field.focusNode!.hasFocus, isTrue);
+
+    await tapKey(tester, 'tab-home');
+    await tapKey(tester, 'topic-helmet');
+    expect(chatInput(tester), 'Ano ang multa kapag walang helmet?');
   });
 
-  testWidgets('SOS rings pulse, and stop when reduce motion is on', (
-    tester,
-  ) async {
-    tester.platformDispatcher.accessibilityFeaturesTestValue =
-        const FakeAccessibilityFeatures();
-    usePhoneScreen(tester);
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          profileRepositoryProvider.overrideWithValue(
-            MemoryProfileRepository(FakeProfileRepository.sample),
-          ),
-          codingServiceProvider.overrideWithValue(
-            const FixedCodingService(isCoding: false),
-          ),
-        ],
-        child: const App(),
-      ),
-    );
-    for (var i = 0; i < 5; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-    }
-    List<Size> rings() => tester
-        .widgetList<Container>(
-          find.descendant(
-            of: find.byType(SosButton),
-            matching: find.byType(Container),
-          ),
-        )
-        .map((c) => c.constraints?.biggest ?? Size.zero)
-        .toList();
-    final before = rings();
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(rings(), isNot(before)); // animating
+  testWidgets('tapping the tip asks Buddy about that law', (tester) async {
+    await pumpHome(tester, isCoding: false);
+    await tapKey(tester, 'home-tip');
+    expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
+    expect(chatInput(tester), startsWith('Ipaliwanag ang RA '));
+  });
 
-    tester.platformDispatcher.accessibilityFeaturesTestValue =
-        const FakeAccessibilityFeatures(disableAnimations: true);
-    await tester.pump();
-    final still = rings();
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(rings(), still); // reduce motion: static
-    await tester.pumpWidget(const SizedBox()); // stop tickers
+  testWidgets('avatar and vehicle card open Profile', (tester) async {
+    await pumpHome(tester, isCoding: false);
+    await tapKey(tester, 'home-avatar');
+    expect(find.text('Profile'), findsWidgets);
+    expect(find.text('NAB 1234'), findsOneWidget); // prefilled field
+    await tapKey(tester, 'tab-home');
+    await tapKey(tester, 'home-vehicle');
+    expect(find.text('Profile'), findsWidgets);
   });
 
   testWidgets('SOS opens Emergency in one tap (no dialog); back returns', (
@@ -152,55 +219,37 @@ void main() {
     expect(find.text('SOS'), findsOneWidget);
   });
 
-  testWidgets('shortcut rows and tab bar switch tabs', (tester) async {
+  testWidgets('Na-flag card and tab bar switch tabs', (tester) async {
     await pumpHome(tester, isCoding: false);
-
-    await tapKey(tester, 'home-chat');
+    await tapKey(tester, 'home-violation');
+    expect(find.text("Sino ang nag-flag sa'yo?"), findsOneWidget);
+    await tapKey(tester, 'tab-profile');
+    expect(find.text('Profile'), findsWidgets);
+    await tapKey(tester, 'tab-chat');
     expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
     await tapKey(tester, 'tab-home');
     expect(find.text('SOS'), findsOneWidget);
-
-    await tapKey(tester, 'home-violation');
-    expect(find.text("Sino ang nag-flag sa'yo?"), findsOneWidget);
-
-    await tapKey(tester, 'tab-profile');
-    expect(find.text('Profile'), findsWidgets);
-    expect(find.text('NAB 1234'), findsOneWidget); // prefilled field
-
-    await tapKey(tester, 'tab-chat');
-    expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
   });
 
-  testWidgets('"Ibahagi lokasyon" opens Emergency at the contacts', (
-    tester,
-  ) async {
-    await pumpHome(tester, isCoding: false);
-    await tapKey(tester, 'home-share-location');
-    expect(find.byKey(const Key('text-all')).hitTestable(), findsOneWidget);
-    expect(
-      find.byKey(const Key('call-contact-0')).hitTestable(),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('"QR Exchange" pill opens the full-screen QR', (tester) async {
-    await pumpHome(tester, isCoding: false);
-    await tapKey(tester, 'home-qr');
-    expect(find.text('Ipa-scan sa kabilang driver'), findsOneWidget);
-    expect(find.text('Home'), findsNothing);
-  });
-
-  testWidgets('small phone + 1.5x system font: no overflow', (tester) async {
-    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
-    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    await pumpHome(tester, isCoding: true);
-    tester.view.physicalSize = const Size(720, 1280);
-    tester.view.devicePixelRatio = 2.0;
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
-    expect(
-      tester.getSize(find.byKey(const Key('home-emergency'))).height,
-      greaterThan(120),
-    );
-  });
+  for (final scale in [1.5, 2.0]) {
+    testWidgets('small phone + ${scale}x font: no overflow, SOS visible', (
+      tester,
+    ) async {
+      tester.platformDispatcher.textScaleFactorTestValue = scale;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await pumpHome(tester, isCoding: true);
+      tester.view.physicalSize = const Size(720, 1280);
+      tester.view.devicePixelRatio = 2.0;
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.byKey(const Key('home-emergency')).hitTestable(), findsOne);
+      // Everything reachable by scrolling the middle.
+      await tester.dragUntilVisible(
+        find.byKey(const Key('home-tip')),
+        find.byKey(const Key('home-scroll')),
+        const Offset(0, -200),
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

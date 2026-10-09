@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/config/features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../shared/speech/mic_controller.dart';
 
 const chatMicKey = 'chat';
 
-/// Bottom input (thumb zone): big mic, pill text box, send — or a full-width
-/// action button when [actionLabel] is set (two-sides steps). While
-/// [streaming], send is disabled and a stop button is shown.
+/// Bottom input (thumb zone): rounded text pill with the send button inside
+/// (mic on the left only when [kVoiceInputEnabled]) — or a full-width action
+/// button when [actionLabel] is set (two-sides steps). While [streaming],
+/// send is replaced by a stop button.
 /// Transparent: the parent provides the frosted background.
 class ChatInputBar extends ConsumerWidget {
   const ChatInputBar({
@@ -90,6 +92,33 @@ class ChatInputBar extends ConsumerWidget {
           ),
         );
 
+        // Send / stop live inside the pill (iMessage-style).
+        final inlineButton = actionLabel != null
+            ? null
+            : Padding(
+                padding: const EdgeInsets.all(5),
+                child: streaming
+                    ? round(
+                        key: const Key('chat-stop'),
+                        tooltip: 'Itigil',
+                        bg: scheme.inverseSurface,
+                        fg: scheme.onInverseSurface,
+                        size: 44,
+                        onPressed: onStop,
+                        icon: const Icon(CupertinoIcons.stop_fill, size: 20),
+                      )
+                    : round(
+                        key: const Key('chat-send'),
+                        tooltip: 'Ipadala',
+                        bg: p.primaryFill,
+                        fg: p.onPrimaryFill,
+                        size: 44,
+                        onPressed: canSend ? submit : null,
+                        icon: const Icon(CupertinoIcons.arrow_up, size: 22),
+                      ),
+              );
+        final pill = BorderRadius.circular(AppRadius.lg + 2);
+
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -97,31 +126,33 @@ class ChatInputBar extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                round(
-                  key: const Key('chat-mic'),
-                  tooltip: listening ? 'Itigil at isulat' : 'Magsalita',
-                  bg: listening ? p.accent : scheme.primary,
-                  fg: listening ? p.onAccent : scheme.onPrimary,
-                  size: 60,
-                  onPressed: mic == MicPhase.transcribing
-                      ? null
-                      : () => _toggleMic(context, ref),
-                  icon: mic == MicPhase.transcribing
-                      ? const CupertinoActivityIndicator()
-                      : Icon(
-                          listening
-                              ? CupertinoIcons.stop_fill
-                              : CupertinoIcons.mic_fill,
-                          size: 30,
-                        ),
-                ),
-                const SizedBox(width: 10),
+                if (kVoiceInputEnabled) ...[
+                  round(
+                    key: const Key('chat-mic'),
+                    tooltip: listening ? 'Itigil at isulat' : 'Magsalita',
+                    bg: listening ? p.accent : p.primaryFill,
+                    fg: listening ? p.onAccent : p.onPrimaryFill,
+                    size: 54,
+                    onPressed: mic == MicPhase.transcribing
+                        ? null
+                        : () => _toggleMic(context, ref),
+                    icon: mic == MicPhase.transcribing
+                        ? const CupertinoActivityIndicator()
+                        : Icon(
+                            listening
+                                ? CupertinoIcons.stop_fill
+                                : CupertinoIcons.mic_fill,
+                            size: 26,
+                          ),
+                  ),
+                  const SizedBox(width: AppSpace.xs),
+                ],
                 Expanded(
                   child: TextField(
                     key: const Key('chat-input'),
                     controller: controller,
                     focusNode: focusNode,
-                    style: context.text.titleMedium,
+                    style: context.text.bodyLarge,
                     minLines: 1,
                     maxLines: 4,
                     textInputAction: TextInputAction.send,
@@ -130,24 +161,34 @@ class ChatInputBar extends ConsumerWidget {
                       filled: true,
                       fillColor: scheme.surface,
                       isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 16,
+                      contentPadding: const EdgeInsets.fromLTRB(
+                        AppSpace.md + 2,
+                        16,
+                        AppSpace.xs,
+                        16,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(color: scheme.outline),
+                        borderRadius: pill,
+                        borderSide: BorderSide(color: p.controlOutline),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: pill,
                         borderSide: BorderSide(
                           color: scheme.outline,
                           width: 0.5,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(color: scheme.primary),
+                        borderRadius: pill,
+                        borderSide: BorderSide(
+                          color: scheme.primary,
+                          width: 1.5,
+                        ),
+                      ),
+                      suffixIcon: inlineButton,
+                      suffixIconConstraints: const BoxConstraints(
+                        minWidth: 54,
+                        minHeight: 54,
                       ),
                       hintText: switch (mic) {
                         MicPhase.listening => 'Nakikinig… (pindutin ulit)',
@@ -157,26 +198,6 @@ class ChatInputBar extends ConsumerWidget {
                     ),
                   ),
                 ),
-                if (actionLabel == null) ...[
-                  const SizedBox(width: 8),
-                  streaming
-                      ? round(
-                          key: const Key('chat-stop'),
-                          tooltip: 'Itigil',
-                          bg: scheme.inverseSurface,
-                          fg: scheme.onInverseSurface,
-                          onPressed: onStop,
-                          icon: const Icon(CupertinoIcons.stop_fill, size: 24),
-                        )
-                      : round(
-                          key: const Key('chat-send'),
-                          tooltip: 'Ipadala',
-                          bg: scheme.primary,
-                          fg: scheme.onPrimary,
-                          onPressed: canSend ? submit : null,
-                          icon: const Icon(CupertinoIcons.arrow_up, size: 26),
-                        ),
-                ],
               ],
             ),
             if (actionLabel != null) ...[

@@ -11,7 +11,7 @@ class UserBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = context.colors;
+    final p = context.palette;
     return Align(
       alignment: Alignment.centerRight,
       child: ConstrainedBox(
@@ -31,7 +31,7 @@ class UserBubble extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
               decoration: BoxDecoration(
-                color: scheme.primary,
+                color: p.primaryFill,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(22),
                   topRight: Radius.circular(22),
@@ -41,9 +41,7 @@ class UserBubble extends StatelessWidget {
               ),
               child: Text(
                 message.text,
-                style: context.text.bodyLarge?.copyWith(
-                  color: scheme.onPrimary,
-                ),
+                style: context.text.bodyLarge?.copyWith(color: p.onPrimaryFill),
               ),
             ),
           ],

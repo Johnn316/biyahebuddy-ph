@@ -102,7 +102,7 @@ class LocalData {
     ).wait;
 
     final profiles = PrefsProfileRepository(prefs);
-    final models = LocalModelManager();
+    final models = LocalModelManager(models: ModelCatalog.enabled);
     await models.refresh();
 
     final database = AppDatabase.open(

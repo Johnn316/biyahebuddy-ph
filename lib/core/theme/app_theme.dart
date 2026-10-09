@@ -1,30 +1,33 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+export 'tokens.dart';
+
 /// Layout constants: large, one-thumb-friendly, iOS-like radii.
 abstract final class AppSizes {
   /// Minimum touch target for one-thumb use while stopped.
   static const minTap = 60.0;
   static const gap = 16.0;
 
-  /// Grouped cards, hero elements.
-  static const radius = 26.0;
+  /// Grouped cards, hero elements (DESIGN.md radius lg).
+  static const radius = 24.0;
 
-  /// Buttons, inputs, inner cards.
-  static const radiusSm = 22.0;
+  /// Buttons, inputs, inner cards (radius md).
+  static const radiusSm = 18.0;
 
-  /// Settings-style icon squares.
-  static const radiusIcon = 10.0;
+  /// Settings-style icon squares (radius xs).
+  static const radiusIcon = 8.0;
 
   /// Readable column width on tablets.
   static const maxContentWidth = 640.0;
 }
 
-/// Brand colors that ColorScheme has no slot for. Screens read these via
-/// `context.palette` — never hardcode colors in features/.
+/// Brand colors that ColorScheme has no slot for (docs/DESIGN.md §2).
+/// Screens read these via `context.palette` — never hardcode colors in
+/// features/.
 ///
-/// Rules: [emergency] (SOS red) is ONLY for emergency. Coding badge and
-/// citations use [accent] (amber). Safe/OK states use [success] (green).
+/// Rules: [emergency] (SOS red) is ONLY for SOS. Coding badge, citations and
+/// validation use [accent] (amber). Safe/OK states use [success] (green).
 @immutable
 class AppPalette extends ThemeExtension<AppPalette> {
   const AppPalette({
@@ -33,36 +36,114 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.emergencyDeep,
     required this.accent,
     required this.onAccent,
+    required this.cautionText,
     required this.success,
     required this.onSuccess,
     required this.muted,
+    required this.textTertiary,
     required this.groupedBackground,
     required this.elevated,
+    required this.sunken,
+    required this.controlOutline,
+    required this.primaryFill,
+    required this.onPrimaryFill,
+    required this.successTint,
+    required this.cautionTint,
+    required this.primaryTint,
+    required this.glass,
+    required this.highlight,
     required this.cardShadow,
+    required this.raisedShadow,
+    required this.heroStart,
+    required this.heroEnd,
+    required this.ringStart,
+    required this.ringEnd,
+    required this.plateFill,
+    required this.plateInk,
+    required this.plateBorder,
   });
 
+  /// SOS red (top of the SOS gradient). SOS surfaces only.
   final Color emergency;
   final Color onEmergency;
 
-  /// Darker end of the SOS gradient.
+  /// Darker end of the SOS gradient; small text on red sits on this.
   final Color emergencyDeep;
+
+  /// Amber fill: coding badge, law pills.
   final Color accent;
   final Color onAccent;
+
+  /// Amber used as TEXT on surfaces (darker in light mode for contrast).
+  final Color cautionText;
+
+  /// Green: safe/OK states, call buttons, Offline-ready.
   final Color success;
   final Color onSuccess;
 
-  /// Secondary label (iOS secondaryLabel, 60%).
+  /// Secondary text (textSecondary in DESIGN.md).
   final Color muted;
 
-  /// iOS grouped background (behind inset cards).
+  /// Disabled / placeholder only — never information.
+  final Color textTertiary;
+
+  /// Canvas (`bg`).
   final Color groupedBackground;
 
-  /// Raised fill on top of cards (iOS secondarySystemGroupedBackground /
-  /// tertiary): Buddy bubbles, search fields, pills.
+  /// Raised fill on a card: Buddy bubble, fields, pressed rows.
   final Color elevated;
 
-  /// Very soft (light) or none (dark).
+  /// Inset wells, segmented-control tracks.
+  final Color sunken;
+
+  /// Input/control boundaries (≥ 3:1 non-text contrast).
+  final Color controlOutline;
+
+  /// Blue for filled buttons and the user's chat bubble (white text ≥ 4.5:1).
+  /// `colorScheme.primary` is the blue for text, links and icons.
+  final Color primaryFill;
+  final Color onPrimaryFill;
+
+  /// Tinted chip backgrounds (paired with success / cautionText / primary).
+  final Color successTint;
+  final Color cautionTint;
+  final Color primaryTint;
+
+  /// Translucent fill for frosted glass (use with a blur).
+  final Color glass;
+
+  /// 0.5dp top highlight on cards in dark mode.
+  final Color highlight;
+
+  /// Level 1 (cards) and level 2 (raised) shadows; none in dark mode.
   final List<BoxShadow> cardShadow;
+  final List<BoxShadow> raisedShadow;
+
+  /// Profile hero card surface (dark: subtle blue→indigo; light: white).
+  final Color heroStart;
+  final Color heroEnd;
+
+  /// Avatar ring gradient.
+  final Color ringStart;
+  final Color ringEnd;
+
+  /// PH license-plate badge: white plate, dark ink, thin border (same in
+  /// both themes, like a real plate).
+  final Color plateFill;
+  final Color plateInk;
+  final Color plateBorder;
+
+  LinearGradient get heroGradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [heroStart, heroEnd],
+  );
+
+  LinearGradient get ringGradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [ringStart, ringEnd],
+  );
 
   LinearGradient get emergencyGradient => LinearGradient(
     begin: Alignment.topCenter,
@@ -75,57 +156,73 @@ class AppPalette extends ThemeExtension<AppPalette> {
     onEmergency: Colors.white,
     emergencyDeep: Color(0xFFD70015),
     accent: Color(0xFFFFB020),
-    onAccent: Color(0xFF000000),
-    success: Color(0xFF34C759),
-    onSuccess: Color(0xFF000000),
-    muted: Color(0x993C3C43),
-    groupedBackground: Color(0xFFF2F2F7),
-    elevated: Color(0xFFE9E9EB),
+    onAccent: Color(0xFF0B0D12),
+    cautionText: Color(0xFF8A5200),
+    success: Color(0xFF1F7A35),
+    onSuccess: Colors.white,
+    muted: Color(0xFF5A6372),
+    textTertiary: Color(0xFF8A93A3),
+    groupedBackground: Color(0xFFF2F3F7),
+    elevated: Color(0xFFE9EBF0),
+    sunken: Color(0xFFE9EBF0),
+    controlOutline: Color(0xFF7C8595),
+    primaryFill: Color(0xFF0064D6),
+    onPrimaryFill: Colors.white,
+    successTint: Color(0xFFE3F5E8),
+    cautionTint: Color(0xFFFFF1D6),
+    primaryTint: Color(0xFFE2EEFF),
+    glass: Color(0xB8FFFFFF),
+    highlight: Color(0x00FFFFFF),
     cardShadow: [
-      BoxShadow(color: Color(0x0D000000), blurRadius: 18, offset: Offset(0, 4)),
+      BoxShadow(color: Color(0x0F0B0D12), blurRadius: 2, offset: Offset(0, 1)),
     ],
+    raisedShadow: [
+      BoxShadow(color: Color(0x140B0D12), blurRadius: 24, offset: Offset(0, 8)),
+    ],
+    heroStart: Color(0xFFFFFFFF),
+    heroEnd: Color(0xFFFFFFFF),
+    ringStart: Color(0xFF0064D6),
+    ringEnd: Color(0xFF5B4BD6),
+    plateFill: Color(0xFFFFFFFF),
+    plateInk: Color(0xFF0B0D12),
+    plateBorder: Color(0xFF8A93A3),
   );
 
   static const dark = AppPalette(
     emergency: Color(0xFFFF3B30),
     onEmergency: Colors.white,
-    emergencyDeep: Color(0xFFC4141C),
+    emergencyDeep: Color(0xFFD70015),
     accent: Color(0xFFFFB020),
-    onAccent: Color(0xFF000000),
-    success: Color(0xFF34C759),
-    onSuccess: Color(0xFF000000),
-    muted: Color(0x99EBEBF5),
-    groupedBackground: Color(0xFF000000),
-    elevated: Color(0xFF2C2C2E),
+    onAccent: Color(0xFF0B0D12),
+    cautionText: Color(0xFFFFB020),
+    success: Color(0xFF30D158),
+    onSuccess: Color(0xFF0B0D12),
+    muted: Color(0xFFA7AFBD),
+    textTertiary: Color(0xFF6B7486),
+    groupedBackground: Color(0xFF0B0D12),
+    elevated: Color(0xFF202530),
+    sunken: Color(0xFF0F1218),
+    controlOutline: Color(0xFF6B7486),
+    primaryFill: Color(0xFF1F6FE5),
+    onPrimaryFill: Colors.white,
+    successTint: Color(0xFF14281B),
+    cautionTint: Color(0xFF2E2410),
+    primaryTint: Color(0xFF14223A),
+    glass: Color(0xB8161A22),
+    highlight: Color(0x0FFFFFFF),
     cardShadow: [],
+    raisedShadow: [],
+    heroStart: Color(0xFF16233D),
+    heroEnd: Color(0xFF211B42),
+    ringStart: Color(0xFF4D9BFF),
+    ringEnd: Color(0xFF8B7CFF),
+    plateFill: Color(0xFFFFFFFF),
+    plateInk: Color(0xFF0B0D12),
+    plateBorder: Color(0xFF8A93A3),
   );
 
   @override
-  AppPalette copyWith({
-    Color? emergency,
-    Color? onEmergency,
-    Color? emergencyDeep,
-    Color? accent,
-    Color? onAccent,
-    Color? success,
-    Color? onSuccess,
-    Color? muted,
-    Color? groupedBackground,
-    Color? elevated,
-    List<BoxShadow>? cardShadow,
-  }) => AppPalette(
-    emergency: emergency ?? this.emergency,
-    onEmergency: onEmergency ?? this.onEmergency,
-    emergencyDeep: emergencyDeep ?? this.emergencyDeep,
-    accent: accent ?? this.accent,
-    onAccent: onAccent ?? this.onAccent,
-    success: success ?? this.success,
-    onSuccess: onSuccess ?? this.onSuccess,
-    muted: muted ?? this.muted,
-    groupedBackground: groupedBackground ?? this.groupedBackground,
-    elevated: elevated ?? this.elevated,
-    cardShadow: cardShadow ?? this.cardShadow,
-  );
+  AppPalette copyWith() => this;
 
   @override
   AppPalette lerp(AppPalette? other, double t) {
@@ -137,12 +234,32 @@ class AppPalette extends ThemeExtension<AppPalette> {
       emergencyDeep: c(emergencyDeep, other.emergencyDeep),
       accent: c(accent, other.accent),
       onAccent: c(onAccent, other.onAccent),
+      cautionText: c(cautionText, other.cautionText),
       success: c(success, other.success),
       onSuccess: c(onSuccess, other.onSuccess),
       muted: c(muted, other.muted),
+      textTertiary: c(textTertiary, other.textTertiary),
       groupedBackground: c(groupedBackground, other.groupedBackground),
       elevated: c(elevated, other.elevated),
+      sunken: c(sunken, other.sunken),
+      controlOutline: c(controlOutline, other.controlOutline),
+      primaryFill: c(primaryFill, other.primaryFill),
+      onPrimaryFill: c(onPrimaryFill, other.onPrimaryFill),
+      successTint: c(successTint, other.successTint),
+      cautionTint: c(cautionTint, other.cautionTint),
+      primaryTint: c(primaryTint, other.primaryTint),
+      glass: c(glass, other.glass),
+      highlight: c(highlight, other.highlight),
       cardShadow: BoxShadow.lerpList(cardShadow, other.cardShadow, t) ?? [],
+      raisedShadow:
+          BoxShadow.lerpList(raisedShadow, other.raisedShadow, t) ?? [],
+      heroStart: c(heroStart, other.heroStart),
+      heroEnd: c(heroEnd, other.heroEnd),
+      ringStart: c(ringStart, other.ringStart),
+      ringEnd: c(ringEnd, other.ringEnd),
+      plateFill: c(plateFill, other.plateFill),
+      plateInk: c(plateInk, other.plateInk),
+      plateBorder: c(plateBorder, other.plateBorder),
     );
   }
 }
@@ -155,38 +272,37 @@ extension AppThemeContext on BuildContext {
 
 abstract final class AppTheme {
   static const fontFamily = 'PlusJakartaSans';
-  static const _link = Color(0xFF0A84FF);
 
   static final ThemeData light = _build(
     palette: AppPalette.light,
     scheme: const ColorScheme(
       brightness: Brightness.light,
-      primary: _link,
+      primary: Color(0xFF0064D6),
       onPrimary: Colors.white,
-      primaryContainer: Color(0xFFDDEBFF),
-      onPrimaryContainer: Color(0xFF003A80),
-      secondary: _link,
+      primaryContainer: Color(0xFFE2EEFF),
+      onPrimaryContainer: Color(0xFF00387A),
+      secondary: Color(0xFF0064D6),
       onSecondary: Colors.white,
       tertiary: Color(0xFFFFB020),
-      onTertiary: Colors.black,
+      onTertiary: Color(0xFF0B0D12),
       tertiaryContainer: Color(0xFFFFF1D6),
       onTertiaryContainer: Color(0xFF5C3B00),
       // Validation errors: amber, NOT red — red is reserved for SOS.
-      error: Color(0xFFB25E00),
+      error: Color(0xFF9A5B00),
       onError: Colors.white,
       surface: Color(0xFFFFFFFF),
-      onSurface: Color(0xFF000000),
-      onSurfaceVariant: Color(0x993C3C43),
+      onSurface: Color(0xFF0B0D12),
+      onSurfaceVariant: Color(0xFF5A6372),
       surfaceContainerLowest: Color(0xFFFFFFFF),
-      surfaceContainerLow: Color(0xFFF2F2F7),
-      surfaceContainer: Color(0xFFEFEFF4),
-      surfaceContainerHigh: Color(0xFFE9E9EB),
-      surfaceContainerHighest: Color(0xFFE5E5EA),
-      outline: Color(0xFFC6C6C8),
-      outlineVariant: Color(0xFFC6C6C8),
-      inverseSurface: Color(0xFF1C1C1E),
-      onInverseSurface: Colors.white,
-      shadow: Colors.black,
+      surfaceContainerLow: Color(0xFFF2F3F7),
+      surfaceContainer: Color(0xFFF7F8FA),
+      surfaceContainerHigh: Color(0xFFE9EBF0),
+      surfaceContainerHighest: Color(0xFFDFE2E8),
+      outline: Color(0xFFC9CED8),
+      outlineVariant: Color(0xFFC9CED8),
+      inverseSurface: Color(0xFF161A22),
+      onInverseSurface: Color(0xFFF2F4F8),
+      shadow: Color(0xFF0B0D12),
     ),
   );
 
@@ -194,31 +310,31 @@ abstract final class AppTheme {
     palette: AppPalette.dark,
     scheme: const ColorScheme(
       brightness: Brightness.dark,
-      primary: _link,
-      onPrimary: Colors.white,
-      primaryContainer: Color(0xFF0B3B73),
+      primary: Color(0xFF4D9BFF),
+      onPrimary: Color(0xFF0B0D12),
+      primaryContainer: Color(0xFF14223A),
       onPrimaryContainer: Color(0xFFD6E8FF),
-      secondary: _link,
-      onSecondary: Colors.white,
+      secondary: Color(0xFF4D9BFF),
+      onSecondary: Color(0xFF0B0D12),
       tertiary: Color(0xFFFFB020),
-      onTertiary: Colors.black,
-      tertiaryContainer: Color(0xFF3D2C0B),
+      onTertiary: Color(0xFF0B0D12),
+      tertiaryContainer: Color(0xFF2E2410),
       onTertiaryContainer: Color(0xFFFFE2A8),
       // Validation errors: amber, NOT red — red is reserved for SOS.
       error: Color(0xFFFFB020),
-      onError: Colors.black,
-      surface: Color(0xFF1C1C1E),
-      onSurface: Color(0xFFFFFFFF),
-      onSurfaceVariant: Color(0x99EBEBF5),
-      surfaceContainerLowest: Color(0xFF000000),
-      surfaceContainerLow: Color(0xFF1C1C1E),
-      surfaceContainer: Color(0xFF242426),
-      surfaceContainerHigh: Color(0xFF2C2C2E),
-      surfaceContainerHighest: Color(0xFF3A3A3C),
-      outline: Color(0xFF38383A),
-      outlineVariant: Color(0xFF38383A),
-      inverseSurface: Color(0xFFF2F2F7),
-      onInverseSurface: Colors.black,
+      onError: Color(0xFF0B0D12),
+      surface: Color(0xFF161A22),
+      onSurface: Color(0xFFF2F4F8),
+      onSurfaceVariant: Color(0xFFA7AFBD),
+      surfaceContainerLowest: Color(0xFF0B0D12),
+      surfaceContainerLow: Color(0xFF161A22),
+      surfaceContainer: Color(0xFF1B1F28),
+      surfaceContainerHigh: Color(0xFF202530),
+      surfaceContainerHighest: Color(0xFF2A303C),
+      outline: Color(0xFF343B49),
+      outlineVariant: Color(0xFF343B49),
+      inverseSurface: Color(0xFFF2F3F7),
+      onInverseSurface: Color(0xFF0B0D12),
       shadow: Colors.black,
     ),
   );
@@ -284,6 +400,8 @@ abstract final class AppTheme {
           textStyle: text.labelLarge,
           shape: pill,
           elevation: 0,
+          backgroundColor: palette.primaryFill,
+          foregroundColor: palette.onPrimaryFill,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -365,17 +483,17 @@ abstract final class AppTheme {
         );
     return TextTheme(
       // Large Title and friends.
-      displayLarge: s(48, FontWeight.w800, h: 1.05, ls: -1),
+      displayLarge: s(44, FontWeight.w800, h: 1.09, ls: -1),
       displayMedium: s(38, FontWeight.w800, h: 1.1, ls: -0.6),
       displaySmall: s(34, FontWeight.w800, h: 1.12, ls: -0.5),
-      headlineLarge: s(30, FontWeight.w800, h: 1.15, ls: -0.4),
+      headlineLarge: s(28, FontWeight.w800, h: 1.2, ls: -0.4),
       headlineMedium: s(26, FontWeight.w700, h: 1.2, ls: -0.3),
       headlineSmall: s(23, FontWeight.w700, h: 1.22, ls: -0.2),
       titleLarge: s(20, FontWeight.w700, ls: -0.2),
-      titleMedium: s(18, FontWeight.w600),
+      titleMedium: s(18, FontWeight.w700),
       titleSmall: s(16, FontWeight.w600),
-      bodyLarge: s(19, FontWeight.w500, h: 1.4),
-      bodyMedium: s(17, FontWeight.w500, h: 1.4),
+      bodyLarge: s(17, FontWeight.w500, h: 1.47),
+      bodyMedium: s(16, FontWeight.w500, h: 1.38),
       bodySmall: s(15, FontWeight.w500, h: 1.35).copyWith(color: muted),
       labelLarge: s(19, FontWeight.w700),
       labelMedium: s(15, FontWeight.w600),

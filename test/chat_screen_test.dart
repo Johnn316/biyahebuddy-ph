@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:biyahebuddy_ph/app.dart';
+import 'package:biyahebuddy_ph/core/config/features.dart';
 import 'package:biyahebuddy_ph/core/contracts/contracts.dart';
 import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
 import 'package:biyahebuddy_ph/core/router/app_router.dart';
 import 'package:biyahebuddy_ph/features/chat/controllers/answer_format.dart';
+import 'package:biyahebuddy_ph/features/chat/controllers/answer_reveal.dart';
 import 'package:biyahebuddy_ph/features/chat/widgets/buddy_answer.dart';
+import 'package:biyahebuddy_ph/features/chat/widgets/law_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -113,8 +116,9 @@ void main() {
     );
 
     expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
-    expect(find.text('Gumagana kahit walang signal'), findsOneWidget);
-    expect(find.text('Magkano multa sa…'), findsOneWidget);
+    expect(find.byKey(const Key('offline-badge')), findsOneWidget);
+    expect(find.text('Ano ang gusto mong itanong?'), findsOneWidget);
+    expect(find.text('Magkano multa pag walang helmet?'), findsOneWidget);
     expect(
       find.text('Nabangga ako, sino may mali?', skipOffstage: false),
       findsOneWidget,
@@ -133,7 +137,7 @@ void main() {
 
     expect(ai.asked, ['Sino ang may right of way?']);
     expect(find.text('Sino ang may right of way?'), findsOneWidget);
-    expect(find.text('Magkano multa sa…'), findsNothing); // chips gone
+    expect(find.text('Ano ang gusto mong itanong?'), findsNothing);
     expect(find.text('Nag-iisip si Buddy…'), findsOneWidget);
     // Streaming: send replaced by stop.
     expect(find.byKey(const Key('chat-send')), findsNothing);
@@ -206,22 +210,234 @@ void main() {
     expect(find.text(answerDisclaimer), findsOneWidget);
   });
 
-  testWidgets('quick chips: "…" fills the box, full question sends', (
+  testWidgets('suggestion cards send on tap', (tester) async {
+    final ai = ControlledAi();
+    await pumpChat(tester, ai: ai);
+    for (var i = 0; i < 4; i++) {
+      expect(find.byKey(Key('quick-$i')), findsOneWidget);
+    }
+    await tester.tap(find.byKey(const Key('quick-3')));
+    await tester.pump();
+    expect(ai.asked, ['Na-flag ako ng MMDA, ano gagawin?']);
+    expect(find.text('Na-flag ako ng MMDA, ano gagawin?'), findsOneWidget);
+  });
+
+  testWidgets('no mic anywhere in chat when voice input is disabled', (
+    tester,
+  ) async {
+    await pumpChat(tester, ai: ControlledAi());
+    expect(find.byKey(const Key('chat-mic')), findsNothing);
+    await tester.tap(find.text('Dalawang panig'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('chat-mic')), findsNothing);
+  }, skip: kVoiceInputEnabled);
+
+  group('natural reply (animations on)', () {
+    Future<void> motionOn(WidgetTester tester) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures();
+      await tester.pump();
+    }
+
+    String shownText(WidgetTester tester) => tester
+        .widgetList<RichText>(
+          find.descendant(
+            of: find.byType(BuddyAnswer),
+            matching: find.byType(RichText),
+          ),
+        )
+        .map((r) => r.text.toPlainText())
+        .join(' ');
+
+    testWidgets('typing dots first, at least 600 ms, even if ready at once', (
+      tester,
+    ) async {
+      final ai = ControlledAi();
+      await pumpChat(tester, ai: ai);
+      await motionOn(tester); // after pumpChat: Home's SOS glow never settles
+      await typeAndSend(tester, 'Tanong');
+      ai.emit(_answer);
+      await ai.finish();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byKey(const Key('typing-dots')), findsOneWidget);
+      expect(find.byKey(const Key('section-kalma')), findsNothing);
+      expect(find.byKey(const Key('chat-stop')), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byKey(const Key('typing-dots')), findsNothing);
+      // Let it finish so no ticker is left running.
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pump(const Duration(seconds: 1));
+    });
+
+    testWidgets('progressive reveal: sections appear one at a time', (
+      tester,
+    ) async {
+      final ai = ControlledAi();
+      await pumpChat(tester, ai: ai);
+      await motionOn(tester); // after pumpChat: Home's SOS glow never settles
+      await typeAndSend(tester, 'Tanong');
+      ai.emit(_answer);
+      await ai.finish();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // A few words in: Kalma is there, later sections not yet.
+      expect(find.byKey(const Key('section-kalma')), findsOneWidget);
+      expect(find.byKey(const Key('section-gagawin')), findsNothing);
+      expect(find.text(answerDisclaimer), findsNothing);
+      expect(shownText(tester), isNot(contains('Kunan ng litrato')));
+      expect(find.byKey(const Key('chat-stop')), findsOneWidget);
+
+      // ~38 words/s: the whole answer (~30 units) lands within ~1.5 s.
+      for (var i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      for (final kind in AnswerSectionKind.values) {
+        expect(find.byKey(Key('section-${kind.name}')), findsOneWidget);
+      }
+      expect(shownText(tester), contains('Kunan ng litrato'));
+      expect(find.text(answerDisclaimer), findsOneWidget);
+      expect(find.byKey(const Key('chat-stop')), findsNothing);
+      expect(find.byKey(const Key('chat-send')), findsOneWidget);
+    });
+
+    testWidgets('tap the answer while typing → full answer at once', (
+      tester,
+    ) async {
+      final ai = ControlledAi();
+      await pumpChat(tester, ai: ai);
+      await motionOn(tester); // after pumpChat: Home's SOS glow never settles
+      await typeAndSend(tester, 'Tanong');
+      ai.emit(_answer);
+      await ai.finish();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 700));
+      expect(find.byKey(const Key('section-gagawin')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('buddy-answer')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 16));
+      await tester.pump(const Duration(milliseconds: 300));
+      for (final kind in AnswerSectionKind.values) {
+        expect(find.byKey(Key('section-${kind.name}')), findsOneWidget);
+      }
+      expect(find.text(answerDisclaimer), findsOneWidget);
+      expect(find.byKey(const Key('chat-send')), findsOneWidget);
+    });
+
+    testWidgets('Stop freezes the reveal even after the stream ended', (
+      tester,
+    ) async {
+      final ai = ControlledAi();
+      await pumpChat(tester, ai: ai);
+      await motionOn(tester); // after pumpChat: Home's SOS glow never settles
+      await typeAndSend(tester, 'Tanong');
+      ai.emit(_answer);
+      await ai.finish();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 750));
+      await tester.tap(find.byKey(const Key('chat-stop')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Itinigil.'), findsOneWidget);
+      expect(find.byKey(const Key('section-gagawin')), findsNothing);
+      expect(find.byKey(const Key('chat-send')), findsOneWidget);
+    });
+  });
+
+  testWidgets('reduce motion: no typing delay, text shows as it arrives', (
+    tester,
+  ) async {
+    // flutter_test_config turns reduce motion on for every test.
+    final ai = ControlledAi();
+    await pumpChat(tester, ai: ai);
+    await typeAndSend(tester, 'Tanong');
+    ai.emit(_answer);
+    await tester.pump();
+    for (final kind in AnswerSectionKind.values) {
+      expect(find.byKey(Key('section-${kind.name}')), findsOneWidget);
+    }
+    expect(find.byKey(const Key('typing-dots')), findsNothing);
+    await ai.finish();
+    await tester.pump();
+    expect(find.text(answerDisclaimer), findsOneWidget);
+  });
+
+  testWidgets('tap a law pill → bottom sheet with the full section text', (
     tester,
   ) async {
     final ai = ControlledAi();
     await pumpChat(tester, ai: ai);
-
-    await tester.tap(find.byKey(const Key('quick-0')));
-    await tester.pump();
-    expect(inputText(tester), 'Magkano multa sa ');
-    expect(ai.asked, isEmpty);
-
-    await tester.ensureVisible(find.byKey(const Key('quick-2')));
+    await typeAndSend(tester, 'Sino ang may right of way?');
+    ai.emit(_answer);
+    await ai.finish();
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('quick-2')));
+
+    await tester.tap(find.byKey(const ValueKey('citation-RA 4136 Sec. 42')));
     await tester.pump();
-    expect(ai.asked, ['Nabangga ako, sino may mali?']);
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('law-sheet')), findsOneWidget);
+    expect(find.textContaining('Right of way'), findsOneWidget);
+    final text = tester
+        .widget<SelectableText>(find.byKey(const Key('law-sheet-text')))
+        .data!;
+    expect(text.length, greaterThan(200));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('one answer card: law = pill + 2-line excerpt + read link; '
+      'steps numbered', (tester) async {
+    final ai = ControlledAi();
+    await pumpChat(tester, ai: ai);
+    await typeAndSend(tester, 'Sino ang may right of way?');
+    ai.emit(
+      '**Kalma muna**\nOk lang.\n\n'
+      '**Ano ang sinasabi ng batas**\nMahabang paliwanag (RA 4136 Sec. 42).\n\n'
+      '**Pagsusuri**\nIkaw ang nauna.\n\n'
+      '**Ano ang gagawin**\n1. Kunan ng litrato.\n2. Tumawag sa 911.',
+    );
+    await ai.finish();
+    await tester.pumpAndSettle();
+
+    // Batas: the law text (from laws.json), not the long AI paragraph.
+    final excerpt = tester.widget<Text>(find.byKey(const Key('law-excerpt')));
+    expect(excerpt.maxLines, 2);
+    expect(find.textContaining('Mahabang paliwanag'), findsNothing);
+    expect(
+      find.byKey(const ValueKey('citation-RA 4136 Sec. 42')),
+      findsOneWidget,
+    );
+    // Gagawin: numbered rows.
+    expect(find.text('1'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    expect(find.textContaining('Kunan ng litrato'), findsOneWidget);
+    // Header: just a small Offline dot.
+    expect(find.byKey(const Key('offline-badge')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('read-law')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('law-sheet')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  test('lawIdFor maps citations to laws.json ids', () {
+    expect(lawIdFor('RA 4136 Sec. 42'), 'ra4136-s42');
+    expect(lawIdFor('R.A. No. 10913, Section 4'), 'ra10913-s4');
+    expect(lawIdFor('MMDA Reg. 96-005'), isNull);
+    expect(lawIdFor('RA 4136'), isNull);
+  });
+
+  test('revealUnits keeps headers and citations whole', () {
+    final u = revealUnits(_answer);
+    expect(u.join(), _answer);
+    expect(u, contains('**Ano ang sinasabi ng batas**\n'));
+    expect(u.any((w) => w.startsWith('RA 4136 Sec. 42')), isTrue);
+    // A header still arriving is held back.
+    expect(revealUnits('Hi.\n**Ano ang', streaming: true).join(), 'Hi.\n');
   });
 
   testWidgets('mic: tap, tap again → transcript fills the box', (tester) async {
@@ -232,7 +448,7 @@ void main() {
     await tester.tap(find.byKey(const Key('chat-mic')));
     await tester.pumpAndSettle();
     expect(inputText(tester), 'Pwede ba mag-U-turn dito?');
-  });
+  }, skip: !kVoiceInputEnabled);
 
   testWidgets('Dalawang panig: A → B → Suriin → result → Bagong kaso', (
     tester,
@@ -243,7 +459,7 @@ void main() {
     await tester.tap(find.text('Dalawang panig'));
     await tester.pumpAndSettle();
     expect(find.text('Ano ang nangyari sa panig mo?'), findsOneWidget);
-    expect(find.text('Magkano multa sa…'), findsNothing);
+    expect(find.text('Magkano multa pag walang helmet?'), findsNothing);
 
     await tester.enterText(find.byKey(const Key('chat-input')), 'Nauna ako');
     await tester.pump();
@@ -359,22 +575,26 @@ void main() {
     );
   });
 
-  testWidgets('small phone + 1.5x text: answer and input fit', (tester) async {
-    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
-    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    await pumpChat(
+  for (final scale in [1.5, 2.0]) {
+    testWidgets('small phone + ${scale}x text: answer and input fit', (
       tester,
-      ai: FakeAiAssistant(tokenDelay: Duration.zero),
-      logicalSize: const Size(360, 640),
-    );
-    expect(tester.takeException(), isNull);
-    await typeAndSend(tester, 'Nabangga ako, sino may mali?');
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
-    await tester.tap(find.text('Dalawang panig'));
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
-  });
+    ) async {
+      tester.platformDispatcher.textScaleFactorTestValue = scale;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await pumpChat(
+        tester,
+        ai: FakeAiAssistant(tokenDelay: Duration.zero),
+        logicalSize: const Size(360, 640),
+      );
+      expect(tester.takeException(), isNull);
+      await typeAndSend(tester, 'Nabangga ako, sino may mali?');
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.text('Dalawang panig'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   group('parseAnswer', () {
     test('accepts short headers and markdown variants', () {
