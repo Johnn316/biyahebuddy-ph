@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon/biyahebuddy_logo.png" alt="BiyaheBuddy PH logo" width="160">
+</p>
+
 # BiyaheBuddy PH
 
 An **offline** AI driving companion for Filipino drivers (Android, Flutter).

@@ -109,19 +109,18 @@ class BrandRow extends StatelessWidget {
       child: Row(
         key: const Key('home-brand'),
         children: [
-          Container(
-            width: compact ? 28 : 36,
-            height: compact ? 28 : 36,
-            decoration: BoxDecoration(
-              gradient: p.ringGradient,
-              borderRadius: BorderRadius.circular(
-                compact ? AppRadius.xs : AppRadius.sm,
-              ),
+          // App logo (assets/icon/biyahebuddy_logo.png), rounded.
+          ClipRRect(
+            borderRadius: BorderRadius.circular(
+              compact ? AppRadius.xs : AppRadius.sm,
             ),
-            child: Icon(
-              Icons.directions_car_filled_rounded,
-              size: compact ? 17 : 22,
-              color: p.onPrimaryFill,
+            child: Image.asset(
+              'assets/icon/biyahebuddy_logo.png',
+              key: const Key('brand-logo'),
+              width: compact ? 28 : 36,
+              height: compact ? 28 : 36,
+              filterQuality: FilterQuality.medium,
+              excludeFromSemantics: true,
             ),
           ),
           const SizedBox(width: AppSpace.sm),

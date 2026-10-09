@@ -27,7 +27,7 @@ The law text and citations in every answer are copied from `laws.json` /
 | whisper.cpp via `whisper_ggml` (MIT; bundles `ffmpeg_kit_flutter_new_min`, LGPL, for local audio conversion) | Package | Runs Whisper on the phone (included in code, disabled in this build) |
 | `record` | Package | Records 16 kHz mono WAV from the mic for Whisper (included in code, disabled in this build) |
 | Local hybrid RAG over `assets/data/laws.json` + `fines.json` (+ `faq.json` when present): sqlite FTS5/bm25 keywords with light Tagalog root matching, EmbeddingGemma vectors, reciprocal rank fusion, rule-based intent routing | Code | Picks the law sections and fines that answers cite |
-| Curated answers (`assets/data/faq.json`, 31 hand-written entries checked against `laws.json`): when a question is very close to one (EmbeddingGemma similarity ≥ 0.80, or word overlap ≥ 0.6 without the embedder), Buddy shows its hand-written Pagsusuri + 3 steps instead of generating them; the law section still comes from retrieval | Data + code | Correct, consistent answers to the most common questions, without the 1B model |
+| Curated answers (`assets/data/faq.json`, 34 hand-written entries checked against `laws.json`): when a question is very close to one (EmbeddingGemma similarity ≥ 0.80, or word overlap ≥ 0.6 without the embedder), Buddy shows its hand-written Pagsusuri + 3 steps instead of generating them; the law section still comes from retrieval | Data + code | Correct, consistent answers to the most common questions, without the 1B model |
 | `sqlite3` (bundles SQLite with FTS5), `shared_preferences`, `path_provider` | Package | Local storage, full-text search |
 | `flutter_riverpod`, `go_router` | Package | State management, navigation |
 | `geolocator` (forced onto Android LocationManager) | Package | GPS for SOS; no network geocoding. Its Android plugin includes Google's `play-services-location` library, which the app never calls, so it works without Google Play Services |
@@ -36,6 +36,7 @@ The law text and citations in every answer are copied from `laws.json` /
 | `qr_flutter` | Package | Driver profile QR card |
 | `cupertino_icons`, Material Icons | Font asset | Icons (bundled) |
 | Plus Jakarta Sans (`assets/fonts/`, SIL OFL 1.1) | Font asset | App typography; bundled, never fetched at runtime |
+| App logo (`assets/icon/`: `biyahebuddy_logo.png`, `app_icon.png`, `app_icon_foreground.png`) | Image asset | App logo: original artwork generated with Claude for this project. Bundled; launcher icons generated from it with `flutter_launcher_icons` (dev-only, build time) |
 | Android SmsManager, TelecomManager, LocationManager, MediaSession foreground service (Kotlin) | Platform API | SOS SMS/call, GPS fix, volume-button trigger (all offline; skipped with a message on devices without a SIM) |
 
 ### Data (bundled assets, sources in [SOURCES.md](SOURCES.md))
@@ -72,7 +73,7 @@ MIT) — neither ships in the app.
 | Tool | Used for |
 |---|---|
 | Claude Code | Project scaffold, backend and frontend code, refactoring, tests, docs |
-| Claude (chat) | Planning, design discussion, prompts, copywriting |
+| Claude (chat) | Planning, design discussion, prompts, copywriting, app logo artwork |
 | Devin | Legal data pipeline (`tools/build_data.py`) and data collection/structuring for `assets/data/` |
 
 All AI-generated legal content is checked against the official sources in

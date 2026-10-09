@@ -66,6 +66,7 @@ void main() {
     // Brand row: this is an AI driving buddy.
     expect(find.text('BiyaheBuddy PH'), findsOneWidget);
     expect(find.byKey(const Key('ai-badge')), findsOneWidget);
+    expect(find.byKey(const Key('brand-logo')), findsOneWidget);
     expect(find.text('AI Driving Buddy'), findsOneWidget);
     expect(
       find.text('Ang AI driving buddy mo — kahit walang signal'),
