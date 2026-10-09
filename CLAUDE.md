@@ -50,6 +50,9 @@ SDK (Flutter 3.41) can resolve.
 - **Frontend uses fakes until backend merges real implementations.** The switch
   is `useFakes` in `lib/core/di/providers.dart`; backend wires real impls there.
 - Fakes live in `lib/core/fakes/` and must keep compiling against the contracts.
+- `FinesRepository.search` queries can be typed keywords OR a whole spoken
+  sentence from `SpeechService` — real impl must handle both (fake matches
+  aliases found inside the query).
 
 ### Data schemas (`assets/data/`)
 
@@ -107,7 +110,8 @@ _Last updated: 2026-10-09_
 | Onboarding (model download + profile form) | John | ✅ On fakes |
 | Profile screen (edit + save) | John | ✅ On fakes |
 | Emergency screen (Ligtas ka ba, 911, contacts SMS+GPS, hotlines, checklist, medical, QR) | John | ✅ On fakes — branch `frontend/emergency` |
-| Violation / Chat | John | ⬜ Placeholder screens |
+| Na-flag ako (agency → violation → result, mic search, IPAKITA officer screen) | John | ✅ On fakes — branch `frontend/violation` |
+| Chat | John | ⬜ Placeholder (accepts `/chat?q=` prefill) |
 | Local DB + JSON loaders | Backend | ⬜ Not started |
 | CodingService (real) | Backend | ⬜ Not started |
 | AI / RAG (LLM package TBD after spike) | Backend | ⬜ Not started |
