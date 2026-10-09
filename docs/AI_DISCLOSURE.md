@@ -1,15 +1,44 @@
 # AI Disclosure
 
-AI tools used to build BiyaheBuddy PH:
+Every model, package, framework, API, asset and AI dev tool used in
+BiyaheBuddy PH. Update this file whenever one is added or removed.
 
-| Tool | Used for | By |
+## Runs locally
+
+Everything here works in airplane mode.
+
+| Item | Type | Purpose |
 |---|---|---|
-| Claude Code | Project scaffold, code generation, refactoring, docs | John, backend teammate |
-| Claude (chat) | Planning, design discussion, copywriting | Team |
-| Devin | Data collection/structuring for `assets/data/` | Devin |
+| On-device LLM (TBD after spike) | Model | Traffic-law Q&A, two-sides analysis |
+| Whisper (variant TBD) | Model | Local speech recognition, Filipino + English |
+| Local RAG over `assets/data/laws.json` | Asset + code | Grounds answers in cited law sections |
+| `assets/data/*.json` (laws, fines, hotlines, coding) | Asset | SAMPLE data; sources in [SOURCES.md](SOURCES.md) |
+| Flutter / Dart | Framework | App UI and logic |
+| flutter_riverpod, go_router | Package | State management, navigation |
+| sqlite3, sqlite3_flutter_libs, shared_preferences, path_provider | Package | Local storage |
+| geolocator | Package | GPS location for SOS (no network geocoding) |
+| url_launcher | Package | Opens the phone dialer / SMS app |
+| permission_handler | Package | Runtime permissions |
+| qr_flutter | Package | Driver profile QR card |
+| Android SmsManager, foreground service (Kotlin) | Platform API | SOS SMS, volume-button trigger |
 
-All AI-generated legal content (laws, fines, hotlines) is checked against the
-official sources listed in [SOURCES.md](SOURCES.md) before shipping.
+## Requires internet
 
-The in-app assistant runs an on-device LLM (model TBD); it does not send user
-data to any server.
+| Item | When | Purpose |
+|---|---|---|
+| Model download (`ModelManager.downloadModels()`) | Once, on first launch | Fetches the LLM + Whisper model files (source URL TBD) |
+
+No other feature uses the network. No cloud AI APIs are used.
+
+## AI dev tools
+
+Claude Code, Claude (chat), Devin.
+
+| Tool | Used for |
+|---|---|
+| Claude Code | Project scaffold, code generation, refactoring, docs |
+| Claude (chat) | Planning, design discussion, copywriting |
+| Devin | Data collection/structuring for `assets/data/` |
+
+All AI-generated legal content is checked against the official sources in
+[SOURCES.md](SOURCES.md) before shipping.

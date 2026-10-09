@@ -56,3 +56,10 @@ models/
 # Gradle build output under android/
 /android/build/
 /android/.gradle/
+
+# Secrets
+.env
+.env.*
+*.keystore
+*.jks
+key.properties

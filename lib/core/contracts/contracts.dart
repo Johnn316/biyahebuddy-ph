@@ -244,3 +244,19 @@ abstract interface class SosService {
   /// Native (Kotlin) foreground service: hold/press volume buttons to trigger SOS.
   Future<void> enableVolumeTrigger();
 }
+
+/// Local (on-device) speech recognition, e.g. Whisper. Filipino + English.
+/// Must never use Android's online recognizer.
+abstract interface class SpeechService {
+  Future<void> startListening();
+  Future<String> stopAndTranscribe();
+}
+
+/// Manages on-device models (LLM, speech, embeddings).
+/// The download is the ONLY network use in the app and happens once.
+abstract interface class ModelManager {
+  bool get isReady;
+
+  /// Downloads all missing models. Emits progress 0.0..1.0, completes when done.
+  Stream<double> downloadModels();
+}

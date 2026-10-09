@@ -36,6 +36,14 @@ final sosServiceProvider = Provider<SosService>(
   (ref) => useFakes ? FakeSosService() : _real('SosService'),
 );
 
+final speechServiceProvider = Provider<SpeechService>(
+  (ref) => useFakes ? FakeSpeechService() : _real('SpeechService'),
+);
+
+final modelManagerProvider = Provider<ModelManager>(
+  (ref) => useFakes ? FakeModelManager() : _real('ModelManager'),
+);
+
 // ---------------------------------------------------------------------------
 // Derived state shared by screens
 // ---------------------------------------------------------------------------

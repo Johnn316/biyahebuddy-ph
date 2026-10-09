@@ -17,11 +17,24 @@ this project's AGP 8.11 / Kotlin 2.2 setup. Don't bump it without running
 `flutter build apk --debug`. Riverpod is on 2.6.x, the newest version this
 SDK (Flutter 3.41) can resolve.
 
+## Hackathon rules (must follow)
+
+- Deadline 10:00 AM Oct 10, single submission, code freeze. Repo must be PUBLIC by then.
+- Core AI must run ON-DEVICE: local LLM, local speech recognition, local RAG. Cloud only optional/secondary.
+- Internet ONLY for one-time model download. Everything else works in airplane mode.
+- Keep docs/AI_DISCLOSURE.md updated (every model, package, framework, API, asset, AI dev tool) with sections "Runs locally" and "Requires internet".
+- Never commit secrets, .env, or model files.
+- Feature freeze 3:00 AM; bug fixes only after.
+
 ## Offline-first rule (non-negotiable)
 
 - Every feature must work with **no network**. Never add a runtime network call.
 - The only allowed network use is the **one-time on-device model download**.
 - No analytics, no cloud APIs, no remote config.
+- Speech recognition is local only (`SpeechService`, e.g. Whisper). Never use
+  Android's `SpeechRecognizer` or `speech_to_text`; they can fall back to Google's
+  online recognizer.
+- Model download goes only through `ModelManager.downloadModels()`.
 - LLM model files are never committed (`*.gguf *.task *.tflite *.bin *.litertlm models/`
   are git-ignored).
 
@@ -93,5 +106,7 @@ _Last updated: 2026-10-09_
 | Local DB + JSON loaders | Backend | ⬜ Not started |
 | CodingService (real) | Backend | ⬜ Not started |
 | AI / RAG (LLM package TBD after spike) | Backend | ⬜ Not started |
+| Local speech (`SpeechService`, Whisper) | Backend | ⬜ Contract + fake only |
+| Model download (`ModelManager`) | Backend | ⬜ Contract + fake only |
 | Native volume SOS | Backend | ⬜ Not started |
 | Verified data + SOURCES.md | Devin | ⬜ SAMPLE data only |
