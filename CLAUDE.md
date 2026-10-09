@@ -105,8 +105,8 @@ _Last updated: 2026-10-09_
 | Onboarding / Emergency / Violation / Chat / Profile | John | ⬜ Placeholder screens |
 | Local DB + JSON loaders | Backend | ⬜ Not started |
 | CodingService (real) | Backend | ⬜ Not started |
-| AI / RAG (LLM package TBD after spike) | Backend | ⬜ Not started |
-| Local speech (`SpeechService`, Whisper) | Backend | ⬜ Contract + fake only |
-| Model download (`ModelManager`) | Backend | ⬜ Contract + fake only |
+| AI / RAG — LLM spike | Backend | 🟡 `llamadart` (llama.cpp) + Gemma 3 1B Q4_K_M (806 MB). PC CPU test: load 3.5 s, first token 1.5–3.8 s, ~22 chars/s; phone numbers TBD. Taglish OK only with law chunks in prompt → Batas section must be built in code. Branch `backend/ai-spike` |
+| Local speech (`SpeechService`, Whisper) | Backend | 🟡 `whisper_ggml` + ggml-base (148 MB), lang `tl`; written, not yet run on a phone |
+| Model download (`ModelManager`) | Backend | 🟡 `LocalModelManager`: public HF URLs, no token, resumable; not yet run on a phone |
 | Native volume SOS | Backend | ⬜ Not started |
 | Verified data + SOURCES.md | Devin | ⬜ SAMPLE data only |
