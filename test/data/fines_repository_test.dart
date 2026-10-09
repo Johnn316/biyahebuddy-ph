@@ -30,11 +30,14 @@ void main() {
   Future<List<String>> names(String q, Agency a) async =>
       (await repo.search(q, a)).map((f) => f.violation).toList();
 
-  test('Taglish question finds the alias, not the other "walang" fine', () async {
-    expect(await names('Magkano multa pag walang helmet?', Agency.lto), [
-      'No helmet',
-    ]);
-  });
+  test(
+    'Taglish question finds the alias, not the other "walang" fine',
+    () async {
+      expect(await names('Magkano multa pag walang helmet?', Agency.lto), [
+        'No helmet',
+      ]);
+    },
+  );
 
   test('filters by agency', () async {
     expect(await names('helmet', Agency.mmda), isEmpty);
@@ -53,15 +56,20 @@ void main() {
 
   test('all-words matches beat single-word matches', () async {
     // "light" alone would also hit a "Light truck ban" row.
-    final db2 = AppDatabase.open(':memory:', lawsJson: '[]', finesJson: '''[
+    final db2 = AppDatabase.open(
+      ':memory:',
+      lawsJson: '[]',
+      finesJson: '''[
       {"violation": "Light truck ban violation", "agency": "mmda", "amount": 2000,
        "legal_basis": "TEST", "aliases": ["truck ban"]},
       {"violation": "Disregarding traffic signs", "agency": "mmda", "amount": 1000,
        "legal_basis": "TEST", "aliases": ["beating the red light"]}
-    ]''');
+    ]''',
+    );
     addTearDown(db2.close);
-    final hits = await SqliteFinesRepository(db2)
-        .search('beating the red light', Agency.mmda);
+    final hits = await SqliteFinesRepository(
+      db2,
+    ).search('beating the red light', Agency.mmda);
     expect(hits.map((f) => f.violation), ['Disregarding traffic signs']);
   });
 

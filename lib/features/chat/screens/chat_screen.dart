@@ -10,7 +10,6 @@ import '../../../core/di/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../shared/widgets/grouped.dart';
 import '../../shared/widgets/pressable.dart';
-import '../../shared/widgets/status_chip.dart';
 import '../controllers/chat_controller.dart';
 import '../widgets/buddy_answer.dart';
 import '../widgets/chat_input_bar.dart';
@@ -41,10 +40,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final q = GoRouterState.of(context).uri.queryParameters['q'];
-    if (q != null && q != _appliedQ) {
-      _appliedQ = q;
-      _input.text = q;
+    final uri = GoRouterState.of(context).uri;
+    if (uri.toString() == _appliedQ) return;
+    _appliedQ = uri.toString();
+    final q = uri.queryParameters['q'];
+    if (q != null) _input.text = q;
+    // Home's Ask field: open with the keyboard up.
+    if (q != null || uri.queryParameters['focus'] == '1') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _inputFocus.requestFocus();
+      });
     }
   }
 
@@ -149,7 +154,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           bottom + AppSpace.md,
         ),
         itemCount: state.visibleMessages.length,
-        separatorBuilder: (_, _) => const SizedBox(height: AppSpace.md),
+        separatorBuilder: (_, _) => const SizedBox(height: AppSpace.xl),
         itemBuilder: (_, i) {
           final m = state.visibleMessages[i];
           return m.role == ChatRole.user
@@ -185,12 +190,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             const BuddyAvatar(size: 40),
             const SizedBox(width: AppSpace.sm),
             Text('Buddy', maxLines: 1, style: context.text.titleLarge),
-            const SizedBox(width: AppSpace.xs),
-            // The badge gives way (ellipsis) before the name does.
+            const SizedBox(width: AppSpace.sm),
             Flexible(
-              child: OfflineReadyBadge(
+              child: _OfflineDot(
                 ready: ref.watch(modelManagerProvider).isReady,
-                compact: true,
               ),
             ),
           ],
@@ -206,33 +209,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 key: const Key('chat-mode'),
                 groupValue: state.mode,
                 thumbColor: context.colors.surface,
-                backgroundColor: p.elevated,
-                padding: const EdgeInsets.all(4),
+                backgroundColor: p.elevated.withValues(alpha: 0.6),
+                padding: const EdgeInsets.all(3),
                 children: {
-                  for (final (m, icon, label) in [
-                    (ChatMode.ask, CupertinoIcons.chat_bubble_fill, 'Tanong'),
-                    (
-                      ChatMode.twoSides,
-                      CupertinoIcons.person_2_fill,
-                      'Dalawang panig',
-                    ),
+                  for (final (m, label) in [
+                    (ChatMode.ask, 'Tanong'),
+                    (ChatMode.twoSides, 'Dalawang panig'),
                   ])
                     m: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(icon, size: 18),
-                          const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: context.text.titleSmall,
-                            ),
-                          ),
-                        ],
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: context.text.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                 },
@@ -579,6 +570,49 @@ class _TwoSidesPrompt extends StatelessWidget {
                 ),
               ],
             ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Small status dot next to "Buddy": green "Offline" when the AI is on the
+/// phone, amber "I-download" when it isn't yet.
+class _OfflineDot extends StatelessWidget {
+  const _OfflineDot({required this.ready});
+
+  final bool ready;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final color = ready ? p.success : p.cautionText;
+    return Semantics(
+      label: ready
+          ? 'Offline-ready. Gumagana si Buddy kahit walang signal.'
+          : 'Hindi pa naka-download si Buddy.',
+      excludeSemantics: true,
+      child: Row(
+        key: const Key('offline-badge'),
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              ready ? 'Offline' : 'I-download',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.text.labelMedium?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
         ],
       ),
     );

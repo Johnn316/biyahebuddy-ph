@@ -43,10 +43,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // (a) Model download.
-    expect(
-      find.textContaining('Isang beses lang: ~1.15 GB'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('Isang beses lang: ~1.15 GB'), findsOneWidget);
     expect(find.byKey(const Key('model-continue')), findsNothing);
     await tester.tap(find.byKey(const Key('model-download')));
     await tester.pump(const Duration(seconds: 1));
@@ -98,7 +95,7 @@ void main() {
     expect(find.text('SOS'), findsOneWidget);
     expect(find.text('ABC 1235'), findsOneWidget); // plate badge
     expect(find.text('Motorsiklo'), findsOneWidget);
-    expect(find.text('Ana Santos'), findsOneWidget); // profile card
+    expect(find.text('AS'), findsOneWidget); // initials avatar
 
     final prefs = await SharedPreferences.getInstance();
     final saved =

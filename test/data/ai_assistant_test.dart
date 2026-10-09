@@ -72,7 +72,9 @@ void expectFormat(String answer) {
 
 void main() {
   late AppDatabase db;
-  setUp(() => db = AppDatabase.open(':memory:', lawsJson: _laws, finesJson: _fines));
+  setUp(
+    () => db = AppDatabase.open(':memory:', lawsJson: _laws, finesJson: _fines),
+  );
   tearDown(() => db.close());
 
   LocalAiAssistant buddy(TextGenerator llm, {bool ready = true}) =>
@@ -88,30 +90,38 @@ void main() {
 
   test('ask: 4 sections in order, real citation and fine from data', () async {
     final llm = FakeGenerator(modelReply);
-    final answer = await buddy(llm).ask('Magkano multa pag walang helmet?').join();
+    final answer = await buddy(
+      llm,
+    ).ask('Magkano multa pag walang helmet?').join();
     expectFormat(answer);
     expect(answer, contains('RA 10054 Sec. 7 — Penalties'));
     expect(answer, contains('Multa (LTO): ₱1,500'));
     expect(answer, contains('Ayon sa RA 10054 Sec. 7, may multa'));
     expect(answer, isNot(contains('Model step')));
-    expect(answer, contains('Itala ang pangalan at ID ng enforcer')); // fine steps
+    expect(
+      answer,
+      contains('Itala ang pangalan at ID ng enforcer'),
+    ); // fine steps
     // The LLM got the retrieved law as context.
     expect(llm.lastUser, contains('[RA 10054 Sec. 7 — Penalties]'));
   });
 
-  test('two sides: neutral steps, 911 in the opener, signal law retrieved', () async {
-    final answer = await buddy(FakeGenerator('Pagsusuri:\nParehong panig.'))
-        .analyzeTwoSides(
-          'Bigla siyang kumanan nang walang signal light, umabante ako.',
-          'Naka-signal ako, mabilis siya.',
-        )
-        .join();
-    expectFormat(answer);
-    expect(answer, contains('RA 4136 Sec. 44'));
-    expect(answer, contains('tumawag agad sa 911'));
-    expect(answer, contains('Kunan ng litrato')); // two-sides steps
-    expect(answer, contains('Parehong panig.'));
-  });
+  test(
+    'two sides: neutral steps, 911 in the opener, signal law retrieved',
+    () async {
+      final answer = await buddy(FakeGenerator('Pagsusuri:\nParehong panig.'))
+          .analyzeTwoSides(
+            'Bigla siyang kumanan nang walang signal light, umabante ako.',
+            'Naka-signal ako, mabilis siya.',
+          )
+          .join();
+      expectFormat(answer);
+      expect(answer, contains('RA 4136 Sec. 44'));
+      expect(answer, contains('tumawag agad sa 911'));
+      expect(answer, contains('Kunan ng litrato')); // two-sides steps
+      expect(answer, contains('Parehong panig.'));
+    },
+  );
 
   test('two sides: sentences that assign fault are removed', () async {
     final answer = await buddy(
@@ -128,9 +138,9 @@ void main() {
   });
 
   test('two sides: only fault sentences → neutral fallback', () async {
-    final answer = await buddy(FakeGenerator('Si Driver A ang may sala.'))
-        .analyzeTwoSides('Kumanan siya bigla.', 'Naka-signal ako.')
-        .join();
+    final answer = await buddy(
+      FakeGenerator('Si Driver A ang may sala.'),
+    ).analyzeTwoSides('Kumanan siya bigla.', 'Naka-signal ako.').join();
     expect(answer, isNot(contains('Si Driver A ang may sala')));
     expect(answer, contains('Ang pulis o korte ang magpapasya'));
   });
@@ -151,18 +161,21 @@ void main() {
     expect(llm.lastUser, isNull);
   });
 
-  test('model error mid-answer: stream still completes with all sections', () async {
-    final answer = await buddy(FakeGenerator('Pagsusuri: Ayon sa', fail: true))
-        .ask('helmet')
-        .join();
-    expectFormat(answer);
-    expect(answer, contains('Hindi natapos'));
-  });
+  test(
+    'model error mid-answer: stream still completes with all sections',
+    () async {
+      final answer = await buddy(
+        FakeGenerator('Pagsusuri: Ayon sa', fail: true),
+      ).ask('helmet').join();
+      expectFormat(answer);
+      expect(answer, contains('Hindi natapos'));
+    },
+  );
 
   test('injury words add the 911 step', () async {
-    final answer = await buddy(FakeGenerator('Pagsusuri: x'))
-        .ask('Nag-overtake siya, may nasaktan')
-        .join();
+    final answer = await buddy(
+      FakeGenerator('Pagsusuri: x'),
+    ).ask('Nag-overtake siya, may nasaktan').join();
     expect(answer, contains('1. Kung may nasaktan, tumawag agad sa 911.'));
   });
 

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../shared/widgets/law_pill.dart';
@@ -12,26 +13,11 @@ import 'law_sheet.dart';
 
 const answerDisclaimer = 'Gabay batay sa batas, hindi legal na hatol.';
 
-({IconData icon, Color color}) _style(
-  BuildContext context,
-  AnswerSectionKind k,
-) => switch (k) {
-  AnswerSectionKind.kalma => (
-    icon: CupertinoIcons.heart_fill,
-    color: context.palette.success,
-  ),
-  AnswerSectionKind.batas => (
-    icon: CupertinoIcons.book_fill,
-    color: context.palette.cautionText,
-  ),
-  AnswerSectionKind.pagsusuri => (
-    icon: CupertinoIcons.search,
-    color: context.colors.primary,
-  ),
-  AnswerSectionKind.gagawin => (
-    icon: CupertinoIcons.list_number,
-    color: context.colors.primary,
-  ),
+/// Section label color (text only — no icon badges).
+Color _labelColor(BuildContext context, AnswerSectionKind k) => switch (k) {
+  AnswerSectionKind.kalma => context.palette.success,
+  AnswerSectionKind.batas => context.palette.cautionText,
+  _ => context.colors.primary,
 };
 
 /// Buddy avatar: blue gradient circle with a soft ring.
@@ -69,8 +55,8 @@ class BuddyAvatar extends StatelessWidget {
 }
 
 /// Buddy's answer (docs/DESIGN.md §8): no bubble — avatar + "Buddy", then
-/// the answer full width with the 4 sections as cards, citations as
-/// tappable law pills, disclaimer underneath.
+/// ONE clean card with the 4 sections (small bold labels), the law as pill +
+/// short excerpt, steps as a numbered list; disclaimer underneath.
 ///
 /// "Natural typing": typing dots for at least [minTypingDots], then the text
 /// appears word by word ([revealWordsPerSecond]) with a soft caret; each
@@ -270,32 +256,51 @@ class _BuddyAnswerState extends State<BuddyAnswer>
           const SizedBox(height: AppSpace.xs),
           if (dots)
             const TypingIndicator()
-          else ...[
-            if (parsed.intro.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(2, 0, 2, AppSpace.xxs),
-                child: CitationText(
-                  parsed.intro,
-                  caretColor: parsed.hasSections ? null : caret,
-                  animate: _animating,
-                ),
+          else
+            // The whole answer is ONE clean card; sections are separated
+            // by whitespace and small bold labels.
+            Container(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.md + 2,
+                AppSpace.md,
+                AppSpace.md + 2,
+                AppSpace.md + 2,
               ),
-            for (final (i, s) in parsed.sections.indexed)
-              _Entrance(
-                key: Key('section-${s.kind.name}'),
-                animate: _animating,
-                child: _SectionCard(
-                  label: s.kind.label,
-                  icon: _style(context, s.kind).icon,
-                  color: _style(context, s.kind).color,
-                  child: CitationText(
-                    s.body,
-                    caretColor: i == parsed.sections.length - 1 ? caret : null,
-                    animate: _animating,
-                  ),
-                ),
+              decoration: BoxDecoration(
+                color: context.colors.surface,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                boxShadow: p.cardShadow,
               ),
-          ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (parsed.intro.isNotEmpty)
+                    CitationText(
+                      parsed.intro,
+                      caretColor: parsed.hasSections ? null : caret,
+                      animate: _animating,
+                    ),
+                  for (final (i, s) in parsed.sections.indexed)
+                    _Entrance(
+                      key: Key('section-${s.kind.name}'),
+                      animate: _animating,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          top: i == 0 && parsed.intro.isEmpty
+                              ? 0
+                              : AppSpace.md + 2,
+                        ),
+                        child: _Section(
+                          kind: s.kind,
+                          body: s.body,
+                          caret: i == parsed.sections.length - 1 ? caret : null,
+                          animate: _animating,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           if (m.stopped || _frozen)
             const _Note('Itinigil.', icon: CupertinoIcons.stop_circle),
           if (m.failed && !_animating)
@@ -359,66 +364,201 @@ class _Entrance extends StatelessWidget {
   }
 }
 
-/// Clean card for one answer section with a small colored icon badge.
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.child,
-    required this.label,
-    required this.icon,
-    required this.color,
+/// One section: small bold label + body. "Batas" shows the law excerpt,
+/// "Gagawin" a numbered list.
+class _Section extends StatelessWidget {
+  const _Section({
+    required this.kind,
+    required this.body,
+    required this.caret,
+    required this.animate,
   });
 
-  final Widget child;
-  final String label;
-  final IconData icon;
-  final Color color;
+  final AnswerSectionKind kind;
+  final String body;
+  final Color? caret;
+  final bool animate;
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
-    return Container(
-      margin: const EdgeInsets.only(top: AppSpace.xs),
-      padding: const EdgeInsets.fromLTRB(
-        AppSpace.md,
-        AppSpace.sm,
-        AppSpace.md,
-        AppSpace.md,
-      ),
-      decoration: BoxDecoration(
-        color: context.colors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        boxShadow: p.cardShadow,
-        border: Border(top: BorderSide(color: p.highlight, width: 0.5)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(AppRadius.xs),
-                ),
-                child: Icon(icon, color: color, size: 17),
-              ),
-              const SizedBox(width: AppSpace.sm),
-              Expanded(
-                child: Text(
-                  label,
-                  style: context.text.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          kind.label,
+          style: context.text.labelLarge?.copyWith(
+            color: _labelColor(context, kind),
+            fontWeight: FontWeight.w800,
           ),
-          const SizedBox(height: AppSpace.xs),
-          child,
-        ],
-      ),
+        ),
+        const SizedBox(height: AppSpace.xxs + 2),
+        switch (kind) {
+          AnswerSectionKind.batas => _LawExcerpt(
+            body: body,
+            caret: caret,
+            animate: animate,
+          ),
+          AnswerSectionKind.gagawin => _Steps(
+            body: body,
+            caret: caret,
+            animate: animate,
+          ),
+          _ => CitationText(body, caretColor: caret, animate: animate),
+        },
+      ],
+    );
+  }
+}
+
+/// Citation pill(s) + the first 2 lines of the law text (from laws.json)
+/// + "Basahin ang buong batas" → bottom sheet. No long quotes inline.
+/// Falls back to the plain text when the law isn't in laws.json.
+class _LawExcerpt extends ConsumerWidget {
+  const _LawExcerpt({
+    required this.body,
+    required this.caret,
+    required this.animate,
+  });
+
+  final String body;
+  final Color? caret;
+  final bool animate;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final laws = ref.watch(lawSectionsProvider).valueOrNull;
+    final cites = {
+      for (final m in citationPattern.allMatches(body)) m.group(0)!,
+    }.toList();
+    String? mainCite;
+    LawSection? law;
+    for (final c in cites) {
+      final id = lawIdFor(c);
+      final l = id == null ? null : laws?[id];
+      if (l != null) {
+        mainCite = c;
+        law = l;
+        break;
+      }
+    }
+    if (law == null || mainCite == null) {
+      return CitationText(body, caretColor: caret, animate: animate);
+    }
+    final cite = mainCite;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: AppSpace.xs,
+          runSpacing: AppSpace.xxs,
+          children: [
+            for (final c in cites)
+              _Entrance(
+                key: ValueKey('citation-$c'),
+                animate: animate,
+                child: LawPill(c, onTap: () => showLawSheet(context, c)),
+              ),
+          ],
+        ),
+        const SizedBox(height: AppSpace.xs),
+        Text(
+          law.text.replaceAll(RegExp(r'\s+'), ' ').trim(),
+          key: const Key('law-excerpt'),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: context.text.bodyMedium?.copyWith(
+            color: context.palette.muted,
+            height: 1.45,
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: CupertinoButton(
+            key: const Key('read-law'),
+            padding: const EdgeInsets.symmetric(vertical: AppSpace.xs),
+            minimumSize: const Size(44, 44),
+            onPressed: () => showLawSheet(context, cite),
+            child: Text(
+              'Basahin ang buong batas',
+              style: context.text.titleSmall?.copyWith(
+                color: context.colors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// "Ano ang gagawin" as a short numbered list.
+class _Steps extends StatelessWidget {
+  const _Steps({
+    required this.body,
+    required this.caret,
+    required this.animate,
+  });
+
+  final String body;
+  final Color? caret;
+  final bool animate;
+
+  @override
+  Widget build(BuildContext context) {
+    final lines = body
+        .split('\n')
+        .map((l) => l.trim())
+        .where((l) => l.isNotEmpty)
+        .toList();
+    final step = RegExp(r'^(\d+)[.)]\s*(.*)$');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final (i, line) in lines.indexed)
+          Padding(
+            padding: EdgeInsets.only(top: i == 0 ? 0 : AppSpace.xs),
+            child: switch (step.firstMatch(line)) {
+              final m? => Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    margin: const EdgeInsets.only(top: 2, right: AppSpace.sm),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: context.palette.primaryTint,
+                      shape: BoxShape.circle,
+                    ),
+                    child: MediaQuery.withClampedTextScaling(
+                      maxScaleFactor: 1.2,
+                      child: Text(
+                        m.group(1)!,
+                        style: context.text.labelMedium?.copyWith(
+                          color: context.colors.primary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: CitationText(
+                      m.group(2)!,
+                      caretColor: i == lines.length - 1 ? caret : null,
+                      animate: animate,
+                    ),
+                  ),
+                ],
+              ),
+              _ => CitationText(
+                line,
+                caretColor: i == lines.length - 1 ? caret : null,
+                animate: animate,
+              ),
+            },
+          ),
+      ],
     );
   }
 }

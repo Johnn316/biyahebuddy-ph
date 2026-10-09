@@ -389,6 +389,41 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('one answer card: law = pill + 2-line excerpt + read link; '
+      'steps numbered', (tester) async {
+    final ai = ControlledAi();
+    await pumpChat(tester, ai: ai);
+    await typeAndSend(tester, 'Sino ang may right of way?');
+    ai.emit(
+      '**Kalma muna**\nOk lang.\n\n'
+      '**Ano ang sinasabi ng batas**\nMahabang paliwanag (RA 4136 Sec. 42).\n\n'
+      '**Pagsusuri**\nIkaw ang nauna.\n\n'
+      '**Ano ang gagawin**\n1. Kunan ng litrato.\n2. Tumawag sa 911.',
+    );
+    await ai.finish();
+    await tester.pumpAndSettle();
+
+    // Batas: the law text (from laws.json), not the long AI paragraph.
+    final excerpt = tester.widget<Text>(find.byKey(const Key('law-excerpt')));
+    expect(excerpt.maxLines, 2);
+    expect(find.textContaining('Mahabang paliwanag'), findsNothing);
+    expect(
+      find.byKey(const ValueKey('citation-RA 4136 Sec. 42')),
+      findsOneWidget,
+    );
+    // Gagawin: numbered rows.
+    expect(find.text('1'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    expect(find.textContaining('Kunan ng litrato'), findsOneWidget);
+    // Header: just a small Offline dot.
+    expect(find.byKey(const Key('offline-badge')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('read-law')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('law-sheet')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   test('lawIdFor maps citations to laws.json ids', () {
     expect(lawIdFor('RA 4136 Sec. 42'), 'ra4136-s42');
     expect(lawIdFor('R.A. No. 10913, Section 4'), 'ra10913-s4');

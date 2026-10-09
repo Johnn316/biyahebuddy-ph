@@ -65,7 +65,10 @@ void main() {
 
   test('streams long lines before the newline arrives', () {
     final f = SectionFilter();
-    expect(f.add('Mabilis ang kabilang sasakyan'), 'Mabilis ang kabilang sasakyan');
+    expect(
+      f.add('Mabilis ang kabilang sasakyan'),
+      'Mabilis ang kabilang sasakyan',
+    );
     expect(f.add(' kanina\nPagsu'), ' kanina\n'); // "Pagsu…" might be a header
   });
 }
