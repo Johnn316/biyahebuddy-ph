@@ -1,0 +1,208 @@
+{
+  "summary": {
+    "label": "faq-holdout-1b",
+    "retriever": "Hybrid FTS5 + embeddinggemma-300m-q8 (RRF, intent, FAQ: 210 phrasings)",
+    "llm": "models/gemma-3-1b-it-Q4_K_M.gguf",
+    "accuracy": 0.6,
+    "lawHitRate": 1.0,
+    "fineHitRate": null,
+    "faqHitRate": 0.6,
+    "faqWrong": 0,
+    "retrievalMsMedian": 35,
+    "answerMsMedian": 3668,
+    "answerMsMean": 2684,
+    "inventedCitationRate": 0.0,
+    "answerQualityRate": 1.0,
+    "badFormat": 0,
+    "blame": 0,
+    "shownWrong": 0,
+    "badAmount": 0,
+    "onTargetCitationRate": 0.5714285714285714,
+    "answerMsMax": 6737
+  },
+  "questions": [
+    {
+      "id": "fh01",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "double-solid-yellow",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s41",
+        "ra4136-s39",
+        "ra4136-s40"
+      ],
+      "fines": [],
+      "answerMs": 74,
+      "answer": "Ayon sa LTO road marking guidelines, ang dobleng solid na dilaw na linya ay hangganan na bawal tawirin para mag-overtake, mula sa alinmang direksyon. Sinasabi rin ng RA 4136 Sec. 41 na bawal pumunta sa kaliwa ng gitnang linya para mag-overtake kung hindi malinaw at ligtas ang daan sa unahan. Kaya hindi ka dapat lumampas o lumusot sa double solid yellow.",
+      "answerProblems": []
+    },
+    {
+      "id": "fh02",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "drunk-driving",
+      "faqHit": true,
+      "laws": [
+        "ra10586-s12",
+        "ra10586-s5",
+        "ra10586-s6"
+      ],
+      "fines": [],
+      "answerMs": 44,
+      "answer": "Ayon sa RA 10586 Sec. 5, bawal magmaneho nang lasing o naka-droga. Ayon sa Sec. 12, may multa at posibleng pagkakulong, at mas mabigat kapag may nasaktan o namatay.",
+      "answerProblems": []
+    },
+    {
+      "id": "fh03",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "helmet",
+      "faqHit": true,
+      "laws": [
+        "ra10054-s3",
+        "ra10054-s7",
+        "ra10054-s4"
+      ],
+      "fines": [],
+      "answerMs": 47,
+      "answer": "Ayon sa RA 10054 Sec. 3, dapat naka-standard na helmet ang driver at ang angkas ng motorsiklo. Ayon sa Sec. 7, may multa na tumataas sa bawat ulit ng paglabag.",
+      "answerProblems": []
+    },
+    {
+      "id": "fh04",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "seatbelt",
+      "faqHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra8750-s12",
+        "ra8750-s2"
+      ],
+      "fines": [],
+      "answerMs": 57,
+      "answer": "Ayon sa RA 8750 Sec. 4, dapat naka-seatbelt ang driver at ang pasahero sa harap habang umaandar ang sasakyan. Ayon sa Sec. 12, may multa ang driver, at mas mataas kapag umulit.",
+      "answerProblems": []
+    },
+    {
+      "id": "fh05",
+      "intent": "general",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra10913-s4",
+        "ra10913-s8",
+        "ra10913-s2"
+      ],
+      "fines": [],
+      "answerMs": 6737,
+      "answer": "Hindi. Ang paggamit ng mobile communications device sa motor vehicle ay ilegal at mapanganib, kaya hindi ito pinapayagan. Dapat maging maingat ang driver at huwag gumamit ng mga electronic devices habang nagmamaneho.",
+      "answerProblems": []
+    },
+    {
+      "id": "fh06",
+      "intent": "general",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra4136-s46",
+        "ra10913-s6",
+        "ra4136-s49"
+      ],
+      "fines": [],
+      "answerMs": 4394,
+      "answer": "Kung mayroon kayong emergency call na kailangan mong gawin sa isang firetruck, dapat mag-stop at manatili malapit sa curb o intersection. Ang pag-iwas sa pagtatangkang makipag-interact sa firetruck ay mahalaga para sa kaligtasan ng lahat.",
+      "answerProblems": []
+    },
+    {
+      "id": "fh07",
+      "intent": "general",
+      "pass": false,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra11229-s5",
+        "ra4136-s39",
+        "ra4136-s46"
+      ],
+      "fines": [],
+      "answerMs": 3472,
+      "answer": "Para sa ligtang paglalakbay, magandang umaga o hapon. Siguraduhing may sapat na kailangan ang sasakyan at siguraduhin ang kaligtasan ng driver at mga pasahero.",
+      "answerProblems": []
+    },
+    {
+      "id": "fh08",
+      "intent": "enforcer",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra4136-s29",
+        "ra4136-s19",
+        "ra10586-s4"
+      ],
+      "fines": [
+        "Arrogance / discourteous conduct by driver (+ driver's seminar)",
+        "Driving without a valid driver's license or conductor's permit"
+      ],
+      "answerMs": 4664,
+      "answer": "Hindi ka maaaring mag-drive. Dahil sa pagkakakilanlan mo na hindi valid ang driver’s license o conductor's permit, kailangan mong i-report ito sa authorities para maayos ang sitwasyon at makapagbigay ng multa.",
+      "answerProblems": []
+    },
+    {
+      "id": "fh09",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra4136-s52",
+        "ra4136-s54",
+        "ra4136-s48"
+      ],
+      "fines": [],
+      "answerMs": 3668,
+      "answer": "Hindi pinapayagan ang pag-drive sa sidewalk dahil ito ay hindi intended for vehicular traffic, at maaaring magdulot ng obstruction sa trapiko. Ang paggamit nito ay labag sa batas na RA 4136 Sec. 52 – Driving or parking on sidewalk.  Ang pagsasagawa nito ay mapanganib rin ang kaligtasan ng iba pang mga sasakyan.",
+      "answerProblems": []
+    },
+    {
+      "id": "fh10",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra10586-s3",
+        "ra4136-s53",
+        "ra4136-s5-p2"
+      ],
+      "fines": [],
+      "answerMs": 3692,
+      "answer": "Hindi ka maaaring mag-drive ng motor vehicle habang nasa ilalim ang alak o nakakain sa kanila. Ang pagpapasya na tumawag ay labis na mapanganib at ilegal, dahil ito'y lumalabala sa batas. Hindi dapat gumawa ng anumang aksyon na makapagdulot ng panganib sa iyong sarili at iba pang mga tao.",
+      "answerProblems": []
+    }
+  ]
+}

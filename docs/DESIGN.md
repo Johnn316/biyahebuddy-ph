@@ -266,7 +266,8 @@ unit. Tappable → sheet with the section's full text and source URL.
    (tablets). Greeting: 4:00–11:59 umaga, 12:00–5:59 PM hapon, otherwise gabi.
 2. **Buddy chat.** Glass header with avatar, "Buddy", Offline-ready badge;
    iMessage bubbles; typing indicator; answer section cards; law pills;
-   glass input with mic/send; Tanong / Dalawang panig segmented control.
+   glass input with mic/send; Tanong / Dalawang panig segmented control (hidden in the demo build:
+   `kTwoSidesEnabled = false`).
 3. **Na-flag ako.** Agency picker (3 large rows with agency color dots) →
    search + mic → results list → Wallet fine card → IPAKITA (full-screen,
    always dark).

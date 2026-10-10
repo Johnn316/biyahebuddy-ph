@@ -68,6 +68,15 @@ class HybridRetriever {
     return (laws: laws, fines: [for (final (_, f) in fines) f]);
   }
 
+  /// Closest FAQ phrasing to [question] (null if the embedder fails).
+  Future<({String id, double score})?> bestFaq(String question) async {
+    final v = await _embedAll([question]);
+    if (v.isEmpty) return null;
+    final top = index.topFaq(v.first, 1);
+    if (top.isEmpty || top.first.id.isEmpty) return null;
+    return (id: top.first.id, score: top.first.score);
+  }
+
   Future<Retrieved> retrieveTwoSides(String driverA, String driverB) async {
     final both = '$driverA\n$driverB';
     final intents = classifyIntent(both)

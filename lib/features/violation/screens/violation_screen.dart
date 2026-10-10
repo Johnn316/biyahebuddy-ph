@@ -99,35 +99,8 @@ class _ViolationStep extends ConsumerWidget {
                 ),
               ),
               data: (fines) => fines.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'Walang nahanap para sa "$query".\n'
-                          'Subukan ang ibang salita o pindutin ang '
-                          '"Hindi ko alam" sa ibaba.',
-                          textAlign: TextAlign.center,
-                          style: context.text.titleMedium?.copyWith(
-                            color: context.palette.muted,
-                          ),
-                        ),
-                      ),
-                    )
-                  : ListView(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      children: [
-                        GroupedSection(
-                          header: query.isEmpty
-                              ? 'Karaniwang violation'
-                              : 'Resulta',
-                          margin: const EdgeInsets.only(top: 18),
-                          children: [
-                            for (final (i, f) in fines.indexed)
-                              _FineTile(index: i, fine: f),
-                          ],
-                        ),
-                      ],
-                    ),
+                  ? _NoMatch(query: query)
+                  : _FineList(fines: fines, grouped: query.isEmpty),
             ),
           ),
           FilledButton.tonalIcon(
@@ -174,6 +147,93 @@ class _FineTile extends StatelessWidget {
         child: Text(
           formatPeso(fine.amount),
           style: context.text.titleSmall?.copyWith(color: p.onAccent),
+        ),
+      ),
+    );
+  }
+}
+
+/// Results. Empty search: every violation of the agency, grouped by
+/// category with a count. Search: one "Resulta" list, best match first.
+class _FineList extends StatelessWidget {
+  const _FineList({required this.fines, required this.grouped});
+
+  final List<Fine> fines;
+  final bool grouped;
+
+  @override
+  Widget build(BuildContext context) {
+    // Keys stay "fine-<n>" in display order across groups.
+    var n = 0;
+    final sections = grouped ? groupFines(fines) : [(null, fines)];
+    return ListView(
+      key: const Key('fine-list'),
+      padding: const EdgeInsets.only(bottom: 12),
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
+          child: Text(
+            '${fines.length} na violation',
+            key: const Key('fine-count'),
+            style: context.text.bodyMedium?.copyWith(
+              color: context.palette.muted,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        for (final (category, list) in sections)
+          GroupedSection(
+            header: category?.label ?? 'Resulta',
+            margin: const EdgeInsets.only(top: 14),
+            children: [for (final f in list) _FineTile(index: n++, fine: f)],
+          ),
+      ],
+    );
+  }
+}
+
+/// Nothing found: say so and offer to ask Buddy with the same words.
+class _NoMatch extends StatelessWidget {
+  const _NoMatch({required this.query});
+
+  final String query;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(CupertinoIcons.search, size: 44, color: context.palette.muted),
+            const SizedBox(height: 10),
+            Text(
+              'Walang nahanap',
+              textAlign: TextAlign.center,
+              style: context.text.titleLarge,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Walang violation na tugma sa "$query".',
+              textAlign: TextAlign.center,
+              style: context.text.bodyLarge?.copyWith(
+                color: context.palette.muted,
+              ),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              key: const Key('ask-buddy-query'),
+              onPressed: () => context.go(
+                Uri(
+                  path: Routes.chat,
+                  queryParameters: {'q': query},
+                ).toString(),
+              ),
+              icon: const Icon(CupertinoIcons.sparkles),
+              label: const Text('Itanong kay Buddy'),
+            ),
+          ],
         ),
       ),
     );

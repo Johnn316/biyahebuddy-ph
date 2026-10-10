@@ -1,5 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
+import 'package:biyahebuddy_ph/data/ai/answer_parts.dart';
+import 'package:biyahebuddy_ph/data/ai/faq_answers.dart';
 import 'package:biyahebuddy_ph/data/ai/local_ai_assistant.dart';
 import 'package:biyahebuddy_ph/data/ai/local_llm.dart';
 import 'package:biyahebuddy_ph/data/local/app_database.dart';
@@ -72,7 +76,9 @@ void expectFormat(String answer) {
 
 void main() {
   late AppDatabase db;
-  setUp(() => db = AppDatabase.open(':memory:', lawsJson: _laws, finesJson: _fines));
+  setUp(
+    () => db = AppDatabase.open(':memory:', lawsJson: _laws, finesJson: _fines),
+  );
   tearDown(() => db.close());
 
   LocalAiAssistant buddy(TextGenerator llm, {bool ready = true}) =>
@@ -88,30 +94,36 @@ void main() {
 
   test('ask: 4 sections in order, real citation and fine from data', () async {
     final llm = FakeGenerator(modelReply);
-    final answer = await buddy(llm).ask('Magkano multa pag walang helmet?').join();
+    final answer = await buddy(
+      llm,
+    ).ask('Magkano multa pag walang helmet?').join();
     expectFormat(answer);
     expect(answer, contains('RA 10054 Sec. 7 — Penalties'));
     expect(answer, contains('Multa (LTO): ₱1,500'));
     expect(answer, contains('Ayon sa RA 10054 Sec. 7, may multa'));
     expect(answer, isNot(contains('Model step')));
-    expect(answer, contains('Itala ang pangalan at ID ng enforcer')); // fine steps
+    // Topic steps (helmet), not generic ones.
+    expect(answer, contains('Magsuot ng helmet na may ICC o PS mark'));
     // The LLM got the retrieved law as context.
     expect(llm.lastUser, contains('[RA 10054 Sec. 7 — Penalties]'));
   });
 
-  test('two sides: neutral steps, 911 in the opener, signal law retrieved', () async {
-    final answer = await buddy(FakeGenerator('Pagsusuri:\nParehong panig.'))
-        .analyzeTwoSides(
-          'Bigla siyang kumanan nang walang signal light, umabante ako.',
-          'Naka-signal ako, mabilis siya.',
-        )
-        .join();
-    expectFormat(answer);
-    expect(answer, contains('RA 4136 Sec. 44'));
-    expect(answer, contains('tumawag agad sa 911'));
-    expect(answer, contains('Kunan ng litrato')); // two-sides steps
-    expect(answer, contains('Parehong panig.'));
-  });
+  test(
+    'two sides: neutral steps, 911 in the opener, signal law retrieved',
+    () async {
+      final answer = await buddy(FakeGenerator('Pagsusuri:\nParehong panig.'))
+          .analyzeTwoSides(
+            'Bigla siyang kumanan nang walang signal light, umabante ako.',
+            'Naka-signal ako, mabilis siya.',
+          )
+          .join();
+      expectFormat(answer);
+      expect(answer, contains('RA 4136 Sec. 44'));
+      expect(answer, contains('tumawag agad sa 911'));
+      expect(answer, contains('Kunan ng litrato')); // two-sides steps
+      expect(answer, contains('Parehong panig.'));
+    },
+  );
 
   test('two sides: sentences that assign fault are removed', () async {
     final answer = await buddy(
@@ -128,9 +140,9 @@ void main() {
   });
 
   test('two sides: only fault sentences → neutral fallback', () async {
-    final answer = await buddy(FakeGenerator('Si Driver A ang may sala.'))
-        .analyzeTwoSides('Kumanan siya bigla.', 'Naka-signal ako.')
-        .join();
+    final answer = await buddy(
+      FakeGenerator('Si Driver A ang may sala.'),
+    ).analyzeTwoSides('Kumanan siya bigla.', 'Naka-signal ako.').join();
     expect(answer, isNot(contains('Si Driver A ang may sala')));
     expect(answer, contains('Ang pulis o korte ang magpapasya'));
   });
@@ -151,18 +163,21 @@ void main() {
     expect(llm.lastUser, isNull);
   });
 
-  test('model error mid-answer: stream still completes with all sections', () async {
-    final answer = await buddy(FakeGenerator('Pagsusuri: Ayon sa', fail: true))
-        .ask('helmet')
-        .join();
-    expectFormat(answer);
-    expect(answer, contains('Hindi natapos'));
-  });
+  test(
+    'model error mid-answer: stream still completes with all sections',
+    () async {
+      final answer = await buddy(
+        FakeGenerator('Pagsusuri: Ayon sa', fail: true),
+      ).ask('helmet').join();
+      expectFormat(answer);
+      expect(answer, contains('Hindi natapos'));
+    },
+  );
 
   test('injury words add the 911 step', () async {
-    final answer = await buddy(FakeGenerator('Pagsusuri: x'))
-        .ask('Nag-overtake siya, may nasaktan')
-        .join();
+    final answer = await buddy(
+      FakeGenerator('Pagsusuri: x'),
+    ).ask('Nag-overtake siya, may nasaktan').join();
     expect(answer, contains('1. Kung may nasaktan, tumawag agad sa 911.'));
   });
 
@@ -176,5 +191,82 @@ void main() {
     await got.future;
     await sub.cancel();
     expect(llm.cancelled, isTrue);
+  });
+
+  group('curated FAQ answers', () {
+    final faq = FaqEntry.parse(File('assets/data/faq.json').readAsStringSync());
+
+    LocalAiAssistant curatedBuddy(TextGenerator llm) => LocalAiAssistant(
+      retriever: LawRetriever(db),
+      llm: llm,
+      isModelReady: () => true,
+      faq: faq,
+    );
+
+    test('faq.json: ~30 entries, each curated with 3 steps and real '
+        'sections', () {
+      expect(faq.length, greaterThanOrEqualTo(30));
+      // Every section id exists in the real laws.json.
+      final ids = {
+        for (final l
+            in (jsonDecode(File('assets/data/laws.json').readAsStringSync())
+                as List<dynamic>))
+          (l as Map<String, dynamic>)['id'] as String,
+      };
+      for (final e in faq) {
+        expect(e.curated, isTrue, reason: e.id);
+        expect(e.gagawin, hasLength(3), reason: e.id);
+        expect(e.aliases.length, greaterThanOrEqualTo(4), reason: e.id);
+        for (final s in e.sections) {
+          expect(ids, contains(s), reason: '${e.id} → $s');
+        }
+      }
+    });
+
+    test('"can i pass double solid yellow lane": curated, no LLM', () async {
+      final llm = FakeGenerator('SHOULD NOT APPEAR');
+      final answer = await curatedBuddy(
+        llm,
+      ).ask('can i pass double solid yellow lane').join();
+      expectFormat(answer);
+      expect(answer, contains('RA 4136 Sec. 41'));
+      expect(answer, contains('Ayon sa LTO road marking guidelines'));
+      expect(answer, contains('1. Manatili sa linya mo'));
+      expect(answer, contains('3. '));
+      expect(answer, isNot(contains('SHOULD NOT APPEAR')));
+      expect(llm.lastUser, isNull);
+    });
+
+    test('every FAQ question (topic menu taps) gets its own curated '
+        'answer', () async {
+      final buddy = curatedBuddy(FakeGenerator(modelReply));
+      for (final e in faq) {
+        final hit = await buddy.curatedFor(e.question);
+        expect(hit?.entry.id, e.id, reason: e.question);
+      }
+    });
+
+    test('no strong FAQ match → LLM as before', () async {
+      final llm = FakeGenerator(modelReply);
+      final answer = await curatedBuddy(llm)
+          .ask(
+            'Ano ang parusa sa dealer na nagbebenta ng helmet na walang ICC?',
+          )
+          .join();
+      expectFormat(answer);
+      expect(llm.lastUser, isNotNull);
+    });
+  });
+
+  test('topic steps per intent instead of "sundin ang batas"', () {
+    expect(
+      AnswerParts.topicSteps('bawal ba mag text habang nagmamaneho'),
+      contains(startsWith('Ilagay ang phone')),
+    );
+    expect(
+      AnswerParts.topicSteps('pwede ba lumampas sa dilaw na linya'),
+      isNotNull,
+    );
+    expect(AnswerParts.topicSteps('Ano ang batas sa tricycle?'), isNull);
   });
 }

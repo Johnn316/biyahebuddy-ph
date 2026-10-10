@@ -10,19 +10,54 @@ abstract final class AnswerParts {
   static const gagawinHeader = '**Ano ang gagawin**';
 
   static const _injuryWords = [
-    'nasaktan', 'sugatan', 'sugat', 'dugo', 'duguan', 'injured', 'injury',
-    'hurt', 'bleeding', 'patay', 'namatay', 'nahimatay', 'walang malay',
-    'ospital', 'hospital', 'bali', 'nasagasaan', 'masakit',
+    'nasaktan',
+    'sugatan',
+    'sugat',
+    'dugo',
+    'duguan',
+    'injured',
+    'injury',
+    'hurt',
+    'bleeding',
+    'patay',
+    'namatay',
+    'nahimatay',
+    'walang malay',
+    'ospital',
+    'hospital',
+    'bali',
+    'nasagasaan',
+    'masakit',
   ];
 
   static const _fineWords = [
-    'multa', 'magkano', 'fine', 'penalty', 'parusa', 'huli', 'nahuli',
-    'flag', 'na-flag', 'naflag', 'tiket', 'ticket', 'tinikitan', 'violation',
+    'multa',
+    'magkano',
+    'fine',
+    'penalty',
+    'parusa',
+    'huli',
+    'nahuli',
+    'flag',
+    'na-flag',
+    'naflag',
+    'tiket',
+    'ticket',
+    'tinikitan',
+    'violation',
   ];
 
   static const _accidentWords = [
-    'bangga', 'nabangga', 'nagkabanggaan', 'banggaan', 'aksidente',
-    'accident', 'sumalpok', 'nasagi', 'gasgas', 'collision',
+    'bangga',
+    'nabangga',
+    'nagkabanggaan',
+    'banggaan',
+    'aksidente',
+    'accident',
+    'sumalpok',
+    'nasagi',
+    'gasgas',
+    'collision',
   ];
 
   static bool _has(String text, List<String> words) {
@@ -125,12 +160,119 @@ abstract final class AnswerParts {
       '\n(Hindi natapos ang pagsusuri ng AI. Basahin ang batas sa itaas.)\n';
 
   /// Concrete, safe next steps, chosen by the kind of situation.
+  /// Numbered "Ano ang gagawin" section.
+  static String steps(List<String> steps) {
+    final list = [
+      for (var i = 0; i < steps.length; i++) '${i + 1}. ${steps[i]}',
+    ];
+    return '$gagawinHeader\n${list.join('\n')}\n';
+  }
+
+  /// Topic-specific steps when the question is clearly about one topic
+  /// (instead of a generic "sundin ang batas"). First matching topic wins.
+  static List<String>? topicSteps(String question) {
+    final q = question.toLowerCase();
+    for (final (words, steps) in _topics) {
+      if (words.any(q.contains)) return steps;
+    }
+    return null;
+  }
+
+  static const _topics = <(List<String>, List<String>)>[
+    (
+      ['helmet'],
+      [
+        'Magsuot ng helmet na may ICC o PS mark, pati ang angkas.',
+        'I-lock nang maayos ang strap bago umandar.',
+        'Kung na-flag, tingnan ang eksaktong multa sa Na-flag ako.',
+      ],
+    ),
+    (
+      ['seatbelt', 'seat belt', 'car seat', 'bata sa harap'],
+      [
+        'Mag-seatbelt bago umandar at paalalahanan ang katabi.',
+        'Paupuin ang batang 12 pababa sa likod, naka-car seat kung kailangan.',
+        'Kung na-flag, kunin ang ticket at bayaran sa tamang opisina.',
+      ],
+    ),
+    (
+      ['cellphone', 'phone', 'text', 'tawag', 'waze', 'gps'],
+      [
+        'Ilagay ang phone sa mount o itabi bago umandar.',
+        'Tumabi muna sa ligtas na lugar bago tumawag o mag-text.',
+        'Gumamit ng hands-free kung kailangan talagang makausap.',
+      ],
+    ),
+    (
+      ['lasing', 'nakainom', 'drunk', 'alak', 'beer', 'alcohol'],
+      [
+        'Huwag magmaneho kapag nakainom; mag-taxi o magpasundo.',
+        'Pumili ng designated driver bago uminom.',
+        'Kung pinara, maging kalmado at sumunod sa sobriety test.',
+      ],
+    ),
+    (
+      [
+        'overtake',
+        'overtaking',
+        'lumampas',
+        'lumusot',
+        'linya',
+        'guhit',
+        'lane',
+        'dilaw',
+        'yellow',
+      ],
+      [
+        'Manatili sa linya mo kapag solid ang guhit.',
+        'Mag-overtake lang sa kaliwa kapag putol-putol ang linya at '
+            'walang kasalubong.',
+        'Huwag mag-overtake sa kurbada, ahon, interseksyon, o riles.',
+      ],
+    ),
+    (
+      ['lisensya', 'license', 'student permit'],
+      [
+        'Laging dalhin ang valid na lisensya habang nagmamaneho.',
+        'I-renew ito sa LTO bago mag-expire.',
+        'Kung kinuha ng enforcer, itago ang ticket at bayaran bago ito '
+            'mag-expire.',
+      ],
+    ),
+    (
+      ['coding', 'uvvrp'],
+      [
+        'Tingnan ang coding status mo sa Home bago umalis.',
+        'Kung coding ka, bumiyahe bago o pagkatapos ng coding hours.',
+        'Alamin ang patakaran ng lungsod na dadaanan mo.',
+      ],
+    ),
+    (
+      ['park', 'parking', 'tow'],
+      [
+        'Mag-park lang sa may marka o pinapayagang lugar.',
+        'Iwasan ang kanto, tawiran, at harap ng driveway.',
+        'Kung na-tow, pumunta sa impounding area dala ang OR/CR at lisensya.',
+      ],
+    ),
+    (
+      ['bilis', 'speed', 'overspeeding', 'mabilis'],
+      [
+        'Sundin ang nakapaskil na speed limit.',
+        'Bagalan sa paaralan, mataong lugar, at kapag umuulan.',
+        'Panatilihin ang ligtas na distansya sa unahan.',
+      ],
+    ),
+  ];
+
   static String gagawin({
     bool injury = false,
     bool aboutFine = false,
     bool accident = false,
     bool twoSides = false,
+    String? question,
   }) {
+    final topic = question == null ? null : topicSteps(question);
     final steps = [
       if (injury || twoSides || accident)
         'Kung may nasaktan, tumawag agad sa 911.',
@@ -138,6 +280,8 @@ abstract final class AnswerParts {
         'Kunan ng litrato ang mga sasakyan, plaka, at lugar bago galawin.',
         'Magpalitan ng pangalan, lisensya, at insurance.',
         'I-report sa traffic enforcer o pulis para sa opisyal na ulat.',
+      ] else if (topic != null) ...[
+        ...topic,
       ] else if (aboutFine) ...[
         'Manatiling kalmado at magalang sa enforcer.',
         'Itala ang pangalan at ID ng enforcer, oras, at lugar.',
@@ -148,10 +292,7 @@ abstract final class AnswerParts {
         'Kung hindi sigurado, magtanong sa LTO o sa traffic enforcer.',
       ],
     ];
-    final list = [
-      for (var i = 0; i < steps.length; i++) '${i + 1}. ${steps[i]}',
-    ];
-    return '$gagawinHeader\n${list.join('\n')}\n';
+    return AnswerParts.steps(steps);
   }
 
   static const _rules =

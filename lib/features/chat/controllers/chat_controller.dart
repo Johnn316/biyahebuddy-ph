@@ -2,7 +2,16 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/contracts/contracts.dart';
 import '../../../core/di/providers.dart';
+import 'flag_flow.dart';
+import 'topics.dart';
+
+export 'flag_flow.dart';
+export 'topics.dart';
+
+/// Which topic menu a Buddy message shows.
+enum TopicMenu { topics, questions }
 
 enum ChatRole { user, buddy }
 
@@ -14,6 +23,12 @@ class ChatMessage {
     this.streaming = false,
     this.stopped = false,
     this.failed = false,
+    this.flag,
+    this.agency,
+    this.fine,
+    this.chips = const [],
+    this.menu,
+    this.topic,
   });
 
   final ChatRole role;
@@ -25,11 +40,34 @@ class ChatMessage {
   final bool stopped;
   final bool failed;
 
+  /// Guided na-flag flow: what this Buddy message shows under its text.
+  final FlagStep? flag;
+  final Agency? agency;
+
+  /// The matched fine ([FlagStep.fine]).
+  final Fine? fine;
+
+  /// Tappable violations ([FlagStep.askViolation] / [FlagStep.noMatch]).
+  final List<String> chips;
+
+  /// Topic menu shown under this Buddy message.
+  final TopicMenu? menu;
+
+  /// [BuddyTopic.id]: the menu's topic, or the topic a tapped question came
+  /// from (its answer then offers the other questions).
+  final String? topic;
+
   ChatMessage copyWith({
     String? text,
     bool? streaming,
     bool? stopped,
     bool? failed,
+    FlagStep? flag,
+    Agency? agency,
+    Fine? fine,
+    List<String>? chips,
+    TopicMenu? menu,
+    String? topic,
   }) => ChatMessage(
     role: role,
     text: text ?? this.text,
@@ -37,6 +75,12 @@ class ChatMessage {
     streaming: streaming ?? this.streaming,
     stopped: stopped ?? this.stopped,
     failed: failed ?? this.failed,
+    flag: flag ?? this.flag,
+    agency: agency ?? this.agency,
+    fine: fine ?? this.fine,
+    chips: chips ?? this.chips,
+    menu: menu ?? this.menu,
+    topic: topic ?? this.topic,
   );
 }
 
@@ -99,9 +143,133 @@ class ChatController extends AutoDisposeNotifier<ChatState> {
   }
 
   /// Ask mode: send a question.
-  void ask(String question) {
+  /// Agency of an open "Ano ang sinabing violation?" question; the next
+  /// typed message is matched against that agency's fines.
+  Agency? _awaitingViolation;
+
+  void ask(String question, {String? topic}) {
     final q = question.trim();
     if (q.isEmpty || state.streaming) return;
+    final awaiting = _awaitingViolation;
+    // A long new question leaves the flow instead of being matched.
+    if (awaiting != null && q.split(RegExp(r'\s+')).length <= 10) {
+      answerViolation(q, awaiting);
+      return;
+    }
+    _awaitingViolation = null;
+    if (isFlaggedWithoutViolation(q)) {
+      _askWhichViolation(q);
+      return;
+    }
+    state = state.copyWith(
+      askMessages: [
+        ...state.askMessages,
+        ChatMessage(role: ChatRole.user, text: q),
+        ChatMessage(
+          role: ChatRole.buddy,
+          text: '',
+          streaming: true,
+          topic: topic,
+        ),
+      ],
+    );
+    _listen(ref.read(aiAssistantProvider).ask(q));
+  }
+
+  /// Flagged without a violation: ask which one, with the agency's most
+  /// common violations as chips.
+  Future<void> _askWhichViolation(String q) async {
+    final agency = detectAgency(q);
+    _pushExchange(q);
+    final all = await ref.read(finesRepositoryProvider).search('', agency);
+    _awaitingViolation = agency;
+    _updateStreaming(
+      (m) => m.copyWith(
+        text: '$flagQuestion\n$flagQuestionHint',
+        streaming: false,
+        flag: FlagStep.askViolation,
+        agency: agency,
+        chips: commonViolations(all),
+      ),
+    );
+  }
+
+  /// The driver named the violation (typed or chip): match it with the
+  /// Na-flag fine search for [agency].
+  Future<void> answerViolation(String text, Agency agency) async {
+    final q = text.trim();
+    if (q.isEmpty || state.streaming) return;
+    _pushExchange(q);
+    final repo = ref.read(finesRepositoryProvider);
+    final found = await repo.search(q, agency);
+    if (found.isNotEmpty) {
+      _awaitingViolation = null;
+      final fine = found.first;
+      _updateStreaming(
+        (m) => m.copyWith(
+          text:
+              'Ito ang multa para sa "${violationLabel(fine)}" '
+              '(${agency.name.toUpperCase()}):',
+          streaming: false,
+          flag: FlagStep.fine,
+          agency: agency,
+          fine: fine,
+        ),
+      );
+    } else {
+      _awaitingViolation = agency;
+      final all = await repo.search('', agency);
+      _updateStreaming(
+        (m) => m.copyWith(
+          text: '$flagNoMatch\n$flagQuestionHint',
+          streaming: false,
+          flag: FlagStep.noMatch,
+          agency: agency,
+          chips: commonViolations(all),
+        ),
+      );
+    }
+  }
+
+  /// Category tapped: Buddy lists its questions.
+  Future<void> openTopic(String id) async {
+    final t = topicById(id);
+    if (t == null || state.streaming) return;
+    await _menuReply(
+      user: t.label,
+      text: 'Pumili ng tanong:',
+      menu: TopicMenu.questions,
+      topic: id,
+    );
+  }
+
+  /// "Bumalik sa mga topic" / "Lahat ng topic".
+  Future<void> showTopics() async {
+    if (state.streaming) return;
+    await _menuReply(
+      user: 'Lahat ng topic',
+      text: 'Pumili ng topic:',
+      menu: TopicMenu.topics,
+    );
+  }
+
+  Future<void> _menuReply({
+    required String user,
+    required String text,
+    required TopicMenu menu,
+    String? topic,
+  }) async {
+    _awaitingViolation = null;
+    _pushExchange(user);
+    // One beat so the typing dots show before the reveal.
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    _updateStreaming(
+      (m) => m.copyWith(text: text, streaming: false, menu: menu, topic: topic),
+    );
+  }
+
+  /// User message + an empty, "typing" Buddy message (dots, then reveal).
+  void _pushExchange(String q) {
     state = state.copyWith(
       askMessages: [
         ...state.askMessages,
@@ -109,7 +277,6 @@ class ChatController extends AutoDisposeNotifier<ChatState> {
         const ChatMessage(role: ChatRole.buddy, text: '', streaming: true),
       ],
     );
-    _listen(ref.read(aiAssistantProvider).ask(q));
   }
 
   /// Two sides, step A → B.

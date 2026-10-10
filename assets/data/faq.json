@@ -1,0 +1,757 @@
+[
+  {
+    "id": "double-solid-yellow",
+    "category": "Road markings & overtaking",
+    "question": "Pwede ba mag-overtake sa double solid yellow line?",
+    "aliases": [
+      "can i pass double solid yellow lane",
+      "can I overtake on a double yellow line",
+      "pwede ba lumampas sa dalawang dilaw na guhit",
+      "bawal ba lumusot sa double yellow",
+      "pwede ba tumawid sa dobleng dilaw na linya",
+      "overtake sa double solid yellow pwede ba",
+      "nag-overtake ako sa double yellow line",
+      "is overtaking allowed on two solid yellow lines",
+      "dalawang solid na dilaw sa gitna pwede ba lumampas",
+      "double yellow centerline passing rule"
+    ],
+    "sections": [
+      "ra4136-s41",
+      "ra4136-s39"
+    ],
+    "pagsusuri": "Ayon sa LTO road marking guidelines, ang dobleng solid na dilaw na linya ay hangganan na bawal tawirin para mag-overtake, mula sa alinmang direksyon. Sinasabi rin ng RA 4136 Sec. 41 na bawal pumunta sa kaliwa ng gitnang linya para mag-overtake kung hindi malinaw at ligtas ang daan sa unahan. Kaya hindi ka dapat lumampas o lumusot sa double solid yellow.",
+    "gagawin": [
+      "Manatili sa linya mo at huwag tumawid sa dobleng dilaw para mag-overtake.",
+      "Maghintay hanggang maging putol-putol (broken) ang linya at malinaw ang kasalubong bago mag-overtake.",
+      "Kung na-flag ka na, ipakita ang lisensya, kunin ang ticket, at bayaran sa tamang opisina."
+    ]
+  },
+  {
+    "id": "single-solid-yellow",
+    "category": "Road markings & overtaking",
+    "question": "Pwede ba mag-overtake sa isang solid na dilaw na linya?",
+    "aliases": [
+      "can i overtake on a single solid yellow line",
+      "single yellow line overtaking allowed",
+      "pwede ba lumampas sa isang dilaw na guhit",
+      "solid yellow line ibig sabihin",
+      "pwede lumusot sa solid na dilaw",
+      "one single solid yellow line can I pass",
+      "isang tuloy-tuloy na dilaw lang ang guhit"
+    ],
+    "sections": [
+      "ra4136-s41",
+      "ra4136-s39"
+    ],
+    "pagsusuri": "Ayon sa LTO road marking guidelines, ang solid na dilaw na linya ay babala na hindi ligtas mag-overtake sa bahaging iyon ng daan. Ayon sa RA 4136 Sec. 41, bawal pumunta sa kaliwa ng gitnang linya para mag-overtake kung hindi kita at ligtas ang unahan.",
+    "gagawin": [
+      "Huwag tumawid sa solid na dilaw para lang mag-overtake.",
+      "Mag-overtake lang kapag putol-putol na ang linya at walang kasalubong.",
+      "Bagalan at sumunod muna sa sasakyan sa unahan hanggang maging ligtas."
+    ]
+  },
+  {
+    "id": "broken-line",
+    "category": "Road markings & overtaking",
+    "question": "Pwede ba mag-overtake sa putol-putol na linya?",
+    "aliases": [
+      "can I overtake on a broken yellow line",
+      "broken white line pwede lumipat ng lane",
+      "dashed line overtaking allowed",
+      "putol putol na dilaw na guhit pwede ba lumampas",
+      "pwede ba mag-overtake sa broken line"
+    ],
+    "sections": [
+      "ra4136-s39",
+      "ra4136-s41"
+    ],
+    "pagsusuri": "Ayon sa LTO road marking guidelines, ang putol-putol na linya (dilaw o puti) ay nagpapahintulot na mag-overtake o lumipat ng lane. Pero ayon sa RA 4136 Sec. 39 at Sec. 41, dapat sa kaliwa ka dumaan, malinaw ang daan sa unahan, at walang kasalubong.",
+    "gagawin": [
+      "Tingnan muna ang kasalubong at ang side mirror bago lumipat.",
+      "Mag-signal, mag-overtake sa kaliwa, at bumalik sa linya kapag malayo na sa naunahan.",
+      "Huwag mag-overtake malapit sa kurbada, tuktok ng ahon, o interseksyon."
+    ]
+  },
+  {
+    "id": "solid-white",
+    "category": "Road markings & overtaking",
+    "question": "Pwede ba lumipat ng lane sa solid na puting linya?",
+    "aliases": [
+      "can I change lanes on a solid white line",
+      "solid white line crossing allowed",
+      "pwede ba tumawid sa puting guhit",
+      "bawal ba mag-lane change sa solid white",
+      "puting linya na tuloy-tuloy ano ibig sabihin"
+    ],
+    "sections": [
+      "ra4136-s41",
+      "ra4136-s37"
+    ],
+    "pagsusuri": "Ayon sa LTO road marking guidelines, ang solid na puting linya ay naghihiwalay ng mga lane na pareho ang direksyon at nagsasabing manatili ka sa lane mo. Ang paglipat dito ay delikado at maaaring ituring na paglabag sa traffic markings.",
+    "gagawin": [
+      "Manatili sa lane mo habang solid ang puting linya.",
+      "Lumipat lang ng lane kapag putol-putol na ang puting linya.",
+      "Mag-signal at tingnan ang blind spot bago lumipat."
+    ]
+  },
+  {
+    "id": "yellow-box",
+    "category": "Road markings & overtaking",
+    "question": "Bawal ba huminto sa yellow box?",
+    "aliases": [
+      "can I stop inside the yellow box",
+      "yellow box junction rules",
+      "na-flag ako sa yellow box",
+      "pwede ba tumigil sa dilaw na kahon",
+      "huminto ako sa loob ng yellow box"
+    ],
+    "sections": [
+      "ra4136-s54"
+    ],
+    "pagsusuri": "Ayon sa MMDA at LTO road marking guidelines, bawal huminto sa loob ng yellow box para hindi maharangan ang interseksyon. Ayon sa RA 4136 Sec. 54, bawal harangan ang daloy ng trapiko.",
+    "gagawin": [
+      "Pumasok lang sa yellow box kung may sapat na espasyo sa kabila para makalabas agad.",
+      "Kung puno ang kabila, huminto bago ang yellow box kahit berde ang ilaw.",
+      "Kung na-flag, makinig sa enforcer at kunin ang ticket; huwag makipagtalo."
+    ]
+  },
+  {
+    "id": "pedestrian-lane",
+    "category": "Road markings & overtaking",
+    "question": "Kailangan bang magbigay daan sa tao sa pedestrian lane?",
+    "aliases": [
+      "do I have to stop for pedestrians at the crosswalk",
+      "pedestrian lane right of way",
+      "tumatawid ang tao sa pedestrian, hihinto ba ako",
+      "huminto ako sa ibabaw ng pedestrian lane",
+      "sino ang may karapatan sa tawiran"
+    ],
+    "sections": [
+      "ra4136-s42"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 42, dapat magbigay daan ang driver sa taong tumatawid sa crosswalk, maliban kung may traffic light o enforcer na nagpapatakbo ng trapiko. Ayon sa LTO road marking guidelines, huwag ding huminto sa ibabaw ng pedestrian lane.",
+    "gagawin": [
+      "Bagalan paglapit sa pedestrian lane at huminto kapag may tumatawid.",
+      "Huminto bago ang guhit, hindi sa ibabaw ng tawiran.",
+      "Hintaying makatawid nang buo ang tao bago umandar ulit."
+    ]
+  },
+  {
+    "id": "stop-line",
+    "category": "Road markings & overtaking",
+    "question": "Saan dapat huminto, bago o lampas sa stop line?",
+    "aliases": [
+      "where should I stop at the stop line",
+      "lumampas ako sa stop line na-flag ako",
+      "stop line violation",
+      "pwede ba lumampas sa puting guhit sa stoplight",
+      "beating the red light ano multa"
+    ],
+    "sections": [],
+    "pagsusuri": "Ayon sa LTO road marking guidelines, ang stop line ay ang puting guhit kung saan dapat huminto ang harap ng sasakyan kapag pula ang ilaw o may stop sign. Ang paglampas dito ay maaaring ituring na paglabag sa traffic signs o beating the red light.",
+    "gagawin": [
+      "Huminto bago ang stop line, hindi sa ibabaw o lampas nito.",
+      "Kapag dilaw na ang ilaw at kaya pang huminto nang ligtas, huminto na.",
+      "Kung na-flag, kunin ang ticket at tingnan ang multa sa Na-flag ako."
+    ]
+  },
+  {
+    "id": "counterflow",
+    "category": "Road markings & overtaking",
+    "question": "Bawal ba mag-counterflow?",
+    "aliases": [
+      "is counterflowing illegal",
+      "counterflow penalty",
+      "nag-counterflow ako para makaiwas sa traffic",
+      "pwede ba sumalubong sa kabilang linya",
+      "magkano multa sa counterflow",
+      "counterflow sa EDSA multa",
+      "multa sa pag-counterflow"
+    ],
+    "sections": [
+      "ra4136-s37"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 37, dapat sa kanang bahagi ng daan magmaneho maliban kung nag-o-overtake nang ligtas. Ang counterflow ay pagpasok sa linya ng kasalubong, kaya delikado ito at may multa sa MMDA at mga lungsod.",
+    "gagawin": [
+      "Manatili sa kanang bahagi ng daan kahit mabagal ang trapiko.",
+      "Huwag gumamit ng linya ng kasalubong para makalusot.",
+      "Kung may nabangga dahil sa counterflow, huminto, tumulong, at tumawag sa 911 kung may sugatan."
+    ]
+  },
+  {
+    "id": "overtake-curve",
+    "category": "Road markings & overtaking",
+    "question": "Saan bawal mag-overtake?",
+    "aliases": [
+      "where is overtaking not allowed",
+      "pwede ba mag-overtake sa kurbada",
+      "overtaking sa intersection bawal ba",
+      "mag-overtake sa paakyat na daan",
+      "bawal ba lumusot sa kanan"
+    ],
+    "sections": [
+      "ra4136-s41",
+      "ra4136-s39"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 41, bawal mag-overtake kapag hindi kita ang unahan, gaya ng palapit sa tuktok ng ahon o sa kurbada, at sa interseksyon o tawiran ng tren. Ayon sa Sec. 39, sa kaliwa dapat dumaan kapag nag-o-overtake.",
+    "gagawin": [
+      "Huwag mag-overtake sa kurbada, tuktok ng ahon, interseksyon, o riles.",
+      "Mag-overtake lang sa kaliwa kapag malinaw at walang kasalubong.",
+      "Kung hindi sigurado, sumunod muna at maghintay ng tuwid na daan."
+    ]
+  },
+  {
+    "id": "helmet",
+    "category": "Helmet & seatbelt",
+    "question": "Magkano multa pag walang helmet sa motor?",
+    "aliases": [
+      "fine for no helmet on a motorcycle",
+      "walang helmet multa",
+      "kailangan ba ng helmet pati angkas",
+      "na-flag ako kasi walang helmet",
+      "hindi standard na helmet bawal ba"
+    ],
+    "sections": [
+      "ra10054-s3",
+      "ra10054-s7"
+    ],
+    "pagsusuri": "Ayon sa RA 10054 Sec. 3, dapat naka-standard na helmet ang driver at ang angkas ng motorsiklo. Ayon sa Sec. 7, may multa na tumataas sa bawat ulit ng paglabag.",
+    "gagawin": [
+      "Magsuot ng helmet na may ICC o PS mark, pati ang angkas.",
+      "I-lock nang maayos ang strap ng helmet bago umandar.",
+      "Kung na-flag, kunin ang ticket at tingnan ang eksaktong multa sa Na-flag ako."
+    ]
+  },
+  {
+    "id": "seatbelt",
+    "category": "Helmet & seatbelt",
+    "question": "Magkano multa pag walang seatbelt?",
+    "aliases": [
+      "fine for not wearing a seatbelt",
+      "kailangan ba mag-seatbelt pati pasahero",
+      "na-flag ako walang seatbelt",
+      "seatbelt sa likod required ba",
+      "hindi naka seatbelt ang katabi ko"
+    ],
+    "sections": [
+      "ra8750-s4",
+      "ra8750-s12"
+    ],
+    "pagsusuri": "Ayon sa RA 8750 Sec. 4, dapat naka-seatbelt ang driver at ang pasahero sa harap habang umaandar ang sasakyan. Ayon sa Sec. 12, may multa ang driver, at mas mataas kapag umulit.",
+    "gagawin": [
+      "Mag-seatbelt bago umandar at paalalahanan ang katabi mo.",
+      "Siguraduhing gumagana ang lahat ng seatbelt ng sasakyan.",
+      "Kung na-flag, kunin ang ticket at bayaran sa tamang opisina."
+    ]
+  },
+  {
+    "id": "child-front-seat",
+    "category": "Helmet & seatbelt",
+    "question": "Pwede ba ang bata sa harap na upuan?",
+    "aliases": [
+      "can a child sit in the front seat",
+      "child car seat required ba",
+      "anak ko nasa harap na-flag ako",
+      "car seat ng bata batas",
+      "bata sa front seat bawal ba",
+      "pwede ba umupo sa harap ang anak ko",
+      "what age can a child sit in front"
+    ],
+    "sections": [
+      "ra11229-s5",
+      "ra11229-s4",
+      "ra11229-s10"
+    ],
+    "pagsusuri": "Ayon sa RA 11229 Sec. 5, bawal paupuin sa harap ang batang 12 taong gulang pababa maliban kung sapat na ang tangkad niya. Ayon sa Sec. 4, dapat gumamit ng child restraint system o car seat, at may multa sa Sec. 10.",
+    "gagawin": [
+      "Paupuin ang bata sa likod na upuan.",
+      "Gumamit ng car seat na angkop sa edad at laki ng bata.",
+      "Siguraduhing naka-lock nang maayos ang car seat bago umandar."
+    ]
+  },
+  {
+    "id": "cellphone",
+    "category": "Cellphone / distracted driving",
+    "question": "Bawal ba gumamit ng cellphone habang nagmamaneho?",
+    "aliases": [
+      "is it illegal to use my phone while driving",
+      "nag-text ako habang nagmamaneho",
+      "magkano multa sa distracted driving",
+      "hawak ko cellphone sa stoplight bawal ba",
+      "na-flag ako kasi gumagamit ng phone",
+      "nag-text habang naka-red light bawal ba",
+      "phone use while stopped at a red light",
+      "sumagot ng tawag habang nagmamaneho"
+    ],
+    "sections": [
+      "ra10913-s4",
+      "ra10913-s8"
+    ],
+    "pagsusuri": "Ayon sa RA 10913 Sec. 4, bawal gumamit ng cellphone para tumawag, mag-text, o mag-browse habang nagmamaneho, kahit nakahinto sa stoplight. Ayon sa Sec. 8, may multa na tumataas sa bawat ulit.",
+    "gagawin": [
+      "Itabi ang phone o ilagay sa mount bago umandar.",
+      "Kung kailangang tumawag o mag-text, tumabi muna sa ligtas na lugar.",
+      "Gumamit ng hands-free kung kailangan talagang makausap habang nagmamaneho."
+    ]
+  },
+  {
+    "id": "phone-gps",
+    "category": "Cellphone / distracted driving",
+    "question": "Pwede ba gumamit ng Waze o GPS habang nagmamaneho?",
+    "aliases": [
+      "can I use waze while driving",
+      "phone holder sa dashboard bawal ba",
+      "GPS navigation allowed under anti distracted driving",
+      "pwede ba nakapatong ang phone sa harap",
+      "hands free calling allowed ba",
+      "google maps on phone while driving",
+      "pwede ba mag-navigate gamit ang phone"
+    ],
+    "sections": [
+      "ra10913-s5",
+      "ra10913-s6"
+    ],
+    "pagsusuri": "Ayon sa RA 10913 Sec. 5, hindi itinuturing na distracted driving ang paggamit ng phone gamit ang hands-free, basta hindi ito nakaharang sa paningin mo sa daan. Ayon sa Sec. 6, pwede ring gumamit ng phone para sa emergency na tawag.",
+    "gagawin": [
+      "Ilagay ang phone sa mount na hindi nakaharang sa paningin.",
+      "I-set ang destinasyon bago umandar, hindi habang nagmamaneho.",
+      "Huwag hawakan o pindutin ang phone habang umaandar."
+    ]
+  },
+  {
+    "id": "drunk-driving",
+    "category": "Drunk driving",
+    "question": "Ano ang parusa sa drunk driving?",
+    "aliases": [
+      "penalty for drunk driving",
+      "nakainom ako pwede ba magmaneho",
+      "lasing na nagmamaneho multa",
+      "DUI philippines penalty",
+      "uminom ako ng beer tapos nagmaneho"
+    ],
+    "sections": [
+      "ra10586-s5",
+      "ra10586-s12"
+    ],
+    "pagsusuri": "Ayon sa RA 10586 Sec. 5, bawal magmaneho nang lasing o naka-droga. Ayon sa Sec. 12, may multa at posibleng pagkakulong, at mas mabigat kapag may nasaktan o namatay.",
+    "gagawin": [
+      "Huwag magmaneho kapag nakainom; mag-taxi o magpasundo.",
+      "Pumili ng designated driver bago pa uminom.",
+      "Kung pinara, maging kalmado at sumunod sa field sobriety test."
+    ]
+  },
+  {
+    "id": "breathalyzer",
+    "category": "Drunk driving",
+    "question": "Pwede ba tumanggi sa breathalyzer test?",
+    "aliases": [
+      "can I refuse a breath test",
+      "ayaw ko magpa-alcohol test",
+      "refuse sobriety test penalty",
+      "pinapahipan ako ng enforcer",
+      "field sobriety test ano yan"
+    ],
+    "sections": [
+      "ra10586-s8",
+      "ra10586-s6"
+    ],
+    "pagsusuri": "Ayon sa RA 10586 Sec. 6, may field sobriety at breath test kapag may dahilan ang enforcer na maghinala. Ayon sa Sec. 8, ang pagtanggi sa test ay may parusa, kabilang ang pagbawi ng lisensya.",
+    "gagawin": [
+      "Maging kalmado at sumunod sa test.",
+      "Itanong nang magalang kung ano ang resulta at ang susunod na hakbang.",
+      "Kung hindi ka sang-ayon, isulat ang detalye at kumonsulta sa abogado."
+    ]
+  },
+  {
+    "id": "accident-duty",
+    "category": "Accidents & right of way",
+    "question": "Ano ang dapat gawin pag nakabangga ako?",
+    "aliases": [
+      "what to do after a car accident",
+      "nabangga ako ano gagawin",
+      "naaksidente ako sa kalsada",
+      "may nabangga akong motor",
+      "minor accident what are my duties",
+      "nakabangga ako ng kotse ano gagawin ko",
+      "I hit another car what do I do now",
+      "required ba ang alcohol at drug test pag naaksidente",
+      "mandatory testing after a road accident"
+    ],
+    "sections": [
+      "ra4136-s55",
+      "ra10586-s7"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 55, dapat huminto ang driver, tumulong sa nasaktan, at mag-report sa pinakamalapit na pulis. Ayon sa RA 10586 Sec. 7, maaaring isailalim sa alcohol test ang mga driver na sangkot sa aksidente.",
+    "gagawin": [
+      "Huminto, buksan ang hazard lights, at tumawag sa 911 kung may sugatan.",
+      "Kunan ng litrato ang mga sasakyan, plaka, at lugar bago galawin.",
+      "Makipagpalitan ng detalye gamit ang QR at mag-report sa pulis."
+    ]
+  },
+  {
+    "id": "hit-and-run",
+    "category": "Accidents & right of way",
+    "question": "Bawal ba umalis pagkatapos ng aksidente?",
+    "aliases": [
+      "is it illegal to leave the scene of an accident",
+      "hit and run penalty",
+      "tinakbuhan ako ng nakabangga",
+      "umalis yung nakabangga sa akin",
+      "pwede ba umalis kung minor lang"
+    ],
+    "sections": [
+      "ra4136-s55"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 55, hindi dapat umalis ang driver na sangkot sa aksidente nang hindi tumutulong sa nasaktan at nagre-report sa awtoridad, maliban kung siya mismo ay nasa panganib o kailangang magdala ng sugatan sa ospital.",
+    "gagawin": [
+      "Huwag umalis; huminto sa ligtas na lugar at tumulong.",
+      "Kung tinakbuhan ka, isulat ang plaka, kulay, at oras, at kunan ng video kung kaya.",
+      "Mag-report agad sa pulis at humingi ng kopya ng police report."
+    ]
+  },
+  {
+    "id": "right-of-way",
+    "category": "Accidents & right of way",
+    "question": "Sino ang may right of way sa intersection?",
+    "aliases": [
+      "who has the right of way at an intersection",
+      "sabay kami dumating sa kanto sino mauuna",
+      "nabangga sa interseksyon sino may mali",
+      "right of way rules philippines",
+      "sino dapat magbigay daan",
+      "who yields when two cars arrive at the same time",
+      "sino magbibigay daan pag sabay sa interseksyon"
+    ],
+    "sections": [
+      "ra4136-s42",
+      "ra4136-s43"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 42, kapag sabay dumating sa interseksyon, ang driver sa kaliwa ang dapat magbigay daan sa nasa kanan, at ang naunang pumasok ang may right of way. Ayon sa Sec. 43, dapat huminto ang galing sa private road o driveway bago pumasok sa highway.",
+    "gagawin": [
+      "Bagalan paglapit sa interseksyon at tingnan ang kanan at kaliwa.",
+      "Magbigay daan sa sasakyang nasa kanan mo o naunang pumasok.",
+      "Kung nagkabanggaan, kunan ng litrato ang posisyon ng mga sasakyan bago galawin."
+    ]
+  },
+  {
+    "id": "emergency-vehicle",
+    "category": "Accidents & right of way",
+    "question": "Ano gagawin pag may ambulansya na may sirena?",
+    "aliases": [
+      "what to do when an ambulance is behind me",
+      "fire truck na may sirena tumabi ba",
+      "police car siren right of way",
+      "may ambulance sa likod ko",
+      "kailangan ba tumabi sa wang wang"
+    ],
+    "sections": [
+      "ra4136-s49"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 49, dapat magbigay daan ang lahat ng sasakyan sa pulis, bumbero, at ambulansya na may sirena o ilaw, tumabi sa kanan, at huminto hanggang makalampas sila.",
+    "gagawin": [
+      "Tumabi sa kanan at huminto nang ligtas.",
+      "Huwag sumunod nang malapit sa likod ng ambulansya.",
+      "Umandar ulit kapag nakalampas na ito at ligtas na."
+    ]
+  },
+  {
+    "id": "flagged-enforcer",
+    "category": "Enforcer / na-flag",
+    "question": "Na-flag ako ng enforcer, ano gagawin ko?",
+    "aliases": [
+      "I got pulled over by an enforcer what should I do",
+      "pinara ako ng MMDA",
+      "hinuli ako ng LTO enforcer",
+      "na-flag ako ng traffic enforcer",
+      "pinahinto ako ng traffic aide",
+      "pinara ako ng enforcer paano ako kikilos",
+      "what to do when stopped by MMDA"
+    ],
+    "sections": [
+      "ra4136-s29"
+    ],
+    "pagsusuri": "Kapag na-flag, may karapatan ang enforcer na hingin ang lisensya at rehistro mo. Ayon sa RA 4136 Sec. 29, maaaring kunin ang lisensya at bigyan ka ng resibo o ticket na pansamantalang pwedeng gamitin.",
+    "gagawin": [
+      "Tumabi nang ligtas, buksan ang ilaw sa loob kung gabi, at maging magalang.",
+      "Ipakita ang lisensya at OR/CR, at itanong kung ano ang violation.",
+      "Kunin ang ticket at bayaran sa opisinang nakasulat dito; huwag mag-abot ng pera sa enforcer."
+    ]
+  },
+  {
+    "id": "license-confiscated",
+    "category": "Enforcer / na-flag",
+    "question": "Kinuha ang lisensya ko, pwede pa ba ako magmaneho?",
+    "aliases": [
+      "my license was confiscated can I still drive",
+      "kinumpiska ang lisensya ko",
+      "temporary operator permit gamit",
+      "paano bawiin ang lisensya na kinuha",
+      "TOP ticket valid ba bilang lisensya"
+    ],
+    "sections": [
+      "ra4136-s29"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 29, kapag kinumpiska ang lisensya, bibigyan ka ng resibo o ticket na pansamantalang pwedeng gamitin bilang lisensya habang hindi pa natatapos ang kaso o bayad.",
+    "gagawin": [
+      "Itago ang ticket o resibo at dalhin ito habang nagmamaneho.",
+      "Bayaran ang multa sa opisinang nakasulat bago mag-expire ang ticket.",
+      "Kunin ang lisensya mo sa opisina pagkatapos magbayad."
+    ]
+  },
+  {
+    "id": "no-license",
+    "category": "License & registration",
+    "question": "Ano ang multa pag nagmaneho nang walang lisensya?",
+    "aliases": [
+      "fine for driving without a license",
+      "naiwan ko ang lisensya ko",
+      "walang lisensya na-flag ako",
+      "pwede ba magmaneho kahit wala pang lisensya",
+      "driving without license penalty"
+    ],
+    "sections": [
+      "ra4136-s19",
+      "ra4136-s24"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 19, bawal magmaneho nang walang valid na lisensya. Ayon sa Sec. 24, dapat dala mo ang lisensya habang nagmamaneho at ipakita ito kapag hiningi ng awtoridad.",
+    "gagawin": [
+      "Huwag magmaneho hangga't wala kang valid na lisensya.",
+      "Laging dalhin ang lisensya; kung naiwan, ipaliwanag nang mahinahon at kunin ang ticket.",
+      "Kung na-flag, tingnan ang eksaktong multa sa Na-flag ako."
+    ]
+  },
+  {
+    "id": "expired-license",
+    "category": "License & registration",
+    "question": "Ano ang mangyayari kung expired ang lisensya ko?",
+    "aliases": [
+      "what if my driver's license is expired",
+      "expired license multa",
+      "paano mag-renew ng lisensya",
+      "nagmaneho ako na expired ang lisensya",
+      "late renewal ng lisensya"
+    ],
+    "sections": [
+      "ra4136-s26",
+      "ra4136-s19"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 26, dapat i-renew ang lisensya bago ito mag-expire. Ang pagmamaneho na expired ang lisensya ay parang walang valid na lisensya sa ilalim ng Sec. 19.",
+    "gagawin": [
+      "Huwag munang magmaneho hangga't hindi na-renew ang lisensya.",
+      "Mag-renew sa LTO at dalhin ang lumang lisensya at medical certificate.",
+      "Bayaran ang anumang late renewal penalty sa LTO."
+    ]
+  },
+  {
+    "id": "registration",
+    "category": "License & registration",
+    "question": "Kailangan bang dala ang OR/CR habang nagmamaneho?",
+    "aliases": [
+      "do I need to carry OR CR",
+      "expired registration ng sasakyan",
+      "unregistered vehicle penalty",
+      "naiwan ko ang OR CR",
+      "rehistro ng sasakyan required ba dala"
+    ],
+    "sections": [
+      "ra4136-s5-p1",
+      "ra4136-s15"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 5, dapat rehistrado ang bawat sasakyang ginagamit sa daan. Ayon sa Sec. 15, dapat dala ang certificate of registration at ipakita kapag hiningi ng awtoridad.",
+    "gagawin": [
+      "Itago ang kopya ng OR/CR sa sasakyan.",
+      "I-renew ang rehistro bago ang buwan ng huling numero ng plaka mo.",
+      "Huwag gamitin ang sasakyan kapag expired ang rehistro."
+    ]
+  },
+  {
+    "id": "student-permit",
+    "category": "License & registration",
+    "question": "Pwede ba magmaneho mag-isa gamit ang student permit?",
+    "aliases": [
+      "can I drive alone with a student permit",
+      "student driver permit rules",
+      "may student permit lang ako",
+      "kailangan ba may kasama pag student permit",
+      "student permit nag-drive mag-isa"
+    ],
+    "sections": [
+      "ra4136-s30"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 30, ang student driver ay hindi pwedeng magmaneho maliban kung may kasamang lisensyadong driver. Pananagutan din ng kasamang driver ang anumang paglabag.",
+    "gagawin": [
+      "Laging magpasama ng lisensyadong driver sa loob ng sasakyan.",
+      "Dalhin ang student permit habang nagmamaneho.",
+      "Kumuha ng non-professional license kapag kwalipikado na."
+    ]
+  },
+  {
+    "id": "coding-hours",
+    "category": "Coding",
+    "question": "Anong oras ang number coding?",
+    "aliases": [
+      "what time is number coding in metro manila",
+      "coding ba ako ngayon",
+      "UVVRP schedule",
+      "plate ending 1 coding kailan",
+      "may window hours ba ang coding"
+    ],
+    "sections": [],
+    "pagsusuri": "Ayon sa MMDA number coding scheme (UVVRP), bawal bumiyahe sa Metro Manila sa takdang oras ang sasakyan na ang huling numero ng plaka ay naka-schedule sa araw na iyon. Tingnan ang coding status sa Home dahil iba-iba ang patakaran ng ilang lungsod.",
+    "gagawin": [
+      "Tingnan ang coding status mo sa Home bago umalis.",
+      "Kung coding ka, umalis bago o pagkatapos ng coding hours.",
+      "Alamin ang patakaran ng lungsod na dadaanan mo dahil may ilan na may sariling schedule."
+    ]
+  },
+  {
+    "id": "coding-fine",
+    "category": "Coding",
+    "question": "Magkano ang multa sa coding?",
+    "aliases": [
+      "fine for number coding violation",
+      "nahuli ako sa coding",
+      "na-flag ako kasi coding ako",
+      "UVVRP violation penalty",
+      "coding violation magkano"
+    ],
+    "sections": [],
+    "pagsusuri": "Ang number coding (UVVRP) ay patakaran ng MMDA at ng mga lungsod, kaya ang multa ay ayon sa MMDA o city ordinance at hindi sa RA 4136. Makikita ang halaga sa Na-flag ako.",
+    "gagawin": [
+      "Kunin ang ticket at tingnan ang halaga sa Na-flag ako.",
+      "Bayaran sa opisina ng MMDA o lungsod na nakasulat sa ticket.",
+      "I-check ang coding status sa Home bago bumiyahe sa susunod."
+    ]
+  },
+  {
+    "id": "reckless-driving",
+    "category": "Accidents & right of way",
+    "question": "Ano ang reckless driving?",
+    "aliases": [
+      "what counts as reckless driving",
+      "reckless driving multa",
+      "mabilis at pa-zigzag na pagmamaneho",
+      "na-flag ako ng reckless driving",
+      "kaskasero sa kalsada bawal"
+    ],
+    "sections": [
+      "ra4136-s48"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 48, bawal magmaneho nang walang ingat o nang mabilis na hindi akma sa daan, trapiko, at panahon, dahil inilalagay nito sa panganib ang tao at ari-arian.",
+    "gagawin": [
+      "Bagalan at panatilihin ang ligtas na distansya sa unahan.",
+      "Huwag mag-zigzag o biglang lumipat ng lane.",
+      "Kung na-flag, kunin ang ticket at tingnan ang multa sa Na-flag ako."
+    ]
+  },
+  {
+    "id": "speed-limit",
+    "category": "Accidents & right of way",
+    "question": "Ano ang speed limit sa Pilipinas?",
+    "aliases": [
+      "what is the speed limit in the philippines",
+      "overspeeding multa",
+      "gaano kabilis pwede sa highway",
+      "speed limit sa city street",
+      "na-flag ako sa overspeeding"
+    ],
+    "sections": [
+      "ra4136-s35",
+      "ra4136-s36"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 35, dapat maingat at akma sa daan at trapiko ang bilis mo, at may maximum na bilis depende sa uri ng daan at sasakyan. Ayon sa Sec. 36, hindi pwedeng gumawa ang lungsod o munisipyo ng ibang speed limit maliban sa nasa batas.",
+    "gagawin": [
+      "Sundin ang nakapaskil na speed limit sign.",
+      "Bagalan sa mga paaralan, mataong lugar, at kapag umuulan.",
+      "Kung na-flag sa overspeeding, kunin ang ticket at tingnan ang multa sa Na-flag ako."
+    ]
+  },
+  {
+    "id": "parking",
+    "category": "Enforcer / na-flag",
+    "question": "Saan bawal mag-park?",
+    "aliases": [
+      "where is parking not allowed",
+      "illegal parking multa",
+      "pwede ba mag-park sa tapat ng bahay",
+      "na-tow ang sasakyan ko",
+      "bawal ba mag-park malapit sa kanto",
+      "saan bawal pumarada",
+      "no parking areas philippines"
+    ],
+    "sections": [
+      "ra4136-s46",
+      "ra4136-s52"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 46, bawal mag-park sa loob ng interseksyon, sa crosswalk, malapit sa kanto, malapit sa pasukan ng fire station, at sa iba pang lugar na nakalista doon. Ayon sa Sec. 52, bawal din mag-park o magmaneho sa sidewalk.",
+    "gagawin": [
+      "Mag-park lang sa may marka o pinapayagang lugar.",
+      "Iwasan ang kanto, tawiran, at harap ng fire station o driveway.",
+      "Kung na-tow, pumunta sa impounding area dala ang OR/CR at lisensya."
+    ]
+  },
+  {
+    "id": "turn-signal",
+    "category": "Signs & Signals",
+    "question": "Kailangan ba mag-signal bago lumiko o huminto?",
+    "aliases": [
+      "do I need to signal before turning",
+      "hindi nag-signal bago kumanan",
+      "signal light bago lumiko required ba",
+      "bumusina ba pag may tao bago umandar",
+      "kumaliwa siya nang walang signal"
+    ],
+    "sections": [
+      "ra4136-s44"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 44, bago umandar, huminto, o lumiko, dapat siguraduhin munang ligtas ito at magbigay ng malinaw na signal sa ibang sasakyan. Pwedeng gamitin ang signal light o ang kamay na nakalabas sa kaliwa, at bumusina kung may taong maaapektuhan.",
+    "gagawin": [
+      "Mag-signal ilang segundo bago lumiko o lumipat ng lane.",
+      "Tingnan ang side mirror at blind spot bago gumalaw.",
+      "Kung sira ang signal light, gumamit ng hand signal at ipaayos agad."
+    ]
+  },
+  {
+    "id": "turning",
+    "category": "Right of Way & Turning",
+    "question": "Saang lane dapat manggaling bago kumanan o kumaliwa?",
+    "aliases": [
+      "which lane should I use before turning",
+      "paano ang tamang pagliko sa intersection",
+      "kumaliwa ako galing sa kanang lane",
+      "right turn from the left lane bawal ba",
+      "tamang lane para lumiko"
+    ],
+    "sections": [
+      "ra4136-s45"
+    ],
+    "pagsusuri": "Ayon sa RA 4136 Sec. 45, kapag kakanan, dapat galing ka sa pinakakanang lane at lumiko nang malapit sa gilid. Kapag kakaliwa, dapat galing ka sa lane na pinakamalapit sa gitna ng kalsada, o sa kaliwang lane kung one-way.",
+    "gagawin": [
+      "Lumipat sa tamang lane bago pa makarating sa interseksyon.",
+      "Mag-signal at bagalan bago lumiko.",
+      "Huwag lumiko mula sa maling lane kahit maluwag ang daan."
+    ]
+  },
+  {
+    "id": "child-car-seat",
+    "category": "Child Safety",
+    "question": "Kailangan ba ng car seat ang anak ko?",
+    "aliases": [
+      "is a child car seat required",
+      "child restraint system batas",
+      "car seat ng bata required ba",
+      "ilang taon dapat naka car seat ang bata",
+      "bata walang car seat sa kotse"
+    ],
+    "sections": [
+      "ra11229-s4",
+      "ra11229-s10"
+    ],
+    "pagsusuri": "Ayon sa RA 11229 Sec. 4, dapat naka-child restraint system o car seat ang bata habang bumibiyahe, maliban kung 150 cm (59 inches) na ang tangkad niya at maayos nang naka-seatbelt. Ayon sa Sec. 10, may multa ang driver na lalabag.",
+    "gagawin": [
+      "Gumamit ng car seat na angkop sa edad, tangkad, at timbang ng bata.",
+      "Siguraduhing naka-lock nang maayos ang car seat bago umandar.",
+      "Kapag 150 cm na ang bata, siguraduhing tama ang pagkakasuot ng seatbelt."
+    ]
+  }
+]

@@ -4,6 +4,7 @@ import '../rag/law_retriever.dart';
 import '../rag/intent.dart';
 import 'answer_parts.dart';
 import 'citation_guard.dart';
+import 'faq_answers.dart';
 import 'local_llm.dart';
 import 'section_filter.dart';
 
@@ -25,7 +26,12 @@ class LocalAiAssistant implements AiAssistant {
     required this.isModelReady,
     this.hybrid,
     bool Function()? isHybridReady,
-  }) : isHybridReady = isHybridReady ?? (() => hybrid != null);
+    List<FaqEntry> faq = const [],
+  }) : isHybridReady = isHybridReady ?? (() => hybrid != null),
+       faq = [
+         for (final e in faq)
+           if (e.curated) e,
+       ];
 
   final LawRetriever retriever;
   final TextGenerator llm;
@@ -34,6 +40,49 @@ class LocalAiAssistant implements AiAssistant {
   /// Semantic + keyword retrieval; used while [isHybridReady] is true.
   final HybridRetriever? hybrid;
   final bool Function() isHybridReady;
+
+  /// Curated answers (faq.json) for common questions.
+  final List<FaqEntry> faq;
+
+  /// Semantic similarity needed to answer from a curated FAQ entry instead
+  /// of the LLM. Stricter than the retrieval boost
+  /// ([HybridRetriever.faqThreshold]): a wrong curated answer is worse than
+  /// an LLM one. Tuned on tools/eval/faq_eval.json.
+  static const curatedThreshold = 0.80;
+
+  /// Same idea for keyword-only mode (word overlap with a phrasing).
+  static const lexicalThreshold = 0.6;
+
+  /// The curated FAQ entry for [question], if the match is strong. Public
+  /// so tools/eval measures exactly what the app does.
+  Future<({FaqEntry entry, double score})?> curatedFor(String question) async {
+    if (faq.isEmpty) return null;
+    final h = hybrid;
+    if (h != null && isHybridReady()) {
+      final best = await h.bestFaq(question);
+      if (best != null && best.score >= curatedThreshold) {
+        for (final e in faq) {
+          if (e.id == best.id) return (entry: e, score: best.score);
+        }
+      }
+      return null;
+    }
+    final lex = lexicalFaqMatch(question, faq);
+    return lex != null && lex.score >= lexicalThreshold ? lex : null;
+  }
+
+  /// Puts the FAQ's own sections first (they were picked by hand), then the
+  /// retrieved ones; max 3 like normal retrieval.
+  List<LawChunk> _withFaqSections(FaqEntry e, List<LawChunk> retrieved) {
+    final out = <LawChunk>[];
+    final seen = <String>{};
+    String base(String id) => id.replaceFirst(RegExp(r'-p\d+$'), '');
+    for (final c in [...retriever.lawsByIds(e.sections), ...retrieved]) {
+      if (seen.add(base(c.id))) out.add(c);
+      if (out.length == 3) break;
+    }
+    return out;
+  }
 
   /// What [ask] cites for [question]. Public so tools/eval measures exactly
   /// the retrieval the app uses.
@@ -63,6 +112,19 @@ class LocalAiAssistant implements AiAssistant {
     final injury = AnswerParts.mentionsInjury(question);
     final aboutFine = AnswerParts.asksAboutFine(question);
     final (:laws, :fines) = await retrieve(question);
+    final curated = await curatedFor(question);
+    if (curated != null) {
+      // Common question: hand-checked analysis + topic steps, no LLM.
+      final e = curated.entry;
+      yield AnswerParts.kalma(injury: injury);
+      yield AnswerParts.batas(_withFaqSections(e, laws), fines);
+      yield '${AnswerParts.pagsusuriHeader}\n${e.pagsusuri}\n\n';
+      yield AnswerParts.steps([
+        if (injury) 'Kung may nasaktan, tumawag agad sa 911.',
+        ...e.gagawin,
+      ]);
+      return;
+    }
     yield* _answer(
       kalma: AnswerParts.kalma(injury: injury),
       laws: laws,
@@ -73,6 +135,7 @@ class LocalAiAssistant implements AiAssistant {
         injury: injury,
         aboutFine: aboutFine,
         accident: AnswerParts.mentionsAccident(question),
+        question: question,
       ),
     );
   }

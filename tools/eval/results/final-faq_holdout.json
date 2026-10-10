@@ -1,0 +1,208 @@
+{
+  "summary": {
+    "label": "final-faq_holdout",
+    "retriever": "Hybrid FTS5 + embeddinggemma-300m-q8 (RRF, intent, FAQ: 212 phrasings)",
+    "llm": null,
+    "accuracy": 0.6,
+    "lawHitRate": 1.0,
+    "fineHitRate": null,
+    "faqHitRate": 0.6,
+    "faqWrong": 0,
+    "retrievalMsMedian": 34,
+    "answerMsMedian": null,
+    "answerMsMean": null,
+    "inventedCitationRate": null,
+    "answerQualityRate": null,
+    "badFormat": 0,
+    "blame": 0,
+    "shownWrong": 0,
+    "badAmount": 0,
+    "onTargetCitationRate": null,
+    "answerMsMax": null
+  },
+  "questions": [
+    {
+      "id": "fh01",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "double-solid-yellow",
+      "faqHit": true,
+      "laws": [
+        "ra4136-s41",
+        "ra4136-s39",
+        "ra4136-s40"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "fh02",
+      "intent": "fine",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "drunk-driving",
+      "faqHit": true,
+      "laws": [
+        "ra10586-s12",
+        "ra10586-s5",
+        "ra10586-s6"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "fh03",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "helmet",
+      "faqHit": true,
+      "laws": [
+        "ra10054-s3",
+        "ra10054-s7",
+        "ra10054-s4"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "fh04",
+      "intent": "general",
+      "pass": true,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": "seatbelt",
+      "faqHit": true,
+      "laws": [
+        "ra8750-s4",
+        "ra8750-s12",
+        "ra8750-s2"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "fh05",
+      "intent": "general",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra10913-s4",
+        "ra10913-s8",
+        "ra10913-s2"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "fh06",
+      "intent": "general",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra4136-s46",
+        "ra10913-s6",
+        "ra4136-s49"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "fh07",
+      "intent": "general",
+      "pass": false,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra11229-s5",
+        "ra4136-s39",
+        "ra4136-s46"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "fh08",
+      "intent": "enforcer",
+      "pass": false,
+      "lawHit": true,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": false,
+      "laws": [
+        "ra4136-s29",
+        "ra4136-s19",
+        "ra10586-s4"
+      ],
+      "fines": [
+        "Arrogance / discourteous conduct by driver (+ driver's seminar)",
+        "Driving without a valid driver's license or conductor's permit"
+      ],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "fh09",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra4136-s52",
+        "ra4136-s54",
+        "ra4136-s48"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    },
+    {
+      "id": "fh10",
+      "intent": "general",
+      "pass": true,
+      "lawHit": null,
+      "fineHit": null,
+      "faq": null,
+      "faqHit": true,
+      "laws": [
+        "ra10586-s3",
+        "ra4136-s53",
+        "ra4136-s5-p2"
+      ],
+      "fines": [],
+      "answerMs": null,
+      "answer": null,
+      "answerProblems": null
+    }
+  ]
+}

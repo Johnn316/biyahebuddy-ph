@@ -12,22 +12,79 @@ final selectedAgencyProvider = StateProvider.autoDispose<Agency?>(
 /// Step 2 search text.
 final violationQueryProvider = StateProvider.autoDispose<String>((ref) => '');
 
-/// How many violations to show when the query is empty.
-const commonViolationsLimit = 8;
-
+/// Empty query → every fine of the agency; otherwise the search results
+/// (best first).
 final violationResultsProvider = FutureProvider.autoDispose<List<Fine>>((
   ref,
 ) async {
   final agency = ref.watch(selectedAgencyProvider);
   if (agency == null) return const [];
   final query = ref.watch(violationQueryProvider).trim();
-  final results = await ref
-      .watch(finesRepositoryProvider)
-      .search(query, agency);
-  return query.isEmpty
-      ? results.take(commonViolationsLimit).toList(growable: false)
-      : results;
+  return ref.watch(finesRepositoryProvider).search(query, agency);
 });
+
+/// How many violations each agency has (agency picker).
+final agencyCountProvider = FutureProvider.autoDispose.family<int, Agency>(
+  (ref, agency) async =>
+      (await ref.watch(finesRepositoryProvider).search('', agency)).length,
+);
+
+/// Groups for the full list (empty search), in display order.
+enum FineCategory {
+  license('Lisensya & Rehistro'),
+  safety('Helmet & Seatbelt'),
+  signs('Signs & Signals'),
+  parking('Parking & Obstruction'),
+  distracted('Distracted / Drunk'),
+  coding('Coding & Truck ban'),
+  other('Iba pa');
+
+  const FineCategory(this.label);
+
+  final String label;
+}
+
+/// Category of [fine] from its violation name and aliases.
+FineCategory fineCategory(Fine fine) {
+  final t = [fine.violation, ...fine.aliases].join(' ').toLowerCase();
+  bool has(List<String> words) => words.any(t.contains);
+  if (has(['distracted', 'mobile phone', 'cellphone', 'influence', 'drunk'])) {
+    return FineCategory.distracted;
+  }
+  if (has(['license', 'lisensya', 'permit', 'registration', 'plate'])) {
+    return FineCategory.license;
+  }
+  if (has(['helmet', 'seatbelt', 'seat belt', 'child', 'dress code'])) {
+    return FineCategory.safety;
+  }
+  if (has(['coding', 'uvvrp', 'truck ban', 'tricycle ban'])) {
+    return FineCategory.coding;
+  }
+  if (has(['parking', 'obstruction', 'loading', 'unloading'])) {
+    return FineCategory.parking;
+  }
+  if (has([
+    'traffic sign',
+    'red light',
+    'signal',
+    'counterflow',
+    'overspeeding',
+    'reckless',
+    'swerving',
+  ])) {
+    return FineCategory.signs;
+  }
+  return FineCategory.other;
+}
+
+/// [fines] grouped by [FineCategory] (empty groups left out), keeping the
+/// original order inside each group.
+List<(FineCategory, List<Fine>)> groupFines(List<Fine> fines) => [
+  for (final c in FineCategory.values)
+    if (fines.where((f) => fineCategory(f) == c).toList() case final list
+        when list.isNotEmpty)
+      (c, list),
+];
 
 extension AgencyLabels on Agency {
   String get label => switch (this) {

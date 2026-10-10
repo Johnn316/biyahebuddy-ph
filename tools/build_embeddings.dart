@@ -110,8 +110,20 @@ Future<void> main(List<String> args) async {
   // "overspeeding"), so the section title separates them: "Restriction as to
   // speed" shares "speed" with "overspeeding"; "Driver to give way" doesn't.
   const genericTitleWords = {
-    'driver', 'drivers', 'vehicle', 'vehicles', 'motor', 'highway',
-    'highways', 'other', 'upon', 'with', 'from', 'shall', 'their', 'certain',
+    'driver',
+    'drivers',
+    'vehicle',
+    'vehicles',
+    'motor',
+    'highway',
+    'highways',
+    'other',
+    'upon',
+    'with',
+    'from',
+    'shall',
+    'their',
+    'certain',
   };
   int titleHits(String title, List<String> terms) => {
     for (final w in title.toLowerCase().split(RegExp('[^a-z]+')))
@@ -145,7 +157,8 @@ Future<void> main(List<String> args) async {
         if (!boilerplate.hasMatch(lawTitles[e.key]!))
           (
             id: e.key,
-            tags: [
+            tags:
+                [
                   for (final t in lawTags[e.key]!.toSet())
                     if (t.length >= 4 && covers(t)) 1 / tagDocs[t]!,
                 ].fold<double>(0, (a, b) => a + b) +
@@ -155,9 +168,9 @@ Future<void> main(List<String> args) async {
     ];
     // Semantic shortlist first (keeps links sensible), then let tag/title
     // evidence re-rank within it; ties keep the vector order.
-    final shortlist = ([...scored]..sort((a, b) => b.vec.compareTo(a.vec)))
-        .take(6)
-        .toList();
+    final shortlist = ([
+      ...scored,
+    ]..sort((a, b) => b.vec.compareTo(a.vec))).take(6).toList();
     final ranked = [
       for (final (rank, s) in shortlist.indexed)
         (id: s.id, key: s.tags - rank * 0.01),
@@ -176,6 +189,7 @@ Future<void> main(List<String> args) async {
     ];
     for (final p in phrasings) {
       faq.add({
+        if (q['id'] != null) 'id': q['id'],
         'text': p,
         'sections': sections,
         'vec': VectorIndex.encode(await embedder.embed(spec.query(p))),

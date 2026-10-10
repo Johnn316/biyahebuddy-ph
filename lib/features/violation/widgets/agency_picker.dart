@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/contracts/contracts.dart';
 import '../../../core/theme/app_theme.dart';
@@ -81,6 +82,7 @@ class AgencyPickerLarge extends StatelessWidget {
                                             a.description,
                                             style: context.text.bodySmall,
                                           ),
+                                          _AgencyCount(agency: a),
                                         ],
                                       ),
                                     ),
@@ -150,6 +152,26 @@ class AgencyPickerCompact extends StatelessWidget {
           HapticFeedback.selectionClick();
           onSelected(a);
         },
+      ),
+    );
+  }
+}
+
+/// "24 na violation" under an agency (empty while loading).
+class _AgencyCount extends ConsumerWidget {
+  const _AgencyCount({required this.agency});
+
+  final Agency agency;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final n = ref.watch(agencyCountProvider(agency)).valueOrNull;
+    return Text(
+      n == null ? ' ' : '$n na violation',
+      key: Key('agency-count-${agency.name}'),
+      style: context.text.labelMedium?.copyWith(
+        color: context.colors.primary,
+        fontWeight: FontWeight.w700,
       ),
     );
   }

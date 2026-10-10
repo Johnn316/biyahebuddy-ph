@@ -4,7 +4,11 @@ import 'package:biyahebuddy_ph/core/contracts/contracts.dart';
 import 'package:biyahebuddy_ph/core/di/providers.dart';
 import 'package:biyahebuddy_ph/core/fakes/fakes.dart';
 import 'package:biyahebuddy_ph/features/violation/controllers/violation_controller.dart';
+import 'package:biyahebuddy_ph/core/theme/app_theme.dart';
+import 'package:biyahebuddy_ph/features/violation/screens/officer_message_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -69,7 +73,10 @@ void main() {
     expect(find.byKey(const Key('violation-search')), findsNothing);
 
     await tapKey(tester, 'agency-lto'); // tap 1
-    expect(find.text('KARANIWANG VIOLATION'), findsOneWidget);
+    // All LTO violations, grouped, with a count.
+    expect(find.text('LISENSYA & REHISTRO'), findsOneWidget);
+    expect(find.text('HELMET & SEATBELT'), findsOneWidget);
+    expect(find.byKey(const Key('fine-count')), findsOneWidget);
     expect(find.text('Driving without a valid license'), findsOneWidget);
     // Only LTO violations.
     expect(find.text('Number coding (UVVRP) violation'), findsNothing);
@@ -109,6 +116,81 @@ void main() {
     await tapKey(tester, 'agency-chip-mmda');
     expect(find.text('Number coding (UVVRP) violation'), findsOneWidget);
     expect(find.text('Driving without a valid license'), findsNothing);
+  });
+
+  testWidgets('agency picker shows each agency violation count', (
+    tester,
+  ) async {
+    await openViolation(tester);
+    for (final a in Agency.values) {
+      final count = await FakeFinesRepository().search('', a);
+      expect(
+        find.text('${count.length} na violation'),
+        findsWidgets,
+        reason: a.name,
+      );
+    }
+  });
+
+  testWidgets('empty search lists every fine (no top-8 cut)', (tester) async {
+    await openViolation(tester);
+    await tapKey(tester, 'agency-mmda');
+    final all = await FakeFinesRepository().search('', Agency.mmda);
+    expect(
+      tester.widget<Text>(find.byKey(const Key('fine-count'))).data,
+      '${all.length} na violation',
+    );
+    for (final f in all) {
+      await tester.scrollUntilVisible(
+        find.text(f.violation),
+        200,
+        scrollable: find.descendant(
+          of: find.byKey(const Key('fine-list')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+    }
+  });
+
+  testWidgets('no match → "Itanong kay Buddy" opens Buddy with the query', (
+    tester,
+  ) async {
+    await openViolation(tester);
+    await tapKey(tester, 'agency-lto');
+    await tester.enterText(
+      find.byKey(const Key('violation-search')),
+      'binangga ako ng kalabaw',
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Walang nahanap'), findsOneWidget);
+    await tapKey(tester, 'ask-buddy-query');
+    expect(find.widgetWithText(AppBar, 'Buddy'), findsOneWidget);
+    final input = tester.widget<TextField>(find.byKey(const Key('chat-input')));
+    expect(input.controller!.text, 'binangga ako ng kalabaw');
+  });
+
+  test('fines are grouped by category', () {
+    Fine f(String v) =>
+        Fine(violation: v, agency: Agency.mmda, amount: 1, legalBasis: '');
+    expect(fineCategory(f('Illegal parking')), FineCategory.parking);
+    expect(fineCategory(f('No seatbelt (driver)')), FineCategory.safety);
+    expect(
+      fineCategory(f('Distracted driving (mobile phone)')),
+      FineCategory.distracted,
+    );
+    expect(fineCategory(f('Disregarding traffic signs')), FineCategory.signs);
+    expect(fineCategory(f('Number coding (UVVRP)')), FineCategory.coding);
+    expect(fineCategory(f('Arrogance / discourteous')), FineCategory.other);
+    final groups = groupFines([
+      f('Illegal parking'),
+      f('No seatbelt'),
+      f('Obstruction of traffic'),
+    ]);
+    expect(groups.map((g) => g.$1), [
+      FineCategory.safety,
+      FineCategory.parking,
+    ]);
+    expect(groups.last.$2, hasLength(2));
   });
 
   testWidgets('no mic on the search when voice input is disabled', (
@@ -163,14 +245,9 @@ void main() {
     await tapKey(tester, 'fine-0');
     await tapKey(tester, 'ipakita');
 
-    expect(
-      find.text(
-        'Magandang araw po. Ayon sa SAMPLE — MMDA Regulation, ang multa sa '
-        'Disregarding traffic signs ay ₱1,000. Maaari po bang mabigyan ng '
-        'official ticket? Salamat po.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('Magandang araw po.'), findsOneWidget);
+    expect(find.text('Disregarding traffic signs'), findsWidgets);
+    expect(find.text('₱1,000'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     // Landscape still fits.
@@ -242,5 +319,100 @@ void main() {
     expect(formatPeso(1000), '₱1,000');
     expect(formatPeso(1234567), '₱1,234,567');
     expect(formatPeso(1500.5), '₱1,500.50');
+  });
+
+  group('IPAKITA layout', () {
+    setUpAll(() async {
+      final loader = FontLoader('PlusJakartaSans');
+      for (final w in ['Regular', 'Medium', 'SemiBold', 'Bold', 'ExtraBold']) {
+        loader.addFont(rootBundle.load('assets/fonts/PlusJakartaSans-$w.ttf'));
+      }
+      await loader.load();
+    });
+
+    const fine = Fine(
+      violation: 'Disregarding traffic signs (incl. beating the red light)',
+      agency: Agency.mmda,
+      amount: 1000,
+      legalBasis:
+          'Metro Manila Traffic Code of 2023 (JMMTC No. 01, s. 2023), '
+          'Sec. 10, as implemented by MMDA Regulation No. 23-002',
+    );
+
+    const sizes = {
+      'small portrait': Size(360, 640),
+      'small landscape': Size(640, 360),
+      'phone portrait': Size(412, 915),
+      'phone landscape': Size(915, 412),
+    };
+    for (final MapEntry(key: name, value: size) in sizes.entries) {
+      testWidgets('$name: full width, words never split, no scroll', (
+        tester,
+      ) async {
+        tester.view.physicalSize = size * 2;
+        tester.view.devicePixelRatio = 2;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.dark,
+            home: const OfficerMessageScreen(fine: fine),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+
+        // Text uses the full width (24dp sides), not a narrow column.
+        final line = tester.getRect(find.byKey(const Key('officer-line-1')));
+        expect(line.width, closeTo(size.width - 48, 1));
+
+        // Lines wrap only at spaces.
+        for (var i = 0; i < 5; i++) {
+          final para = tester.renderObject<RenderParagraph>(
+            find.descendant(
+              of: find.byKey(Key('officer-line-$i')),
+              matching: find.byType(RichText),
+            ),
+          );
+          final text = para.text.toPlainText();
+          final painter = TextPainter(
+            text: para.text,
+            textAlign: para.textAlign,
+            textDirection: TextDirection.ltr,
+          )..layout(maxWidth: para.size.width);
+          addTearDown(painter.dispose);
+          var offset = 0;
+          while (offset < text.length) {
+            final end = painter
+                .getLineBoundary(TextPosition(offset: offset))
+                .end;
+            if (end >= text.length || end <= offset) break;
+            final atSpace = text[end - 1] == ' ' || text[end] == ' ';
+            expect(atSpace, isTrue, reason: 'line $i breaks at "$text"@$end');
+            offset = end;
+          }
+        }
+
+        // Fits without scrolling; base ≥ 22 in portrait.
+        final scroll = tester.state<ScrollableState>(
+          find.descendant(
+            of: find.byKey(const Key('officer-message')),
+            matching: find.byType(Scrollable),
+          ),
+        );
+        expect(scroll.position.maxScrollExtent, 0);
+        final greeting = tester.widget<Text>(
+          find.byKey(const Key('officer-line-0')),
+        );
+        if (size.height > size.width) {
+          expect(greeting.style!.fontSize, greaterThanOrEqualTo(22));
+        }
+        // Fine amount is the biggest, in amber.
+        final amount = tester.widget<Text>(
+          find.byKey(const Key('officer-line-2')),
+        );
+        expect(amount.style!.fontSize, greaterThan(greeting.style!.fontSize!));
+        expect(amount.style!.color, AppPalette.dark.accent);
+      });
+    }
   });
 }
