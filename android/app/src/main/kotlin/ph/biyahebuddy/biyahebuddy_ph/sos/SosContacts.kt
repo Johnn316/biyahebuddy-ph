@@ -30,6 +30,13 @@ object SosContacts {
         return runCatching { phones(JSONArray(saved ?: "[]")) }.getOrDefault(emptyList())
     }
 
+    /** The saved driver Profile (Dart key "profile_v1"), or null. */
+    fun profile(ctx: Context): JSONObject? = runCatching {
+        ctx.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+            .getString("flutter.profile_v1", null)
+            ?.let { JSONObject(it) }
+    }.getOrNull()
+
     private fun phones(array: JSONArray?): List<String> {
         if (array == null) return emptyList()
         return (0 until array.length())

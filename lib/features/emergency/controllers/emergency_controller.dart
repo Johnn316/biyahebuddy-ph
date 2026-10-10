@@ -47,19 +47,72 @@ final sosCapabilitiesProvider = FutureProvider.autoDispose<SosCapabilities>((
 /// Emergency numbers work without a SIM, so these are never greyed out.
 const alwaysCallable = {'911', '112'};
 
-/// SOS SMS text. Status sentence is left out until "Ligtas ka ba?" is answered.
-String buildSosMessage(({double lat, double lng})? location, bool? injured) {
-  final where = location == null
-      ? 'Lokasyon: hindi makuha ang GPS.'
-      : 'Lokasyon: https://maps.google.com/?q='
-            '${location.lat.toStringAsFixed(6)},'
-            '${location.lng.toStringAsFixed(6)}.';
-  final status = switch (injured) {
-    true => ' May sugatan',
-    false => ' Ligtas ako',
-    null => '',
-  };
-  return 'Naaksidente ako. $where$status';
+/// SOS SMS text: says it's from BiyaheBuddy PH and who needs help, so it
+/// doesn't look like spam. Uses whatever profile fields exist (empty ones are
+/// skipped, never "null"). The injury line appears once "Ligtas ka ba?" is
+/// answered. Plain text, no emojis; > 160 chars, so the native side sends
+/// it as a multipart SMS. Keep in sync with VolumeSosService.sosMessage.
+String buildSosMessage(
+  ({double lat, double lng})? location,
+  bool? injured, {
+  Profile? profile,
+  DateTime? now,
+}) {
+  String? clean(String? v) {
+    final t = v?.trim() ?? '';
+    return t.isEmpty || t == 'null' ? null : t;
+  }
+
+  final name = clean(profile?.name);
+  final plate = clean(profile?.plateNo);
+  final vehicle = clean(profile?.vehicleType);
+  final blood = clean(profile?.bloodType);
+  final who = [
+    name ?? 'Ang driver na ito',
+    if (plate != null) '(plate $plate)',
+  ].join(' ');
+  final car = [
+    if (vehicle != null) 'Sasakyan: $vehicle',
+    if (blood != null) 'Blood type: $blood',
+  ].join(' | ');
+
+  return [
+    'BiyaheBuddy PH - SOS ALERT',
+    '${name == null ? who : 'Si $who'} ay naaksidente at humihingi ng tulong.',
+    if (injured == true) 'May sugatan.',
+    if (injured == false) 'Walang sugatan.',
+    location == null
+        ? 'Lokasyon: hindi makuha ang GPS. Tawagan siya para malaman kung '
+              'nasaan siya.'
+        : 'Lokasyon: https://maps.google.com/?q='
+              '${location.lat.toStringAsFixed(6)},'
+              '${location.lng.toStringAsFixed(6)}',
+    if (car.isNotEmpty) car,
+    'Tawagan siya agad. Kung hindi sumasagot, tumawag sa 911.',
+    '- Awtomatikong ipinadala ng BiyaheBuddy PH app '
+        '(${sosTime(now ?? DateTime.now())})',
+  ].join('\n');
+}
+
+/// "7:52 AM, Okt 10" (offline, no intl).
+String sosTime(DateTime t) {
+  const months = [
+    'Ene',
+    'Peb',
+    'Mar',
+    'Abr',
+    'May',
+    'Hun',
+    'Hul',
+    'Ago',
+    'Set',
+    'Okt',
+    'Nob',
+    'Dis',
+  ];
+  final h = t.hour % 12 == 0 ? 12 : t.hour % 12;
+  final m = t.minute.toString().padLeft(2, '0');
+  return '$h:$m ${t.hour < 12 ? 'AM' : 'PM'}, ${months[t.month - 1]} ${t.day}';
 }
 
 /// Sends the SOS text (with GPS) to one or more emergency contacts.
@@ -75,7 +128,13 @@ class SosSmsController extends AutoDisposeAsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final location = await sos.currentLocation();
-      await sos.smsContacts(contacts, buildSosMessage(location, injured));
+      final profile = await ref
+          .read(profileProvider.future)
+          .catchError((Object _) => null);
+      await sos.smsContacts(
+        contacts,
+        buildSosMessage(location, injured, profile: profile),
+      );
     });
     return !state.hasError;
   }
