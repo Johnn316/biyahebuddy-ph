@@ -50,8 +50,9 @@ const alwaysCallable = {'911', '112'};
 /// SOS SMS text: says it's from BiyaheBuddy PH and who needs help, so it
 /// doesn't look like spam. Uses whatever profile fields exist (empty ones are
 /// skipped, never "null"). The injury line appears once "Ligtas ka ba?" is
-/// answered. Plain text, no emojis; > 160 chars, so the native side sends
-/// it as a multipart SMS. Keep in sync with VolumeSosService.sosMessage.
+/// answered. Plain text, no emojis, no links (PH networks block SMS with
+/// URLs); > 160 chars, so the native side sends it as a multipart SMS.
+/// Keep in sync with VolumeSosService.sosMessage.
 String buildSosMessage(
   ({double lat, double lng})? location,
   bool? injured, {
@@ -84,9 +85,11 @@ String buildSosMessage(
     location == null
         ? 'Lokasyon: hindi makuha ang GPS. Tawagan siya para malaman kung '
               'nasaan siya.'
-        : 'Lokasyon: https://maps.google.com/?q='
-              '${location.lat.toStringAsFixed(6)},'
-              '${location.lng.toStringAsFixed(6)}',
+        // Plain coordinates, NO link: PH networks silently drop P2P
+        // texts that contain URLs (anti-scam filtering).
+        : 'Lokasyon (GPS): ${location.lat.toStringAsFixed(6)}, '
+              '${location.lng.toStringAsFixed(6)}\n'
+              'I-paste sa Google Maps o Waze para makita.',
     if (car.isNotEmpty) car,
     'Tawagan siya agad. Kung hindi sumasagot, tumawag sa 911.',
     '- Awtomatikong ipinadala ng BiyaheBuddy PH app '

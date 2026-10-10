@@ -270,7 +270,8 @@ class VolumeSosService : Service() {
      * Same text as the app's buildSosMessage (emergency_controller.dart):
      * says it's from BiyaheBuddy PH and who needs help, so it doesn't look
      * like spam. Empty profile fields are skipped (never "null"). Plain
-     * text, no emojis; sent as a multipart SMS (SosTelephony.sendSms).
+     * text, no emojis, no links (PH networks block SMS with URLs); sent as
+     * a multipart SMS (SosTelephony.sendSms).
      */
     private fun sosMessage(location: Location?): String {
         val p = SosContacts.profile(this)
@@ -288,9 +289,11 @@ class VolumeSosService : Service() {
         val where = if (location == null) {
             "Lokasyon: hindi makuha ang GPS. Tawagan siya para malaman kung nasaan siya."
         } else {
+            // Plain coordinates, NO link: PH networks silently drop P2P
+            // texts that contain URLs (anti-scam filtering).
             String.format(
                 Locale.US,
-                "Lokasyon: https://maps.google.com/?q=%.6f,%.6f",
+                "Lokasyon (GPS): %.6f, %.6f\nI-paste sa Google Maps o Waze para makita.",
                 location.latitude,
                 location.longitude,
             )

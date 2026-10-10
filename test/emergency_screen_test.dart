@@ -11,7 +11,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import 'helpers.dart';
 
-const _maps = 'https://maps.google.com/?q=14.554700,121.024400';
+const _maps =
+    'Lokasyon (GPS): 14.554700, 121.024400\n'
+    'I-paste sa Google Maps o Waze para makita.';
 
 /// Device without SIM / dialer: capability checks say no, actions throw
 /// [SosUnavailable] with a user-facing message.
@@ -159,11 +161,13 @@ void main() {
       first,
       contains(
         'Si Juan Dela Cruz (plate NAB 1234) ay naaksidente at humihingi ng '
-        'tulong.\nMay sugatan.\nLokasyon: $_maps\n'
+        'tulong.\nMay sugatan.\n$_maps\n'
         'Sasakyan: Kotse | Blood type: O+\n',
       ),
     );
     expect(first, isNot(contains('null')));
+    // No links: PH networks drop P2P SMS that contain URLs.
+    expect(first, isNot(contains('http')));
     expect(find.text('Na-text si ${contacts[0].name}'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('injured-no')));
@@ -333,7 +337,7 @@ void main() {
       'BiyaheBuddy PH - SOS ALERT\n'
       'Si Juan Dela Cruz (plate NAB 1234) ay naaksidente at humihingi ng '
       'tulong.\n'
-      'Lokasyon: $_maps\n'
+      '$_maps\n'
       'Sasakyan: Kotse | Blood type: O+\n'
       'Tawagan siya agad. Kung hindi sumasagot, tumawag sa 911.\n'
       '- Awtomatikong ipinadala ng BiyaheBuddy PH app (7:52 AM, Okt 10)',
