@@ -153,10 +153,17 @@ void main() {
     await tester.tap(find.byKey(const Key('text-contact-0')));
     await tester.pumpAndSettle();
     expect(sos.texts.single.phones, [contacts[0].phone]);
+    final first = sos.texts.single.message;
+    expect(first, startsWith('BiyaheBuddy PH - SOS ALERT\n'));
     expect(
-      sos.texts.single.message,
-      'Naaksidente ako. Lokasyon: $_maps. May sugatan',
+      first,
+      contains(
+        'Si Juan Dela Cruz (plate NAB 1234) ay naaksidente at humihingi ng '
+        'tulong.\nMay sugatan.\nLokasyon: $_maps\n'
+        'Sasakyan: Kotse | Blood type: O+\n',
+      ),
     );
+    expect(first, isNot(contains('null')));
     expect(find.text('Na-text si ${contacts[0].name}'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('injured-no')));
@@ -164,10 +171,7 @@ void main() {
     await tester.tap(find.byKey(const Key('text-all')));
     await tester.pumpAndSettle();
     expect(sos.texts.last.phones, [for (final c in contacts) c.phone]);
-    expect(
-      sos.texts.last.message,
-      'Naaksidente ako. Lokasyon: $_maps. Ligtas ako',
-    );
+    expect(sos.texts.last.message, contains('\nWalang sugatan.\n'));
   });
 
   testWidgets('hotline row dials in one tap', (tester) async {
@@ -318,11 +322,53 @@ void main() {
     }
   });
 
-  test('SOS message without GPS or answer', () {
+  test('SOS message: full profile, exact format', () {
     expect(
-      buildSosMessage(null, null),
-      'Naaksidente ako. Lokasyon: hindi makuha ang GPS.',
+      buildSosMessage(
+        (lat: 14.5547, lng: 121.0244),
+        null,
+        profile: FakeProfileRepository.sample,
+        now: DateTime(2026, 10, 10, 7, 52),
+      ),
+      'BiyaheBuddy PH - SOS ALERT\n'
+      'Si Juan Dela Cruz (plate NAB 1234) ay naaksidente at humihingi ng '
+      'tulong.\n'
+      'Lokasyon: $_maps\n'
+      'Sasakyan: Kotse | Blood type: O+\n'
+      'Tawagan siya agad. Kung hindi sumasagot, tumawag sa 911.\n'
+      '- Awtomatikong ipinadala ng BiyaheBuddy PH app (7:52 AM, Okt 10)',
     );
+  });
+
+  test('SOS message: no GPS, no profile → no empty fields, never "null"', () {
+    final m = buildSosMessage(null, null, now: DateTime(2026, 10, 10, 19, 5));
+    expect(
+      m,
+      'BiyaheBuddy PH - SOS ALERT\n'
+      'Ang driver na ito ay naaksidente at humihingi ng tulong.\n'
+      'Lokasyon: hindi makuha ang GPS. Tawagan siya para malaman kung nasaan '
+      'siya.\n'
+      'Tawagan siya agad. Kung hindi sumasagot, tumawag sa 911.\n'
+      '- Awtomatikong ipinadala ng BiyaheBuddy PH app (7:05 PM, Okt 10)',
+    );
+    expect(m, isNot(contains('null')));
+    expect(m, isNot(contains('Sasakyan')));
+  });
+
+  test('SOS message: empty name and blood type are skipped', () {
+    const p = Profile(
+      name: '  ',
+      age: 30,
+      plateNo: 'ABC 123',
+      licenseNo: '',
+      restrictionCode: '',
+      vehicleType: 'Motorsiklo',
+    );
+    final m = buildSosMessage(null, true, profile: p);
+    expect(m, contains('Ang driver na ito (plate ABC 123) ay naaksidente'));
+    expect(m, contains('\nMay sugatan.\n'));
+    expect(m, contains('\nSasakyan: Motorsiklo\n'));
+    expect(m, isNot(contains('Blood type')));
   });
 }
 

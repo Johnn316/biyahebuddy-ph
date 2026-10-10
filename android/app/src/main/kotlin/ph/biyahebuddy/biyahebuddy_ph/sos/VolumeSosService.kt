@@ -266,18 +266,44 @@ class VolumeSosService : Service() {
         }
     }
 
+    /**
+     * Same text as the app's buildSosMessage (emergency_controller.dart):
+     * says it's from BiyaheBuddy PH and who needs help, so it doesn't look
+     * like spam. Empty profile fields are skipped (never "null"). Plain
+     * text, no emojis; sent as a multipart SMS (SosTelephony.sendSms).
+     */
     private fun sosMessage(location: Location?): String {
+        val p = SosContacts.profile(this)
+        fun field(key: String): String? =
+            p?.optString(key, "")?.trim()?.takeIf { it.isNotEmpty() && it != "null" }
+
+        val name = field("name")
+        val plate = field("plate_no")
+        val vehicle = field("vehicle_type")
+        val blood = field("blood_type")
+        val who = listOfNotNull(name ?: "Ang driver na ito", plate?.let { "(plate $it)" })
+            .joinToString(" ")
+        val car = listOfNotNull(vehicle?.let { "Sasakyan: $it" }, blood?.let { "Blood type: $it" })
+            .joinToString(" | ")
         val where = if (location == null) {
-            "hindi makuha ang GPS"
+            "Lokasyon: hindi makuha ang GPS. Tawagan siya para malaman kung nasaan siya."
         } else {
             String.format(
                 Locale.US,
-                "https://maps.google.com/?q=%.6f,%.6f",
+                "Lokasyon: https://maps.google.com/?q=%.6f,%.6f",
                 location.latitude,
                 location.longitude,
             )
         }
-        return "SOS! Naaksidente ako. Lokasyon: $where"
+        val time = java.text.SimpleDateFormat("h:mm a, MMM d", Locale.US).format(java.util.Date())
+        return listOfNotNull(
+            "BiyaheBuddy PH - SOS ALERT",
+            "${if (name == null) who else "Si $who"} ay naaksidente at humihingi ng tulong.",
+            where,
+            car.takeIf { it.isNotEmpty() },
+            "Tawagan siya agad. Kung hindi sumasagot, tumawag sa 911.",
+            "- Awtomatikong ipinadala ng BiyaheBuddy PH app ($time)",
+        ).joinToString("\n")
     }
 
     // ---- notifications + vibration ------------------------------------
